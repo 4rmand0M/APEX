@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidad — APEX Fitness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Variables (espejo de variables.css) ── */
+    :root[data-tema="oscuro"] {
+      --fondo:          #080808;
+      --superficie:     #111111;
+      --superficie-2:   #1a1a1a;
+      --borde:          #212121;
+      --borde-hover:    #383838;
+      --texto:          #F0F0F0;
+      --texto-atenuado: #505050;
+      --texto-sub:      #888888;
+      --acento:         #C8F400;
+      --acento-dim:     rgba(200,244,0,0.07);
+      --acento-rgb:     200,244,0;
+      --fondo-panel:    #0D0D0D;
+      --error:          #FF6565;
+      --texto-boton:    #080808;
+    }
+    :root[data-tema="claro"] {
+      --fondo:          #EEEDE7;
+      --superficie:     #FFFFFF;
+      --superficie-2:   #E5E4DE;
+      --borde:          #D6D6D0;
+      --borde-hover:    #BCBCB6;
+      --texto:          #0A0A0A;
+      --texto-atenuado: #9A9A94;
+      --texto-sub:      #666660;
+      --acento:         #0A0A0A;
+      --acento-dim:     rgba(10,10,10,0.055);
+      --acento-rgb:     10,10,10;
+      --fondo-panel:    #E0DFD9;
+      --error:          #D93B3B;
+      --texto-boton:    #F0F0F0;
+    }
+
+    /* ── Reset base ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+      cursor: none;
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
+
+    /* ── Cursor ── */
+    #cursor-punto {
+      position: fixed; width: 6px; height: 6px;
+      background: var(--acento); border-radius: 50%;
+      pointer-events: none; z-index: 99999;
+      transform: translate(-50%,-50%);
+      will-change: left, top;
+      transition: width .12s, height .12s;
+    }
+    #cursor-anillo {
+      position: fixed; width: 22px; height: 22px;
+      border: 1px solid rgba(var(--acento-rgb),.30); border-radius: 50%;
+      pointer-events: none; z-index: 99998;
+      transform: translate(-50%,-50%);
+      will-change: left, top;
+      transition: width .16s, height .16s, border-color .16s;
+    }
+    body.sobre-interactivo #cursor-punto  { width: 9px; height: 9px; }
+    body.sobre-interactivo #cursor-anillo { width: 36px; height: 36px; border-color: rgba(var(--acento-rgb),.14); }
+
+    /* ── NAV ── */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--fondo);
+      border-bottom: 1px solid var(--borde);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 52px;
+      height: 60px;
+      transition: background 0.3s;
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 9px;
+      text-decoration: none; color: var(--texto);
+    }
+    .nav-logo-nombre {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 18px; letter-spacing: 8px; color: var(--texto);
+    }
+
+    .nav-acciones {
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .boton-tema {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--superficie); border: 1px solid var(--borde);
+      display: flex; align-items: center; justify-content: center;
+      cursor: none; color: var(--texto-atenuado);
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .boton-tema:hover { border-color: var(--borde-hover); color: var(--texto); background: var(--superficie-2); }
+
+    .boton-volver-nav {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: none; border: none;
+      color: var(--texto-atenuado);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      cursor: none; text-decoration: none;
+      transition: color 0.14s;
+    }
+    .boton-volver-nav:hover { color: var(--texto); }
+
+    /* ── HERO de la página ── */
+    .pagina-hero {
+      background: var(--fondo-panel);
+      border-bottom: 1px solid var(--borde);
+      padding: 64px 52px 52px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+
+    .fondo-cuadricula {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.011) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.011) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    [data-tema="claro"] .fondo-cuadricula {
+      background-image:
+        linear-gradient(rgba(0,0,0,.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,.022) 1px, transparent 1px);
+    }
+
+    .hero-etiqueta {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 8px; letter-spacing: 5px; text-transform: uppercase;
+      color: var(--acento); margin-bottom: 14px;
+      position: relative; z-index: 1;
+    }
+    .hero-etiqueta::before {
+      content: ''; width: 22px; height: 1px; background: var(--acento); flex-shrink: 0;
+    }
+    [data-tema="claro"] .hero-etiqueta       { color: var(--texto-sub); }
+    [data-tema="claro"] .hero-etiqueta::before { background: var(--texto-sub); }
+
+    .hero-titulo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(48px, 6vw, 80px);
+      line-height: .88; letter-spacing: 1px;
+      color: var(--texto); position: relative; z-index: 1;
+      margin-bottom: 18px;
+    }
+
+    .hero-meta {
+      display: flex; align-items: center; gap: 22px;
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--texto-atenuado); position: relative; z-index: 1;
+    }
+
+    .hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+    .meta-punto {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--acento); flex-shrink: 0;
+    }
+    [data-tema="claro"] .meta-punto { background: var(--texto-atenuado); }
+
+    /* ── LAYOUT PRINCIPAL ── */
+    .contenedor-principal {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 0;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 52px 80px;
+    }
+
+    /* ── SIDEBAR — Índice de secciones ── */
+    .sidebar-indice {
+      padding: 48px 32px 48px 0;
+      border-right: 1px solid var(--borde);
+      position: sticky;
+      top: 60px;
+      height: calc(100vh - 60px);
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .sidebar-indice::-webkit-scrollbar { display: none; }
+
+    .indice-titulo {
+      font-size: 8px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--texto-atenuado); margin-bottom: 18px;
+    }
+
+    .indice-lista { list-style: none; }
+
+    .indice-item {
+      margin-bottom: 4px;
+    }
+
+    .indice-enlace {
+      display: block;
+      font-size: 11px; letter-spacing: .5px;
+      color: var(--texto-atenuado);
+      text-decoration: none; padding: 5px 0;
+      transition: color 0.14s;
+      cursor: none;
+      border-left: 1px solid transparent;
+      padding-left: 12px;
+      margin-left: -1px;
+    }
+    .indice-enlace:hover { color: var(--texto); border-left-color: var(--borde-hover); }
+    .indice-enlace.activo { color: var(--acento); border-left-color: var(--acento); }
+    [data-tema="claro"] .indice-enlace.activo { color: var(--texto); border-left-color: var(--texto); }
+
+    /* ── CONTENIDO ── */
+    .contenido-legal {
+      padding: 48px 0 48px 52px;
+    }
+
+    /* Cada sección */
+    .seccion {
+      margin-bottom: 52px;
+      padding-bottom: 52px;
+      border-bottom: 1px solid var(--borde);
+      scroll-margin-top: 80px;
+    }
+    .seccion:last-child { border-bottom: none; }
+
+    .seccion-numero {
+      font-size: 8px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--acento); margin-bottom: 8px; display: block;
+    }
+    [data-tema="claro"] .seccion-numero { color: var(--texto-atenuado); }
+
+    .seccion-titulo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 32px; letter-spacing: 1px;
+      color: var(--texto); margin-bottom: 20px; line-height: 1;
+    }
+
+    .seccion p {
+      font-size: 13px; line-height: 1.85;
+      color: var(--texto-sub); font-weight: 300;
+      margin-bottom: 14px;
+      max-width: 640px;
+    }
+
+    .seccion p:last-child { margin-bottom: 0; }
+
+    /* Lista dentro de sección */
+    .lista-legal {
+      list-style: none;
+      margin: 14px 0;
+    }
+
+    .lista-legal li {
+      font-size: 13px; line-height: 1.85;
+      color: var(--texto-sub); font-weight: 300;
+      padding: 6px 0 6px 18px;
+      position: relative;
+      max-width: 640px;
+    }
+
+    .lista-legal li::before {
+      content: '—';
+      position: absolute; left: 0;
+      color: var(--acento); font-weight: 400;
+    }
+    [data-tema="claro"] .lista-legal li::before { color: var(--texto-atenuado); }
+
+    /* Bloque destacado */
+    .bloque-destacado {
+      background: var(--superficie);
+      border: 1px solid var(--borde);
+      border-left: 2px solid var(--acento);
+      border-radius: 0 5px 5px 0;
+      padding: 16px 20px;
+      margin: 18px 0;
+      max-width: 640px;
+    }
+    [data-tema="claro"] .bloque-destacado { border-left-color: var(--texto); }
+
+    .bloque-destacado p {
+      font-size: 12px; color: var(--texto-sub); margin: 0;
+    }
+
+    /* Tabla de datos */
+    .tabla-datos {
+      width: 100%; max-width: 640px;
+      border-collapse: collapse; margin: 18px 0;
+      font-size: 12px;
+    }
+
+    .tabla-datos th {
+      font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--texto-atenuado); font-weight: 600;
+      text-align: left; padding: 10px 14px;
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .tabla-datos td {
+      padding: 10px 14px;
+      color: var(--texto-sub); font-weight: 300;
+      border-bottom: 1px solid var(--borde);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+
+    .tabla-datos tr:last-child td { border-bottom: none; }
+    .tabla-datos tr:hover td { background: var(--superficie); }
+
+    /* Email de contacto */
+    .enlace-contacto {
+      color: var(--acento);
+      text-decoration: none;
+      font-size: 13px;
+      cursor: none;
+      transition: opacity 0.14s;
+    }
+    .enlace-contacto:hover { opacity: .7; }
+    [data-tema="claro"] .enlace-contacto { color: var(--texto); text-decoration: underline; }
+
+    /* ── FOOTER ── */
+    .pie-pagina {
+      border-top: 1px solid var(--borde);
+      padding: 28px 52px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 14px;
+    }
+
+    .pie-marca {
+      display: flex; align-items: center; gap: 9px;
+      text-decoration: none; color: var(--texto);
+    }
+    .pie-marca-nombre {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 16px; letter-spacing: 7px; color: var(--texto);
+    }
+
+    .pie-texto {
+      font-size: 10px; color: var(--texto-atenuado);
+      letter-spacing: .5px;
+    }
+
+    .pie-enlaces {
+      display: flex; gap: 18px;
+    }
+
+    .pie-enlace {
+      font-size: 10px; letter-spacing: 1px;
+      color: var(--texto-atenuado); text-decoration: none; cursor: none;
+      transition: color 0.14s;
+    }
+    .pie-enlace:hover { color: var(--texto); }
+
+    /* ── Responsive ── */
+    @media (max-width: 820px) {
+      body { cursor: auto; }
+      #cursor-punto, #cursor-anillo { display: none; }
+      button, a { cursor: pointer; }
+
+      .nav { padding: 0 22px; }
+      .pagina-hero { padding: 44px 22px 36px; }
+
+      .contenedor-principal {
+        grid-template-columns: 1fr;
+        padding: 0 22px 60px;
+      }
+
+      .sidebar-indice {
+        display: none; /* En móvil se oculta el índice lateral */
+      }
+
+      .contenido-legal { padding: 36px 0; }
+      .pie-pagina { padding: 24px 22px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div id="cursor-punto"></div>
+
+  <!-- ── NAV ── -->
+  <nav class="nav">
+    <a href="/index.html" class="nav-logo">
+      <svg width="20" height="20" viewBox="0 0 68 68" fill="none">
+        <polygon points="34,4 62,58 34,44 6,58" fill="none"
+          stroke="currentColor" stroke-width="2.8" stroke-linejoin="round"/>
+      </svg>
+      <span class="nav-logo-nombre">APEX</span>
+    </a>
+
+    <div class="nav-acciones">
+      <a href="/index.html" class="boton-volver-nav">← Volver al inicio</a>
+      <button class="boton-tema" onclick="alternarTema()" title="Cambiar tema">
+        <svg id="icono-luna" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg id="icono-sol" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="display:none">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <div class="pagina-hero">
+    <div class="fondo-cuadricula"></div>
+    <div class="hero-etiqueta">Documento Legal</div>
+    <h1 class="hero-titulo">Politica de<br>Privacidad</h1>
+    <div class="hero-meta">
+      <span><div class="meta-punto"></div>APEX Fitness</span>
+      <span><div class="meta-punto"></div>República Dominicana</span>
+      <span><div class="meta-punto"></div>Última actualización: Marzo 2026</span>
+    </div>
+  </div>
+
+  <!-- ── CUERPO: SIDEBAR + CONTENIDO ── -->
+  <div class="contenedor-principal">
+
+    <!-- Índice lateral -->
+    <aside class="sidebar-indice">
+      <div class="indice-titulo">Contenido</div>
+      <ul class="indice-lista">
+        <li class="indice-item"><a class="indice-enlace activo" href="#s1">1. Información general</a></li>
+        <li class="indice-item"><a class="indice-enlace" href="#s2">2. Datos que recolectamos</a></li>
+        <li class="indice-item"><a class="indice-enlace" href="#s3">3. Uso de los datos</a></li>
+        <li class="indice-item"><a class="indice-enlace" href="#s4">4. Almacenamiento</a></li>
+        <li class="indice-item"><a class="indice-enlace" href="#s5">5. Tus derechos</a></li>
+        <li class="indice-item"><a class="indice-enlace" href="#s6">6. Cookies</a></li>
+        <li class="indice-item"><a class="indice-enlace" href="#s7">7. Menores de edad</a></li>
+        <li class="indice-item"><a class="indice-enlace" href="#s8">8. Cambios</a></li>
+        <li class="indice-item"><a class="indice-enlace" href="#s9">9. Contacto</a></li>
+      </ul>
+    </aside>
+
+    <!-- Contenido legal -->
+    <main class="contenido-legal">
+
+      <!-- 1 -->
+      <section class="seccion" id="s1">
+        <span class="seccion-numero">01</span>
+        <h2 class="seccion-titulo">Información General</h2>
+        <p>
+          APEX Fitness ("nosotros", "la plataforma") se compromete a proteger
+          la privacidad de todos los usuarios que acceden a nuestros servicios
+          de gestión y seguimiento de entrenamiento físico.
+        </p>
+        <p>
+          Esta Política de Privacidad describe cómo recopilamos, usamos, almacenamos
+          y protegemos la información personal que nos proporcionas al registrarte
+          o utilizar la plataforma.
+        </p>
+        <div class="bloque-destacado">
+          <p>
+            Al crear una cuenta en APEX Fitness, aceptas expresamente las prácticas
+            descritas en este documento. Si no estás de acuerdo, te pedimos que no
+            utilices la plataforma.
+          </p>
+        </div>
+      </section>
+
+      <!-- 2 -->
+      <section class="seccion" id="s2">
+        <span class="seccion-numero">02</span>
+        <h2 class="seccion-titulo">Datos que Recolectamos</h2>
+        <p>
+          Según el rol que elijas al registrarte (Entrenador, Monitor o Alumno),
+          recopilamos distintos tipos de datos personales y de uso.
+        </p>
+
+        <table class="tabla-datos">
+          <thead>
+            <tr>
+              <th>Tipo de dato</th>
+              <th>Descripción</th>
+              <th>Obligatorio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Nombre completo</td>
+              <td>Identificación del usuario en la plataforma</td>
+              <td>Sí</td>
+            </tr>
+            <tr>
+              <td>Correo electrónico</td>
+              <td>Acceso a la cuenta y comunicaciones</td>
+              <td>Sí</td>
+            </tr>
+            <tr>
+              <td>Teléfono</td>
+              <td>Contacto y recuperación de cuenta</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td>Fecha de nacimiento</td>
+              <td>Verificación de edad mínima y personalización</td>
+              <td>Sí</td>
+            </tr>
+            <tr>
+              <td>Datos de entrenamiento</td>
+              <td>Rutinas, objetivos, nivel físico, condición médica relevante</td>
+              <td>Parcial</td>
+            </tr>
+            <tr>
+              <td>Datos de rol</td>
+              <td>Especialidad, turno, titulación, área de trabajo</td>
+              <td>Según rol</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          También recopilamos automáticamente datos técnicos de uso como dirección
+          IP, tipo de navegador, páginas visitadas y tiempos de sesión, con el único
+          fin de mantener la seguridad y mejorar el rendimiento de la plataforma.
+        </p>
+      </section>
+
+      <!-- 3 -->
+      <section class="seccion" id="s3">
+        <span class="seccion-numero">03</span>
+        <h2 class="seccion-titulo">Uso de los Datos</h2>
+        <p>Utilizamos los datos recopilados exclusivamente para los siguientes fines:</p>
+        <ul class="lista-legal">
+          <li>Crear y gestionar tu cuenta en la plataforma.</li>
+          <li>Personalizar los planes y rutinas de entrenamiento según tu perfil.</li>
+          <li>Facilitar la comunicación entre alumnos, monitores y entrenadores.</li>
+          <li>Enviar notificaciones relacionadas con tu actividad dentro de APEX Fitness.</li>
+          <li>Garantizar la seguridad de la plataforma y prevenir el uso fraudulento.</li>
+          <li>Mejorar las funcionalidades existentes mediante análisis de uso agregado y anónimo.</li>
+        </ul>
+        <p>
+          APEX Fitness <strong style="color:var(--texto); font-weight:600;">no vende, alquila ni cede</strong>
+          tus datos personales a terceros con fines comerciales bajo ninguna circunstancia.
+        </p>
+      </section>
+
+      <!-- 4 -->
+      <section class="seccion" id="s4">
+        <span class="seccion-numero">04</span>
+        <h2 class="seccion-titulo">Almacenamiento y Seguridad</h2>
+        <p>
+          Los datos se almacenan en servidores con medidas de seguridad técnicas y organizativas
+          adecuadas para prevenir el acceso no autorizado, la pérdida o la divulgación indebida.
+        </p>
+        <ul class="lista-legal">
+          <li>Las contraseñas se almacenan cifradas mediante algoritmos de hash seguros (bcrypt).</li>
+          <li>Las comunicaciones entre tu dispositivo y la plataforma se realizan bajo protocolo HTTPS.</li>
+          <li>El acceso a los datos está restringido únicamente al personal autorizado del equipo APEX.</li>
+          <li>Se realizan copias de seguridad periódicas para garantizar la integridad de la información.</li>
+        </ul>
+        <p>
+          Conservamos tus datos personales mientras tu cuenta esté activa. Si solicitas la
+          eliminación de tu cuenta, procederemos a borrar o anonimizar tus datos en un
+          plazo máximo de 30 días hábiles.
+        </p>
+      </section>
+
+      <!-- 5 -->
+      <section class="seccion" id="s5">
+        <span class="seccion-numero">05</span>
+        <h2 class="seccion-titulo">Tus Derechos</h2>
+        <p>
+          Como usuario de APEX Fitness tienes derecho a:
+        </p>
+        <ul class="lista-legal">
+          <li><strong style="color:var(--texto); font-weight:500;">Acceso:</strong> Solicitar una copia de todos los datos personales que tenemos sobre ti.</li>
+          <li><strong style="color:var(--texto); font-weight:500;">Rectificación:</strong> Corregir datos inexactos o desactualizados desde tu perfil o mediante solicitud.</li>
+          <li><strong style="color:var(--texto); font-weight:500;">Eliminación:</strong> Solicitar la supresión de tus datos personales de la plataforma.</li>
+          <li><strong style="color:var(--texto); font-weight:500;">Portabilidad:</strong> Recibir tus datos en un formato estructurado y legible por máquina.</li>
+          <li><strong style="color:var(--texto); font-weight:500;">Oposición:</strong> Oponerte al tratamiento de tus datos para fines específicos.</li>
+        </ul>
+        <p>
+          Para ejercer cualquiera de estos derechos, contacta a nuestro equipo en
+          <a class="enlace-contacto" href="mailto:privacidad@apexfitness.com">privacidad@apexfitness.com</a>.
+          Responderemos en un plazo máximo de 15 días hábiles.
+        </p>
+      </section>
+
+      <!-- 6 -->
+      <section class="seccion" id="s6">
+        <span class="seccion-numero">06</span>
+        <h2 class="seccion-titulo">Cookies y Tecnologías Similares</h2>
+        <p>
+          APEX Fitness utiliza cookies técnicas estrictamente necesarias para el funcionamiento
+          de la plataforma, como mantener tu sesión activa y recordar tus preferencias de tema.
+        </p>
+        <p>
+          No utilizamos cookies de seguimiento comercial ni compartimos datos de navegación
+          con plataformas de publicidad de terceros.
+        </p>
+        <div class="bloque-destacado">
+          <p>
+            Puedes configurar tu navegador para rechazar o eliminar cookies, pero ten en cuenta
+            que esto puede afectar el funcionamiento correcto de la plataforma.
+          </p>
+        </div>
+      </section>
+
+      <!-- 7 -->
+      <section class="seccion" id="s7">
+        <span class="seccion-numero">07</span>
+        <h2 class="seccion-titulo">Menores de Edad</h2>
+        <p>
+          APEX Fitness está orientada a usuarios mayores de 16 años. No recopilamos
+          intencionalmente datos personales de menores de esa edad sin el consentimiento
+          expreso de sus tutores legales.
+        </p>
+        <p>
+          Si detectamos que un menor ha proporcionado datos sin autorización parental,
+          procederemos a eliminar dicha información de forma inmediata.
+        </p>
+      </section>
+
+      <!-- 8 -->
+      <section class="seccion" id="s8">
+        <span class="seccion-numero">08</span>
+        <h2 class="seccion-titulo">Cambios en esta Política</h2>
+        <p>
+          Nos reservamos el derecho de actualizar esta Política de Privacidad para reflejar
+          cambios en la legislación aplicable o en nuestras prácticas de tratamiento de datos.
+        </p>
+        <p>
+          Cuando realicemos cambios significativos, te notificaremos mediante un aviso visible
+          en la plataforma o por correo electrónico al menos 7 días antes de que entren en vigor.
+          La fecha de la última actualización siempre estará visible al inicio de este documento.
+        </p>
+      </section>
+
+      <!-- 9 -->
+      <section class="seccion" id="s9">
+        <span class="seccion-numero">09</span>
+        <h2 class="seccion-titulo">Contacto</h2>
+        <p>
+          Si tienes preguntas, dudas o solicitudes relacionadas con el tratamiento de
+          tus datos personales, puedes contactarnos a través de los siguientes medios:
+        </p>
+        <ul class="lista-legal">
+          <li>Correo electrónico: <a class="enlace-contacto" href="mailto:privacidad@apexfitness.com">privacidad@apexfitness.com</a></li>
+          <li>Plataforma: a través de la sección de soporte en tu perfil de usuario.</li>
+          <li>Ubicación: República Dominicana.</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <footer class="pie-pagina">
+    <a href="/index.html" class="pie-marca">
+      <svg width="16" height="16" viewBox="0 0 68 68" fill="none">
+        <polygon points="34,4 62,58 34,44 6,58" fill="none"
+          stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+      <span class="pie-marca-nombre">APEX</span>
+    </a>
+    <span class="pie-texto">© 2026 APEX Fitness — República Dominicana</span>
+    <div class="pie-enlaces">
+      <a href="/pages/terminos.html" class="pie-enlace">Términos y Condiciones</a>
+      <a href="/pages/privacidad.html" class="pie-enlace">Privacidad</a>
+      <a href="/pages/login.html" class="pie-enlace">Iniciar sesión</a>
+    </div>
+  </footer>
+
+  <script>
+    /* ── Cursor ── */
+    (function() {
+      var punto  = document.getElementById('cursor-punto');
+      var anillo = document.getElementById('cursor-anillo');
+      var posR   = { x: 0, y: 0 };
+      var posA   = { x: 0, y: 0 };
+
+      document.addEventListener('mousemove', function(e) {
+        posR.x = e.clientX; posR.y = e.clientY;
+        punto.style.left = e.clientX + 'px';
+        punto.style.top  = e.clientY + 'px';
+      });
+
+      (function loop() {
+        posA.x += (posR.x - posA.x) * 0.13;
+        posA.y += (posR.y - posA.y) * 0.13;
+        anillo.style.left = posA.x + 'px';
+        anillo.style.top  = posA.y + 'px';
+        requestAnimationFrame(loop);
+      })();
+
+      var sel = 'button, a';
+      document.addEventListener('mouseover', function(e) {
+        if (e.target.closest(sel)) document.body.classList.add('sobre-interactivo');
+      });
+      document.addEventListener('mouseout', function(e) {
+        if (e.target.closest(sel)) document.body.classList.remove('sobre-interactivo');
+      });
+    })();
+
+    /* ── Tema ── */
+    var modoOscuro = true;
+    function alternarTema() {
+      modoOscuro = !modoOscuro;
+      document.documentElement.setAttribute('data-tema', modoOscuro ? 'oscuro' : 'claro');
+      document.getElementById('icono-luna').style.display = modoOscuro ? 'block' : 'none';
+      document.getElementById('icono-sol').style.display  = modoOscuro ? 'none'  : 'block';
+    }
+
+    /* ── Índice activo al hacer scroll ── */
+    (function() {
+      var enlaces = document.querySelectorAll('.indice-enlace');
+      var secciones = document.querySelectorAll('.seccion');
+
+      window.addEventListener('scroll', function() {
+        var desdeTop = window.scrollY + 100;
+        secciones.forEach(function(sec) {
+          if (sec.offsetTop <= desdeTop && (sec.offsetTop + sec.offsetHeight) > desdeTop) {
+            enlaces.forEach(function(e) { e.classList.remove('activo'); });
+            var enlaceActivo = document.querySelector('.indice-enlace[href="#' + sec.id + '"]');
+            if (enlaceActivo) enlaceActivo.classList.add('activo');
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APEX — Iniciar Sesión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/variables.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/auth.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <style>
+    /* Íconos Lucide dentro de tarjetas de rol */
+    .rol-icono [data-lucide] {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      stroke-width: 1.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      color: var(--texto-sub);
+      transition: color 0.14s;
+    }
+
+    .tarjeta-rol.seleccionado .rol-icono [data-lucide] {
+      color: var(--acento);
+    }
+
+    /* Color de fondo del contenedor del Select */
+    .choices__inner {
+      background-color: var(--fondo) !important;
+      border: 1px solid var(--borde) !important;
+      color: var(--texto);
+    }
+
+    /* El color cuando pasas el mouse por encima (Tu efecto verde) */
+    .choices__item--choice.is-highlighted {
+      background-color: var(--acento) !important;
+      color: #000 !important;
+      /* Texto negro al resaltar */
+    }
+
+    /* Color del menú desplegable */
+    .choices__list--dropdown {
+      background-color: var(--fondo) !important;
+      border: 1px solid var(--borde) !important;
+    }
+
+    /* Ajustar tamaño de letra y espacio entre líneas de los items del menú */
+    .choices__item--choice {
+      font-size: 12px !important;
+      /* Hace el texto más pequeño */
+      padding: 6px 14px !important;
+      /* Reduce el relleno interno */
+      line-height: 1.3 !important;
+      /* Ajusta la altura de línea para que sea más compacta */
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Cursor personalizado -->
+  <div id="cursor-punto"></div>
+
+  <!-- ═══════════════ PANTALLA DE CARGA ═══════════════════ -->
+  <div id="pantalla-carga">
+    <div class="logo-carga">
+      <svg width="58" height="58" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon class="svg-trazar" points="34,4 62,58 34,44 6,58" fill="none" stroke="#C8F400" stroke-width="2.2"
+          stroke-linejoin="round" stroke-linecap="round" />
+      </svg>
+      <div class="carga-nombre">APEX</div>
+      <div class="carga-slogan">Forge Your Limits</div>
+    </div>
+    <div class="barra-carga-fondo">
+      <div class="barra-carga-relleno"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ APLICACIÓN PRINCIPAL ════════════════ -->
+  <div id="app">
+
+    <!-- ── PANEL IZQUIERDO — MARCA ── -->
+    <div class="panel-marca">
+      <div class="fondo-cuadricula"></div>
+      <div class="resplandor resplandor-uno"></div>
+      <div class="resplandor resplandor-dos"></div>
+
+      <div class="logo-superior">
+        <svg width="22" height="22" viewBox="0 0 68 68" fill="none">
+          <polygon points="34,4 62,58 34,44 6,58" fill="none" stroke="currentColor" stroke-width="2.8"
+            stroke-linejoin="round" />
+        </svg>
+        <span class="logo-superior-nombre">APEX</span>
+      </div>
+
+      <div class="contenido-marca">
+        <div class="etiqueta-superior">Performance Training</div>
+        <h1 class="titular">
+          FORJA TU <br>
+          <span class="titular-acento">LIMITE</span>
+        </h1>
+        <p class="descripcion-marca">
+          Plataforma de entrenamiento de élite para atletas, entrenadores y monitores que exigen resultados reales.
+        </p>
+        <div class="fila-estadisticas">
+          <div class="estadistica">
+            <div class="estadistica-numero">12K+</div>
+            <div class="estadistica-etiqueta">Atletas</div>
+          </div>
+          <div class="estadistica">
+            <div class="estadistica-numero">480</div>
+            <div class="estadistica-etiqueta">Entrenadores</div>
+          </div>
+          <div class="estadistica">
+            <div class="estadistica-numero">98%</div>
+            <div class="estadistica-etiqueta">Retención</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANEL DERECHO — AUTH ── -->
+    <div class="panel-auth">
+
+      <button class="boton-tema" id="boton-tema" onclick="alternarTema()" title="Cambiar tema">
+        <svg id="icono-luna" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.7">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <svg id="icono-sol" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.7" style="display:none">
+          <circle cx="12" cy="12" r="4" />
+          <path
+            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </svg>
+      </button>
+
+      <div class="contenedor-auth">
+
+        <!-- ════ VISTA: INICIO DE SESIÓN ════ -->
+        <div class="vista activa" id="vista-login">
+          <div class="vista-etiqueta">Bienvenido de vuelta</div>
+          <div class="vista-titulo">Iniciar<br>Sesión</div>
+
+          <div class="campo">
+            <label class="campo-etiqueta" for="login-correo">Correo electrónico</label>
+            <input class="campo-input" type="email" id="login-correo" placeholder="tu@correo.com" autocomplete="email">
+          </div>
+
+          <div class="campo">
+            <label class="campo-etiqueta" for="login-contrasena">Contraseña</label>
+            <div class="fila-input">
+              <input class="campo-input tiene-boton" type="password" id="login-contrasena" placeholder="••••••••"
+                autocomplete="current-password">
+              <button class="boton-ver" onclick="alternarVisibilidad('login-contrasena', this)">ver</button>
+            </div>
+            <div class="campo-error" id="error-login">Verifica tus datos e intenta de nuevo.</div>
+          </div>
+
+          <button class="boton-principal" id="btn-login" onclick="manejarLogin()">Entrar →</button>
+
+          <div class="pie-vista">
+            <button class="enlace" onclick="mostrarVista('vista-olvidaste')">¿Olvidaste la contraseña?</button>
+            <button class="enlace" onclick="mostrarVista('vista-registro')">Crear cuenta →</button>
+          </div>
+        </div>
+
+
+        <!-- ════ VISTA: CREAR CUENTA (4 pasos) ════ -->
+        <div class="vista" id="vista-registro">
+          <button class="boton-volver" onclick="mostrarVista('vista-login')">← Volver</button>
+          <div class="vista-etiqueta">Únete a APEX</div>
+          <div class="vista-titulo">Crear<br>Cuenta</div>
+
+          <div class="indicador-pasos">
+            <div class="paso-indicador completado" id="ind-1"></div>
+            <div class="paso-indicador" id="ind-2"></div>
+            <div class="paso-indicador" id="ind-3"></div>
+            <div class="paso-indicador" id="ind-4"></div>
+          </div>
+
+          <!-- Paso 1: Rol -->
+          <div class="paso-registro activo" id="paso-1">
+            <div class="etiqueta-seccion">¿Cuál es tu rol?</div>
+            <div class="cuadricula-roles">
+              <div class="tarjeta-rol" onclick="seleccionarRol(this,'entrenador')">
+                <div class="rol-icono"><i data-lucide="dumbbell"></i></div>
+                <div class="rol-nombre">Entrenador</div>
+                <div class="rol-descripcion">Diseña y gestiona programas de entrenamiento</div>
+              </div>
+              <div class="tarjeta-rol" onclick="seleccionarRol(this,'monitor')">
+                <div class="rol-icono"><i data-lucide="clipboard-list"></i></div>
+                <div class="rol-nombre">Monitor</div>
+                <div class="rol-descripcion">Supervisa sesiones en sala y apoya al alumno</div>
+              </div>
+              <div class="tarjeta-rol" onclick="seleccionarRol(this,'alumno')">
+                <div class="rol-icono"><i data-lucide="zap"></i></div>
+                <div class="rol-nombre">Alumno</div>
+                <div class="rol-descripcion">Sigue tu plan de entrenamiento personalizado</div>
+              </div>
+            </div>
+            <div class="campo-error" id="error-rol">Selecciona un rol para continuar.</div>
+            <button class="boton-principal" onclick="avanzarPaso(2)">Continuar →</button>
+          </div>
+
+          <!-- Paso 2: Datos personales -->
+          <div class="paso-registro" id="paso-2">
+            <div class="campo">
+              <label class="campo-etiqueta" for="reg-nombre">Nombre completo</label>
+              <input class="campo-input" type="text" id="reg-nombre" placeholder="Tu nombre completo"
+                autocomplete="name">
+            </div>
+            <div class="campo">
+              <label class="campo-etiqueta" for="reg-correo">Correo electrónico</label>
+              <input class="campo-input" type="email" id="reg-correo" placeholder="tu@correo.com" autocomplete="email">
+            </div>
+            <div class="campo">
+              <label class="campo-etiqueta" for="reg-telefono">Teléfono (opcional)</label>
+              <input class="campo-input" type="tel" id="reg-telefono" placeholder="+1 000 000 0000" autocomplete="tel">
+            </div>
+            <div class="campo">
+              <label class="campo-etiqueta" for="reg-nacimiento">Fecha de nacimiento</label>
+              <input class="campo-input" type="date" id="reg-nacimiento" autocomplete="bday">
+            </div>
+            <div class="campo-error" id="error-paso2">Completa los campos obligatorios.</div>
+            <button class="boton-principal" onclick="avanzarPaso(3)">Continuar →</button>
+            <button class="boton-secundario" onclick="avanzarPaso(1)">← Anterior</button>
+          </div>
+
+          <!-- Paso 3: Info por rol -->
+          <div class="paso-registro" id="paso-3">
+
+            <!-- Entrenador -->
+            <div class="info-por-rol" id="info-entrenador">
+              <div class="campo">
+                <label class="campo-etiqueta" for="ent-especialidad">Especialidad principal</label>
+                <select class="campo-select" id="ent-especialidad">
+                  <option value="" disabled selected>Selecciona una especialidad</option>
+                  <option value="fuerza">Entrenamiento de fuerza</option>
+                  <option value="cardio">Cardio y resistencia</option>
+                  <option value="funcional">Entrenamiento funcional</option>
+                  <option value="crossfit">CrossFit</option>
+                  <option value="yoga">Yoga y flexibilidad</option>
+                  <option value="rehabilitacion">Rehabilitación física</option>
+                  <option value="nutricion">Nutrición deportiva</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label class="campo-etiqueta" for="ent-certificacion">Certificación o titulación</label>
+                <input class="campo-input" type="text" id="ent-certificacion"
+                  placeholder="Ej: NSCA-CSCS, ACSM, ISSA...">
+              </div>
+              <div class="campo">
+                <label class="campo-etiqueta" for="ent-experiencia">Años de experiencia</label>
+                <select class="campo-select" id="ent-experiencia">
+                  <option value="" disabled selected>Selecciona el rango</option>
+                  <option value="menos1">Menos de 1 año</option>
+                  <option value="1-3">De 1 a 3 años</option>
+                  <option value="3-5">De 3 a 5 años</option>
+                  <option value="5-10">De 5 a 10 años</option>
+                  <option value="10mas">Más de 10 años</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label class="campo-etiqueta" for="ent-presentacion">Presentación breve (opcional)</label>
+                <textarea class="campo-textarea" id="ent-presentacion"
+                  placeholder="Cuéntanos sobre tu enfoque como entrenador..."></textarea>
+              </div>
+            </div>
+
+            <!-- Monitor -->
+            <div class="info-por-rol" id="info-monitor">
+              <div class="campo">
+                <label class="campo-etiqueta" for="mon-area">Área de trabajo principal</label>
+                <select class="campo-select" id="mon-area">
+                  <option value="" disabled selected>Selecciona el área</option>
+                  <option value="sala-pesas">Sala de pesas y musculación</option>
+                  <option value="clases-grupales">Clases grupales</option>
+                  <option value="natacion">Natación y aqua fitness</option>
+                  <option value="cardio">Zona de cardio</option>
+                  <option value="crossfit">Box de CrossFit</option>
+                  <option value="pilates">Pilates y sala suelo</option>
+                  <option value="recepcion">Recepción y atención al socio</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label class="campo-etiqueta" for="mon-turno">Turno disponible</label>
+                <select class="campo-select" id="mon-turno">
+                  <option value="" disabled selected>Selecciona el turno</option>
+                  <option value="manana">Mañana (06:00 – 14:00)</option>
+                  <option value="tarde">Tarde (14:00 – 22:00)</option>
+                  <option value="partido">Horario partido</option>
+                  <option value="fines-semana">Solo fines de semana</option>
+                  <option value="flexible">Horario flexible</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label class="campo-etiqueta" for="mon-vinculacion">Tipo de vinculación</label>
+                <select class="campo-select" id="mon-vinculacion">
+                  <option value="" disabled selected>Tipo de contrato</option>
+                  <option value="fijo">Contrato fijo</option>
+                  <option value="temporal">Contrato temporal</option>
+                  <option value="practicas">Prácticas / FCT</option>
+                  <option value="autonomo">Autónomo / Freelance</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label class="campo-etiqueta" for="mon-titulacion">Titulación</label>
+                <input class="campo-input" type="text" id="mon-titulacion"
+                  placeholder="Ej: TAFAD, TASAF, Grado en CCAFD...">
+              </div>
+              <div class="campo">
+                <label class="campo-etiqueta" for="mon-socios">Socios que supervisas (aprox.)</label>
+                <select class="campo-select" id="mon-socios">
+                  <option value="" disabled selected>Volumen de socios</option>
+                  <option value="menos50">Menos de 50</option>
+                  <option value="50-150">50 a 150</option>
+                  <option value="150-300">150 a 300</option>
+                  <option value="mas300">Más de 300</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Alumno -->
+            <div class="info-por-rol" id="info-alumno">
+              <div class="campo">
+                <label class="campo-etiqueta" for="alu-objetivo">Objetivo principal</label>
+                <select class="campo-select" id="alu-objetivo">
+                  <option value="" disabled selected>¿Qué quieres lograr?</option>
+                  <option value="perder-peso">Perder peso y definir</option>
+                  <option value="ganar-musculo">Ganar músculo y fuerza</option>
+                  <option value="resistencia">Mejorar resistencia</option>
+                  <option value="flexibilidad">Flexibilidad y movilidad</option>
+                  <option value="rendimiento">Rendimiento deportivo</option>
+                  <option value="bienestar">Bienestar general y salud</option>
+                  <option value="rehabilitacion">Rehabilitación y recuperación</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label class="campo-etiqueta" for="alu-nivel">Nivel actual</label>
+                <select class="campo-select" id="alu-nivel">
+                  <option value="" disabled selected>Selecciona tu nivel</option>
+                  <option value="principiante">Principiante — Empezando desde cero</option>
+                  <option value="basico">Básico — Algo de experiencia</option>
+                  <option value="intermedio">Intermedio — Entreno con regularidad</option>
+                  <option value="avanzado">Avanzado — Alta exigencia</option>
+                  <option value="elite">Élite — Competidor o federado</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label class="campo-etiqueta" for="alu-frecuencia">Días de entrenamiento por semana</label>
+                <select class="campo-select" id="alu-frecuencia">
+                  <option value="" disabled selected>Frecuencia semanal</option>
+                  <option value="1-2">1 a 2 días</option>
+                  <option value="3-4">3 a 4 días</option>
+                  <option value="5-6">5 a 6 días</option>
+                  <option value="diario">Todos los días</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label class="campo-etiqueta" for="alu-condicion">Condición médica relevante (opcional)</label>
+                <textarea class="campo-textarea" id="alu-condicion"
+                  placeholder="Ej: lesión de rodilla, hipertensión..."></textarea>
+              </div>
+            </div>
+
+            <div class="campo-error" id="error-paso3">Completa los campos requeridos para continuar.</div>
+            <button class="boton-principal" onclick="avanzarPaso(4)">Continuar →</button>
+            <button class="boton-secundario" onclick="avanzarPaso(2)">← Anterior</button>
+          </div>
+
+          <!-- Paso 4: Contraseña -->
+          <div class="paso-registro" id="paso-4">
+            <div class="campo">
+              <label class="campo-etiqueta" for="reg-contrasena">Contraseña</label>
+              <div class="fila-input">
+                <input class="campo-input tiene-boton" type="password" id="reg-contrasena"
+                  placeholder="Mínimo 8 caracteres" autocomplete="new-password" oninput="verificarFuerza(this)">
+                <button class="boton-ver" onclick="alternarVisibilidad('reg-contrasena', this)">ver</button>
+              </div>
+              <div class="barra-fuerza-fondo">
+                <div class="barra-fuerza-relleno" id="barra-fuerza"></div>
+              </div>
+            </div>
+            <div class="campo">
+              <label class="campo-etiqueta" for="reg-confirmar">Confirmar contraseña</label>
+              <input class="campo-input" type="password" id="reg-confirmar" placeholder="Repite tu contraseña"
+                autocomplete="new-password">
+            </div>
+            <div class="campo-error" id="error-paso4">Las contraseñas no coinciden o son muy cortas.</div>
+            <p style="font-size:10px; color:var(--texto-atenuado); margin:10px 0; line-height:1.7;">
+              Al crear tu cuenta aceptas los
+              <button class="enlace" style="font-size:10px; text-decoration:underline;">Términos de Uso</button>
+              y la
+              <button class="enlace" style="font-size:10px; text-decoration:underline;">Política de Privacidad</button>.
+            </p>
+            <button class="boton-principal" id="btn-registro" onclick="manejarRegistro()">Crear Cuenta</button>
+            <button class="boton-secundario" onclick="avanzarPaso(3)">← Anterior</button>
+          </div>
+
+        </div><!-- /vista-registro -->
+
+
+        <!-- ════ VISTA: OLVIDÉ CONTRASEÑA ════ -->
+        <div class="vista" id="vista-olvidaste">
+          <button class="boton-volver" onclick="mostrarVista('vista-login')">← Volver</button>
+          <div class="vista-etiqueta">Recuperar acceso</div>
+          <div class="vista-titulo">Olvidé mi<br>Contraseña</div>
+
+          <div id="formulario-recuperacion">
+            <p style="font-size:12px; color:var(--texto-sub); line-height:1.75; font-weight:300; margin-bottom:20px;">
+              Ingresa tu correo y te enviaremos un enlace seguro para restablecer tu acceso.
+            </p>
+            <div class="campo">
+              <label class="campo-etiqueta" for="olv-correo">Correo electrónico</label>
+              <input class="campo-input" type="email" id="olv-correo" placeholder="tu@correo.com" autocomplete="email">
+              <div class="campo-error" id="error-olvidaste">Ingresa un correo electrónico válido.</div>
+            </div>
+            <button class="boton-principal" id="btn-recuperar" onclick="manejarOlvidaste()">Enviar Enlace →</button>
+            <button class="boton-secundario" onclick="mostrarVista('vista-login')">Cancelar</button>
+          </div>
+
+          <div class="caja-exito" id="exito-recuperacion">
+            <div class="circulo-exito">✓</div>
+            <div class="exito-titulo">Enviado</div>
+            <p class="exito-descripcion">
+              Si existe una cuenta con ese correo, recibirás el enlace en breve. Revisa también la carpeta de spam.
+            </p>
+            <button class="boton-secundario" onclick="mostrarVista('vista-login')" style="margin-top:22px;">
+              Volver al inicio de sesión
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /contenedor-auth -->
+    </div><!-- /panel-auth -->
+  </div><!-- /app -->
+
+  <script src="../assets/js/auth.js"></script>
+  <script>lucide.createIcons();</script>
+  <script>
+    // Seleccionamos todos los elementos con la clase .selector-apex
+    const selects = document.querySelectorAll('.campo-select');
+
+    selects.forEach((select) => {
+      new Choices(select, {
+        searchEnabled: false,
+        itemSelectText: '',
+        shouldSort: false,
+      });
+    });
+  </script>
+</body>
+
+</html>

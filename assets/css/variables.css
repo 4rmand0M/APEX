@@ -1,0 +1,39 @@
+/* ============================================================
+   APEX FITNESS — Variables de Tema
+   Contiene los tokens de diseño para modo oscuro y claro.
+   Importar primero antes que cualquier otro CSS.
+============================================================ */
+
+:root[data-tema="oscuro"] {
+  --fondo:           #080808;
+  --superficie:      #111111;
+  --superficie-2:    #1a1a1a;
+  --borde:           #212121;
+  --borde-hover:     #383838;
+  --texto:           #F0F0F0;
+  --texto-atenuado:  #505050;
+  --texto-sub:       #888888;
+  --acento:          #C8F400;
+  --acento-dim:      rgba(200,244,0,0.07);
+  --acento-rgb:      200,244,0;
+  --fondo-panel:     #0D0D0D;
+  --error:           #FF6565;
+  --texto-boton:     #080808;
+}
+
+:root[data-tema="claro"] {
+  --fondo:           #EEEDE7;
+  --superficie:      #FFFFFF;
+  --superficie-2:    #E5E4DE;
+  --borde:           #D6D6D0;
+  --borde-hover:     #BCBCB6;
+  --texto:           #0A0A0A;
+  --texto-atenuado:  #9A9A94;
+  --texto-sub:       #666660;
+  --acento:          #0A0A0A;
+  --acento-dim:      rgba(10,10,10,0.055);
+  --acento-rgb:      10,10,10;
+  --fondo-panel:     #E0DFD9;
+  --error:           #D93B3B;
+  --texto-boton:     #F0F0F0;
+}

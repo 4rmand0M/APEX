@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APEX — QA Tester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Variables ── */
+    :root[data-tema="oscuro"] {
+      --fondo:         #080808;
+      --superficie:    #111111;
+      --superficie-2:  #181818;
+      --borde:         #1e1e1e;
+      --borde-h:       #333;
+      --texto:         #F0F0F0;
+      --texto-dim:     #444;
+      --texto-sub:     #777;
+      --acento:        #C8F400;
+      --acento-rgb:    200,244,0;
+      --acento-dim:    rgba(200,244,0,.07);
+      --panel:         #0C0C0C;
+      --error:         #FF6565;
+      --btn-txt:       #080808;
+    }
+    :root[data-tema="claro"] {
+      --fondo:         #EEEDE7;
+      --superficie:    #fff;
+      --superficie-2:  #E8E7E1;
+      --borde:         #D4D4CE;
+      --borde-h:       #ADADAA;
+      --texto:         #0A0A0A;
+      --texto-dim:     #999;
+      --texto-sub:     #666;
+      --acento:        #0A0A0A;
+      --acento-rgb:    10,10,10;
+      --acento-dim:    rgba(10,10,10,.055);
+      --panel:         #E0DFD9;
+      --error:         #D93B3B;
+      --btn-txt:       #F0F0F0;
+    }
+
+    /* ── Reset ── */
+    *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'DM Sans',sans-serif;
+      background:var(--fondo); color:var(--texto);
+      min-height:100vh; cursor:none;
+      transition:background .25s,color .25s;
+    }
+
+    /* ── Cursor ── */
+    #cp {
+      position:fixed; width:6px; height:6px;
+      background:var(--acento); border-radius:50%;
+      pointer-events:none; z-index:9999;
+      transform:translate(-50%,-50%);
+      transition:width .1s,height .1s;
+    }
+    #ca {
+      position:fixed; width:20px; height:20px;
+      border:1px solid rgba(var(--acento-rgb),.28); border-radius:50%;
+      pointer-events:none; z-index:9998;
+      transform:translate(-50%,-50%);
+      transition:width .14s,height .14s,border-color .14s;
+    }
+    body.si #cp { width:8px; height:8px; }
+    body.si #ca { width:32px; height:32px; border-color:rgba(var(--acento-rgb),.12); }
+
+    /* ════════════════════════════
+       PANTALLA PIN
+    ════════════════════════════ */
+    #pin-screen {
+      position:fixed; inset:0; background:#080808;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      z-index:8000; gap:0;
+    }
+    #pin-screen.out { animation:fadeOut .45s ease forwards; }
+    @keyframes fadeOut { to { opacity:0; pointer-events:none; } }
+
+    .p-logo {
+      display:flex; flex-direction:column; align-items:center;
+      gap:12px; margin-bottom:40px;
+      animation:up .5s .1s ease both;
+    }
+    .p-nombre {
+      font-family:'Bebas Neue',cursive;
+      font-size:40px; letter-spacing:14px; color:#F0F0F0;
+    }
+    .p-tag {
+      font-size:8px; letter-spacing:5px;
+      text-transform:uppercase; color:#252525;
+    }
+
+    @keyframes up {
+      from { opacity:0; transform:translateY(-10px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .p-box {
+      display:flex; flex-direction:column;
+      align-items:center; gap:18px;
+      animation:up .5s .25s ease both;
+    }
+    .p-label {
+      font-size:8px; letter-spacing:4px;
+      text-transform:uppercase; color:#303030;
+    }
+
+    .p-dots { display:flex; gap:12px; }
+    .p-dot {
+      width:9px; height:9px; border-radius:50%;
+      border:1px solid #252525;
+      transition:background .12s,border-color .12s;
+    }
+    .p-dot.on { background:#C8F400; border-color:#C8F400; }
+    .p-dot.err { animation:shake .35s ease; background:#FF6565; border-color:#FF6565; }
+    @keyframes shake {
+      0%,100% { transform:translateX(0); }
+      25%      { transform:translateX(-5px); }
+      75%      { transform:translateX(5px); }
+    }
+
+    .p-teclado {
+      display:grid; grid-template-columns:repeat(3,1fr);
+      gap:8px; width:200px;
+    }
+    .p-tecla {
+      height:48px; border-radius:5px;
+      background:#0e0e0e; border:1px solid #1a1a1a;
+      font-family:'DM Sans',sans-serif;
+      font-size:17px; color:#E0E0E0;
+      cursor:none; display:flex; align-items:center;
+      justify-content:center;
+      transition:background .1s,transform .07s;
+      user-select:none;
+    }
+    .p-tecla:hover  { background:#161616; border-color:#282828; }
+    .p-tecla:active { transform:scale(.93); }
+    .p-del  { font-size:12px; color:#444; }
+    .p-void { background:transparent; border:none; pointer-events:none; }
+
+    .p-err {
+      font-size:9px; letter-spacing:2px; text-transform:uppercase;
+      color:#FF6565; min-height:14px; opacity:0;
+      transition:opacity .18s;
+    }
+    .p-err.on { opacity:1; }
+
+    /* ════════════════════════════
+       APP
+    ════════════════════════════ */
+    #app { display:none; }
+    #app.on { display:block; animation:up .4s ease; }
+
+    /* ── NAV ── */
+    .nav {
+      position:sticky; top:0; z-index:100;
+      background:var(--panel);
+      border-bottom:1px solid var(--borde);
+      height:52px; display:flex;
+      align-items:center; padding:0 28px; gap:12px;
+    }
+    .nav-logo {
+      display:flex; align-items:center; gap:8px;
+      text-decoration:none; color:var(--texto);
+    }
+    .nav-nombre {
+      font-family:'Bebas Neue',cursive;
+      font-size:17px; letter-spacing:7px; color:var(--texto);
+    }
+    .nav-div {
+      width:1px; height:20px; background:var(--borde);
+    }
+    .nav-badge {
+      font-size:7px; letter-spacing:3px; text-transform:uppercase;
+      color:var(--acento); border:1px solid var(--acento);
+      padding:2px 7px; border-radius:3px;
+    }
+    [data-tema="claro"] .nav-badge { color:var(--texto-sub); border-color:var(--borde); }
+    .nav-esp { flex:1; }
+
+    /* Botón tema nav */
+    .nav-tema {
+      width:30px; height:30px; border-radius:50%;
+      background:var(--superficie); border:1px solid var(--borde);
+      display:flex; align-items:center; justify-content:center;
+      cursor:none; color:var(--texto-dim);
+      transition:border-color .14s,color .14s;
+    }
+    .nav-tema:hover { border-color:var(--borde-h); color:var(--texto); }
+
+    /* ── CONTENIDO ── */
+    .contenido {
+      max-width:860px; margin:0 auto;
+      padding:48px 28px 80px;
+    }
+
+    /* Cabecera de sección */
+    .seccion-top {
+      display:flex; align-items:center; gap:12px;
+      margin-bottom:22px;
+    }
+    .seccion-linea {
+      width:22px; height:1px; background:var(--acento); flex-shrink:0;
+    }
+    [data-tema="claro"] .seccion-linea { background:var(--texto-sub); }
+    .seccion-label {
+      font-size:8px; letter-spacing:4px; text-transform:uppercase;
+      color:var(--acento);
+    }
+    [data-tema="claro"] .seccion-label { color:var(--texto-sub); }
+
+    /* Título grande */
+    .titulo-grande {
+      font-family:'Bebas Neue',cursive;
+      font-size:clamp(48px,6vw,72px);
+      letter-spacing:1px; line-height:.9;
+      color:var(--texto); margin-bottom:10px;
+    }
+    .subtitulo {
+      font-size:12px; color:var(--texto-sub);
+      font-weight:300; margin-bottom:40px;
+    }
+
+    /* ── GRID DE PÁGINAS ── */
+    .grid-paginas {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+      gap:10px; margin-bottom:48px;
+    }
+
+    .tarjeta-pagina {
+      background:var(--superficie);
+      border:1px solid var(--borde);
+      border-radius:8px; padding:20px 18px 16px;
+      cursor:none; user-select:none;
+      transition:border-color .14s, transform .1s, background .14s;
+      position:relative; overflow:hidden;
+    }
+    .tarjeta-pagina:hover {
+      border-color:var(--borde-h);
+      transform:translateY(-2px);
+    }
+    .tarjeta-pagina:active { transform:translateY(0); }
+
+    /* Línea de acento al tope de cada tarjeta */
+    .tarjeta-pagina::before {
+      content:''; position:absolute;
+      top:0; left:0; right:0; height:2px;
+      background:var(--borde);
+      transition:background .14s;
+    }
+    .tarjeta-pagina:hover::before { background:var(--acento); }
+    [data-tema="claro"] .tarjeta-pagina:hover::before { background:var(--texto); }
+
+    .tp-icono {
+      font-size:20px; margin-bottom:11px;
+      display:block;
+    }
+    .tp-nombre {
+      font-family:'Bebas Neue',cursive;
+      font-size:19px; letter-spacing:2px;
+      color:var(--texto); margin-bottom:5px;
+      line-height:1;
+    }
+    .tp-desc {
+      font-size:10px; color:var(--texto-dim);
+      font-weight:300; line-height:1.5;
+      margin-bottom:14px;
+    }
+
+    /* Botones dentro de la tarjeta */
+    .tp-acciones {
+      display:flex; gap:7px;
+    }
+    .tp-btn-abrir {
+      flex:1; padding:8px 0;
+      background:var(--acento); color:var(--btn-txt);
+      border:none; border-radius:4px;
+      font-family:'DM Sans',sans-serif;
+      font-size:9px; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase;
+      cursor:none;
+      transition:filter .12s, transform .08s;
+    }
+    .tp-btn-abrir:hover { filter:brightness(1.07); }
+    .tp-btn-abrir:active { transform:scale(.97); }
+
+    .tp-btn-reporte {
+      padding:8px 10px;
+      background:transparent; border:1px solid var(--borde);
+      border-radius:4px;
+      font-family:'DM Sans',sans-serif;
+      font-size:9px; color:var(--texto-dim);
+      letter-spacing:1px; text-transform:uppercase;
+      cursor:none; white-space:nowrap;
+      transition:border-color .12s, color .12s;
+    }
+    .tp-btn-reporte:hover { border-color:var(--borde-h); color:var(--texto); }
+
+    /* ── SEPARADOR ── */
+    .separador { height:1px; background:var(--borde); margin:40px 0; }
+
+    /* ── SECCIÓN REPORTE ── */
+    .reporte-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px; margin-bottom:10px;
+    }
+
+    .campo { margin-bottom:10px; }
+    .campo-label {
+      display:block; font-size:8px; letter-spacing:2px;
+      text-transform:uppercase; color:var(--texto-dim);
+      margin-bottom:5px;
+    }
+    .campo-input, .campo-select {
+      width:100%; padding:10px 12px;
+      background:var(--superficie); border:1px solid var(--borde);
+      border-radius:5px; color:var(--texto);
+      font-family:'DM Sans',sans-serif; font-size:12px;
+      outline:none; -webkit-appearance:none; appearance:none;
+      transition:border-color .13s;
+    }
+    .campo-input:focus, .campo-select:focus { border-color:var(--acento); }
+    .campo-input::placeholder { color:var(--texto-dim); font-weight:300; }
+    .campo-select {
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='5'%3E%3Cpath d='M0 0L5 5L10 0' stroke='%23666' fill='none'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 10px center;
+      padding-right:26px; cursor:none;
+    }
+    .campo-textarea {
+      width:100%; padding:10px 12px;
+      background:var(--superficie); border:1px solid var(--borde);
+      border-radius:5px; color:var(--texto);
+      font-family:'DM Sans',sans-serif; font-size:12px;
+      outline:none; resize:none; height:80px; line-height:1.7;
+      transition:border-color .13s;
+    }
+    .campo-textarea:focus { border-color:var(--acento); }
+    .campo-textarea::placeholder { color:var(--texto-dim); font-weight:300; }
+
+    /* Selector de modo */
+    .modo-row { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+    .modo-btn {
+      padding:9px; border:1px solid var(--borde); border-radius:4px;
+      font-family:'DM Sans',sans-serif; font-size:10px;
+      letter-spacing:1px; text-transform:uppercase;
+      color:var(--texto-dim); text-align:center; cursor:none;
+      transition:border-color .12s, background .12s, color .12s;
+      user-select:none;
+    }
+    .modo-btn:hover { border-color:var(--borde-h); }
+    .modo-btn.activo {
+      border-color:var(--acento); background:var(--acento-dim);
+      color:var(--texto);
+    }
+    [data-tema="claro"] .modo-btn.activo { border-color:var(--texto); }
+
+    /* Botón enviar WA */
+    .btn-wa {
+      width:100%; padding:12px;
+      background:#25D366; color:#fff; border:none;
+      border-radius:5px; cursor:none;
+      font-family:'DM Sans',sans-serif;
+      font-size:10px; font-weight:700; letter-spacing:2.5px;
+      text-transform:uppercase; margin-top:8px;
+      display:flex; align-items:center; justify-content:center; gap:9px;
+      transition:filter .12s, transform .08s;
+    }
+    .btn-wa:hover { filter:brightness(1.07); transform:translateY(-1px); }
+    .btn-wa:active { transform:translateY(0); }
+
+    .form-error {
+      font-size:10px; color:var(--error);
+      margin-bottom:8px; opacity:0; max-height:0;
+      overflow:hidden; transition:opacity .15s,max-height .16s;
+    }
+    .form-error.on { opacity:1; max-height:20px; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:600px){
+      body { cursor:auto; }
+      #cp,#ca { display:none; }
+      button,a,select { cursor:pointer; }
+      .reporte-grid { grid-template-columns:1fr; }
+      .grid-paginas { grid-template-columns:1fr 1fr; }
+      .contenido { padding:28px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="cp"></div>
+<div id="ca"></div>
+
+<!-- ════════════════════════════
+     PANTALLA PIN
+════════════════════════════ -->
+<div id="pin-screen">
+
+  <div class="p-logo">
+    <svg width="40" height="40" viewBox="0 0 68 68" fill="none">
+      <polygon points="34,4 62,58 34,44 6,58"
+        fill="none" stroke="#C8F400" stroke-width="2.4" stroke-linejoin="round"/>
+    </svg>
+    <div class="p-nombre">APEX</div>
+    <div class="p-tag">QA Tester — Acceso restringido</div>
+  </div>
+
+  <div class="p-box">
+    <div class="p-label">Introduce el PIN</div>
+
+    <div class="p-dots">
+      <div class="p-dot" id="d0"></div>
+      <div class="p-dot" id="d1"></div>
+      <div class="p-dot" id="d2"></div>
+      <div class="p-dot" id="d3"></div>
+    </div>
+
+    <div class="p-teclado">
+      <button class="p-tecla" onclick="pT('1')">1</button>
+      <button class="p-tecla" onclick="pT('2')">2</button>
+      <button class="p-tecla" onclick="pT('3')">3</button>
+      <button class="p-tecla" onclick="pT('4')">4</button>
+      <button class="p-tecla" onclick="pT('5')">5</button>
+      <button class="p-tecla" onclick="pT('6')">6</button>
+      <button class="p-tecla" onclick="pT('7')">7</button>
+      <button class="p-tecla" onclick="pT('8')">8</button>
+      <button class="p-tecla" onclick="pT('9')">9</button>
+      <div class="p-void p-tecla"></div>
+      <button class="p-tecla" onclick="pT('0')">0</button>
+      <button class="p-tecla p-del" onclick="pB()">⌫</button>
+    </div>
+
+    <div class="p-err" id="p-err">PIN incorrecto</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     APP PRINCIPAL
+════════════════════════════ -->
+<div id="app">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <svg width="18" height="18" viewBox="0 0 68 68" fill="none">
+        <polygon points="34,4 62,58 34,44 6,58"
+          fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+      <span class="nav-nombre">APEX</span>
+    </div>
+    <div class="nav-div"></div>
+    <div class="nav-badge">QA Tester</div>
+    <div class="nav-esp"></div>
+    <button class="nav-tema" onclick="toggleTema()" title="Cambiar tema">
+      <svg id="i-luna" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg id="i-sol" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="contenido">
+
+    <!-- Título -->
+    <div class="seccion-top">
+      <div class="seccion-linea"></div>
+      <div class="seccion-label">Panel de pruebas</div>
+    </div>
+    <div class="titulo-grande">Dashboard<br>de Testing</div>
+    <p class="subtitulo">Abre cualquier página en una nueva ventana y reporta errores directo por WhatsApp.</p>
+
+    <!-- ── GRID DE PÁGINAS ── -->
+    <div class="grid-paginas">
+
+      <div class="tarjeta-pagina">
+        <span class="tp-icono">🏠</span>
+        <div class="tp-nombre">Index</div>
+        <div class="tp-desc">Página de inicio principal de la plataforma.</div>
+        <div class="tp-acciones">
+          <button class="tp-btn-abrir" onclick="abrirPagina('index.html','Index')">Abrir →</button>
+          <button class="tp-btn-reporte" onclick="precargarReporte('Index')">Bug</button>
+        </div>
+      </div>
+
+      <div class="tarjeta-pagina">
+        <span class="tp-icono">🔐</span>
+        <div class="tp-nombre">Login</div>
+        <div class="tp-desc">Inicio de sesión, registro y recuperación de contraseña.</div>
+        <div class="tp-acciones">
+          <button class="tp-btn-abrir" onclick="abrirPagina('login.html','Login')">Abrir →</button>
+          <button class="tp-btn-reporte" onclick="precargarReporte('Login')">Bug</button>
+        </div>
+      </div>
+
+      <div class="tarjeta-pagina">
+        <span class="tp-icono">⚠️</span>
+        <div class="tp-nombre">Error 404</div>
+        <div class="tp-desc">Página de error para rutas no encontradas.</div>
+        <div class="tp-acciones">
+          <button class="tp-btn-abrir" onclick="abrirPagina('error.html','Error 404')">Abrir →</button>
+          <button class="tp-btn-reporte" onclick="precargarReporte('Error 404')">Bug</button>
+        </div>
+      </div>
+
+      <div class="tarjeta-pagina">
+        <span class="tp-icono">🔒</span>
+        <div class="tp-nombre">Privacidad</div>
+        <div class="tp-desc">Política de privacidad y tratamiento de datos.</div>
+        <div class="tp-acciones">
+          <button class="tp-btn-abrir" onclick="abrirPagina('privacidad.html','Privacidad')">Abrir →</button>
+          <button class="tp-btn-reporte" onclick="precargarReporte('Privacidad')">Bug</button>
+        </div>
+      </div>
+
+      <div class="tarjeta-pagina">
+        <span class="tp-icono">📄</span>
+        <div class="tp-nombre">Términos</div>
+        <div class="tp-desc">Términos y condiciones de uso de la plataforma.</div>
+        <div class="tp-acciones">
+          <button class="tp-btn-abrir" onclick="abrirPagina('terminos.html','Términos')">Abrir →</button>
+          <button class="tp-btn-reporte" onclick="precargarReporte('Términos')">Bug</button>
+        </div>
+      </div>
+
+    </div><!-- /grid-paginas -->
+
+    <div class="separador"></div>
+
+    <!-- ── FORMULARIO DE REPORTE ── -->
+    <div class="seccion-top">
+      <div class="seccion-linea"></div>
+      <div class="seccion-label">Reportar un error</div>
+    </div>
+
+    <div class="reporte-grid">
+      <div class="campo">
+        <label class="campo-label">Fecha</label>
+        <input class="campo-input" type="date" id="r-fecha">
+      </div>
+      <div class="campo">
+        <label class="campo-label">Hora</label>
+        <input class="campo-input" type="time" id="r-hora">
+      </div>
+    </div>
+
+    <div class="reporte-grid">
+      <div class="campo">
+        <label class="campo-label">Página con el error</label>
+        <select class="campo-select" id="r-pagina">
+          <option value="">— Seleccionar —</option>
+          <option>Index</option>
+          <option>Login</option>
+          <option>Error 404</option>
+          <option>Privacidad</option>
+          <option>Términos</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label class="campo-label">Nombre del tester</label>
+        <input class="campo-input" type="text" id="r-tester" placeholder="Tu nombre">
+      </div>
+    </div>
+
+    <div class="campo">
+      <label class="campo-label">Modo de interfaz donde ocurrió</label>
+      <div class="modo-row">
+        <div class="modo-btn" id="m-osc" onclick="setModo('oscuro')">🌙 Modo Oscuro</div>
+        <div class="modo-btn" id="m-cla" onclick="setModo('claro')">☀️ Modo Claro</div>
+      </div>
+    </div>
+
+    <div class="campo">
+      <label class="campo-label">Descripción del error</label>
+      <textarea class="campo-textarea" id="r-desc"
+        placeholder="¿Qué pasó? ¿Qué esperabas? ¿Qué obtuviste?"></textarea>
+    </div>
+
+    <div class="form-error" id="form-err">Completa todos los campos antes de enviar.</div>
+
+    <button class="btn-wa" onclick="enviar()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="white">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      Enviar reporte por WhatsApp
+    </button>
+
+  </div><!-- /contenido -->
+</div><!-- /app -->
+
+<script>
+  /* ── Cursor ── */
+  var cp=document.getElementById('cp'), ca=document.getElementById('ca');
+  var pr={x:0,y:0}, pa={x:0,y:0};
+  document.addEventListener('mousemove',function(e){
+    pr.x=e.clientX; pr.y=e.clientY;
+    cp.style.left=e.clientX+'px'; cp.style.top=e.clientY+'px';
+  });
+  (function loop(){
+    pa.x+=(pr.x-pa.x)*.13; pa.y+=(pr.y-pa.y)*.13;
+    ca.style.left=pa.x+'px'; ca.style.top=pa.y+'px';
+    requestAnimationFrame(loop);
+  })();
+  var sel='button,a,select,.modo-btn,.tarjeta-pagina';
+  document.addEventListener('mouseover',function(e){ if(e.target.closest(sel)) document.body.classList.add('si'); });
+  document.addEventListener('mouseout', function(e){ if(e.target.closest(sel)) document.body.classList.remove('si'); });
+
+  /* ── PIN ── */
+  var PIN='1360', pin='', fallos=0, bloq=false;
+
+  function pDots(){
+    for(var i=0;i<4;i++){
+      var d=document.getElementById('d'+i);
+      d.classList.remove('on','err');
+      if(i<pin.length) d.classList.add('on');
+    }
+  }
+  function pT(n){
+    if(bloq||pin.length>=4) return;
+    pin+=n; pDots();
+    if(pin.length===4) setTimeout(pCheck,110);
+  }
+  function pB(){ if(!bloq){ pin=pin.slice(0,-1); pDots(); } }
+  function pCheck(){
+    if(pin===PIN){
+      document.getElementById('pin-screen').classList.add('out');
+      setTimeout(function(){
+        document.getElementById('pin-screen').style.display='none';
+        document.getElementById('app').classList.add('on');
+        rellenarFechaHora();
+        setModo('oscuro');
+      },460);
+    } else {
+      fallos++;
+      for(var i=0;i<4;i++) document.getElementById('d'+i).classList.add('err');
+      var msg=document.getElementById('p-err');
+      if(fallos>=5){
+        bloq=true;
+        var seg=60;
+        msg.textContent='Bloqueado '+seg+'s'; msg.classList.add('on');
+        var iv=setInterval(function(){
+          seg--;
+          msg.textContent='Bloqueado '+seg+'s';
+          if(seg<=0){
+            clearInterval(iv); bloq=false; fallos=0; pin=''; pDots();
+            msg.textContent='PIN incorrecto'; msg.classList.remove('on');
+          }
+        },1000);
+      } else {
+        msg.classList.add('on');
+        setTimeout(function(){ msg.classList.remove('on'); pin=''; pDots(); },1600);
+      }
+    }
+  }
+  document.addEventListener('keydown',function(e){
+    var ps=document.getElementById('pin-screen');
+    if(ps.style.display==='none') return;
+    if(e.key>='0'&&e.key<='9') pT(e.key);
+    if(e.key==='Backspace') pB();
+  });
+
+  /* ── Tema ── */
+  var oscuro=true;
+  function toggleTema(){
+    oscuro=!oscuro;
+    document.documentElement.setAttribute('data-tema',oscuro?'oscuro':'claro');
+    document.getElementById('i-luna').style.display=oscuro?'block':'none';
+    document.getElementById('i-sol').style.display =oscuro?'none':'block';
+  }
+
+  /* ── Abrir página en nueva ventana ── */
+  function abrirPagina(archivo, nombre){
+    window.open(archivo,'_blank');
+    /* Pre-cargar el nombre en el reporte */
+    document.getElementById('r-pagina').value=nombre;
+  }
+
+  /* ── Pre-cargar nombre de página al pulsar "Bug" ── */
+  function precargarReporte(nombre){
+    document.getElementById('r-pagina').value=nombre;
+    rellenarFechaHora();
+    setModo(oscuro?'oscuro':'claro');
+    /* Scroll suave al formulario */
+    document.getElementById('r-fecha').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  /* ── Rellenar fecha y hora automáticamente ── */
+  function rellenarFechaHora(){
+    var ahora=new Date();
+    var yyyy=ahora.getFullYear();
+    var mm=String(ahora.getMonth()+1).padStart(2,'0');
+    var dd=String(ahora.getDate()).padStart(2,'0');
+    var hh=String(ahora.getHours()).padStart(2,'0');
+    var min=String(ahora.getMinutes()).padStart(2,'0');
+    document.getElementById('r-fecha').value=yyyy+'-'+mm+'-'+dd;
+    document.getElementById('r-hora').value=hh+':'+min;
+  }
+
+  /* ── Selector de modo ── */
+  var modoActual='';
+  function setModo(m){
+    modoActual=m;
+    document.getElementById('m-osc').classList.toggle('activo',m==='oscuro');
+    document.getElementById('m-cla').classList.toggle('activo',m==='claro');
+  }
+
+  /* ── Enviar reporte por WhatsApp ── */
+  function enviar(){
+    var fecha  = document.getElementById('r-fecha').value;
+    var hora   = document.getElementById('r-hora').value;
+    var pagina = document.getElementById('r-pagina').value;
+    var tester = document.getElementById('r-tester').value.trim();
+    var desc   = document.getElementById('r-desc').value.trim();
+    var err    = document.getElementById('form-err');
+
+    if(!fecha||!hora||!pagina||!tester||!desc||!modoActual){
+      err.classList.add('on');
+      setTimeout(function(){ err.classList.remove('on'); },2800);
+      return;
+    }
+
+    /* Formatear fecha DD/MM/YYYY */
+    var p=fecha.split('-');
+    var fechaFmt=p[2]+'/'+p[1]+'/'+p[0];
+    var modoTxt=modoActual==='oscuro'?'🌙 Modo Oscuro':'☀️ Modo Claro';
+
+    var msg=
+      '🐛 *REPORTE DE ERROR — APEX FITNESS*\n'+
+      '━━━━━━━━━━━━━━━━━━━━\n\n'+
+      '📅 *Fecha:* '+fechaFmt+'\n'+
+      '⏰ *Hora:* '+hora+'\n'+
+      '📄 *Página:* '+pagina+'\n'+
+      '🎨 *Modo:* '+modoTxt+'\n'+
+      '👤 *Tester:* '+tester+'\n\n'+
+      '📝 *Error:*\n'+desc+'\n\n'+
+      '━━━━━━━━━━━━━━━━━━━━\n'+
+      '_APEX QA Tester_';
+
+    window.open('https://wa.me/18294647947?text='+encodeURIComponent(msg),'_blank');
+
+    /* Limpiar campos variables */
+    document.getElementById('r-tester').value='';
+    document.getElementById('r-desc').value='';
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+/* ============================================================
+   APEX FITNESS — Estilos Base
+   Reset, tipografía, cursor y pantalla de carga.
+============================================================ */
+
+/* ─── RESET Y BASE ─────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  overflow-x: hidden;
+  overflow-y: auto;
+  cursor: none;
+  transition: background 0.3s, color 0.3s;
+}
+
+body {
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  cursor: none;
+  transition: background 0.3s, color 0.3s;
+}
+
+
+/* ─── CURSOR PERSONALIZADO ─────────────────────────────── */
+#cursor-punto {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background: var(--acento);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  will-change: left, top;
+  transition: width 0.12s, height 0.12s;
+}
+
+#cursor-anillo {
+  position: fixed;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(var(--acento-rgb), 0.30);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate(-50%, -50%);
+  will-change: left, top;
+  transition: width 0.16s, height 0.16s, border-color 0.16s;
+}
+
+body.sobre-interactivo #cursor-punto  { width: 9px; height: 9px; }
+body.sobre-interactivo #cursor-anillo { width: 36px; height: 36px; border-color: rgba(var(--acento-rgb),0.14); }
+
+
+/* ─── PANTALLA DE CARGA ────────────────────────────────── */
+#pantalla-carga {
+  position: fixed;
+  inset: 0;
+  background: #080808;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  gap: 38px;
+}
+
+#pantalla-carga.saliendo {
+  animation: animSalida 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes animSalida {
+  to { opacity: 0; transform: scale(1.018); }
+}
+
+.logo-carga {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  animation: animEntrada 0.7s 0.2s cubic-bezier(0.34, 1.45, 0.64, 1) both;
+}
+
+@keyframes animEntrada {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.svg-trazar {
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  animation: animTrazado 1.1s 0.5s ease forwards;
+}
+
+@keyframes animTrazado { to { stroke-dashoffset: 0; } }
+
+.carga-nombre {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 52px;
+  letter-spacing: 14px;
+  color: #F0F0F0;
+  animation: animTexto 0.45s 0.9s ease both;
+}
+
+.carga-slogan {
+  font-size: 9px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: #282828;
+  animation: animTexto 0.45s 1.1s ease both;
+}
+
+@keyframes animTexto {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.barra-carga-fondo {
+  width: 160px;
+  height: 1px;
+  background: #1c1c1c;
+  overflow: hidden;
+  animation: animTexto 0.3s 1.4s ease both;
+}
+
+.barra-carga-relleno {
+  height: 100%;
+  background: #C8F400;
+  animation: animBarra 2s 1.5s cubic-bezier(0.3, 0, 0.1, 1) both;
+  width: 0%;
+}
+
+@keyframes animBarra {
+  0%   { width: 0%;   }
+  40%  { width: 52%;  }
+  75%  { width: 75%;  }
+  100% { width: 100%; }
+}
+
+
+/* ─── RESPONSIVE (MÓVIL) ───────────────────────────────── */
+@media (max-width: 820px) {
+  html, body { overflow: auto; cursor: auto; }
+  #cursor-punto, #cursor-anillo { display: none; }
+  button, a, .tarjeta-rol, .boton-tema              { cursor: pointer; }
+  .campo-input, .campo-select, .campo-textarea       { cursor: text; }
+  .boton-principal, .boton-secundario,
+  .boton-ver, .boton-volver, .enlace                 { cursor: pointer; }
+}
