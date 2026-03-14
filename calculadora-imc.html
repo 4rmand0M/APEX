@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora IMC — APEX Fitness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/calculadora-imc.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+  <div id="cursor-punto"></div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="dashboard.html" class="nav-logo">
+      <svg width="18" height="18" viewBox="0 0 68 68" fill="none">
+        <polygon points="34,4 62,58 34,44 6,58" fill="none" stroke="currentColor" stroke-width="2.8"
+          stroke-linejoin="round" />
+      </svg>
+      <span class="nav-nombre">APEX</span>
+    </a>
+    <div class="nav-acciones">
+      <a href="dashboard.html" class="nav-back">← Dashboard</a>
+      <button class="boton-tema" onclick="alternarTema()">
+        <svg id="icono-luna" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <svg id="icono-sol" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8" style="display:none">
+          <circle cx="12" cy="12" r="4" />
+          <path
+            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- PÁGINA -->
+  <div class="pagina">
+
+    <div class="cabecera">
+      <div class="cabecera-badge">Métricas de salud</div>
+      <h1>Calculadora<br>de IMC</h1>
+    </div>
+
+    <div id="error-auth" class="error-banner">
+      ⚠ Debes iniciar sesión para guardar métricas. <a href="login.html"
+        style="color:var(--error);text-decoration:underline;">Iniciar sesión →</a>
+    </div>
+
+    <div class="grid-main">
+
+      <!-- FORMULARIO -->
+      <div class="card">
+        <div class="card-titulo">Ingresa tus medidas</div>
+
+        <div class="campo">
+          <label for="peso">Peso (kg)</label>
+          <input type="number" id="peso" placeholder="75.5" min="20" max="300" step="0.1">
+        </div>
+        <div class="campo">
+          <label for="altura">Altura (cm)</label>
+          <input type="number" id="altura" placeholder="175" min="100" max="250" step="0.5">
+        </div>
+        <div class="campo">
+          <label for="grasa">% Grasa corporal <span
+              style="color:var(--texto-atenuado);font-size:9px">(opcional)</span></label>
+          <input type="number" id="grasa" placeholder="18.5" min="3" max="60" step="0.1">
+        </div>
+        <div class="campo">
+          <label for="cintura">Cintura (cm) <span
+              style="color:var(--texto-atenuado);font-size:9px">(opcional)</span></label>
+          <input type="number" id="cintura" placeholder="80" min="40" max="200" step="0.5">
+        </div>
+        <div class="campo">
+          <label for="notas">Notas <span style="color:var(--texto-atenuado);font-size:9px">(opcional)</span></label>
+          <input type="text" id="notas" placeholder="Ej: post-entrenamiento">
+        </div>
+
+        <button class="btn-calcular" onclick="calcularIMC()">Calcular IMC →</button>
+        <button class="btn-guardar" id="btn-guardar" onclick="guardarMetrica()" disabled>Guardar en historial</button>
+      </div>
+
+      <!-- RESULTADO -->
+      <div class="card resultado-imc" id="panel-resultado">
+        <div class="estado-vacio" id="estado-vacio">
+          <div class="estado-vacio-icono">⚖</div>
+          <div class="estado-vacio-txt">Ingresa tus datos</div>
+        </div>
+
+        <div id="resultado-contenido" style="display:none">
+          <div class="card-titulo">Resultado</div>
+          <div class="imc-valor" id="imc-valor">—</div>
+          <div class="imc-categoria" id="imc-categoria">—</div>
+
+          <div class="imc-barra-fondo">
+            <div class="imc-indicador" id="imc-indicador" style="left:0%"></div>
+          </div>
+          <div class="imc-rangos">
+            <span>16</span><span>18.5</span><span>25</span><span>30</span><span>35</span><span>40</span>
+          </div>
+
+          <div class="imc-metricas">
+            <div class="imc-metrica">
+              <div class="imc-metrica-valor" id="res-peso">—</div>
+              <div class="imc-metrica-label">Peso kg</div>
+            </div>
+            <div class="imc-metrica">
+              <div class="imc-metrica-valor" id="res-altura">—</div>
+              <div class="imc-metrica-label">Altura cm</div>
+            </div>
+            <div class="imc-metrica">
+              <div class="imc-metrica-valor" id="res-peso-ideal">—</div>
+              <div class="imc-metrica-label">Peso ideal kg</div>
+            </div>
+            <div class="imc-metrica">
+              <div class="imc-metrica-valor" id="res-diff">—</div>
+              <div class="imc-metrica-label">Diferencia kg</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /grid-main -->
+
+    <!-- HISTORIAL DESDE SUPABASE -->
+    <div class="card">
+      <div class="historial-cabecera">
+        <h2>Historial de Métricas</h2>
+        <div class="historial-count" id="historial-count">— registros</div>
+      </div>
+
+      <div id="historial-cargando">
+        <div class="skeleton sk-row"></div>
+        <div class="skeleton sk-row"></div>
+        <div class="skeleton sk-row"></div>
+      </div>
+
+      <div id="historial-contenido" style="display:none">
+        <table class="historial-tabla">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Peso kg</th>
+              <th>Altura cm</th>
+              <th>IMC</th>
+              <th>Categoría</th>
+              <th>% Grasa</th>
+              <th>Notas</th>
+            </tr>
+          </thead>
+          <tbody id="historial-tbody"></tbody>
+        </table>
+      </div>
+
+      <div id="historial-vacio" style="display:none">
+        <div class="estado-vacio">
+          <div class="estado-vacio-icono">📋</div>
+          <div class="estado-vacio-txt">Sin registros — Guarda tu primera medición</div>
+        </div>
+      </div>
+
+      <div id="historial-error" class="error-banner">
+        No se pudo cargar el historial. Verifica tu sesión e intenta de nuevo.
+      </div>
+    </div>
+
+  </div><!-- /pagina -->
+
+  <div class="notif-guardado" id="notif">✓ Medición guardada correctamente</div>
+
+
+  <script src="assets/js/calculadora-imc.js"></script>
+</body>
+
+</html>

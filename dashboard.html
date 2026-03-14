@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — APEX Fitness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+
+<body>
+  <div id="cursor-punto"></div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">
+      <svg width="18" height="18" viewBox="0 0 68 68" fill="none">
+        <polygon points="34,4 62,58 34,44 6,58" fill="none" stroke="currentColor" stroke-width="2.8"
+          stroke-linejoin="round" />
+      </svg>
+      <span class="nav-nombre">APEX</span>
+    </a>
+    <div class="nav-sep"></div>
+    <span class="nav-titulo">Dashboard</span>
+    <div class="nav-esp"></div>
+    <span class="nav-badge-usuario" id="nav-usuario">Cargando...</span>
+    <button class="nav-btn" id="btn-logout" onclick="cerrarSesion()" style="display:none">Salir →</button>
+    <button class="boton-tema" onclick="alternarTema()">
+      <svg id="icono-luna" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.8">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+      </svg>
+      <svg id="icono-sol" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.8" style="display:none">
+        <circle cx="12" cy="12" r="4" />
+        <path
+          d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+      </svg>
+    </button>
+  </nav>
+
+  <div class="pagina">
+
+    <!-- ERROR GLOBAL -->
+    <div id="error-global" class="error-banner" style="margin-bottom:16px"></div>
+
+    <!-- HEADER -->
+    <div class="dash-header">
+      <div class="dash-header-top">
+        <div class="dash-titulo">Dashboard</div>
+        <div class="dash-fecha" id="dash-fecha"></div>
+      </div>
+      <div class="dash-subtitulo">Métricas generales de la plataforma en tiempo real</div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+       SECCIÓN 1 — RESUMEN DE USUARIOS
+  ══════════════════════════════════════ -->
+    <div class="seccion-label">Usuarios</div>
+
+    <div class="grid-4" id="grid-usuarios">
+      <!-- Se llena con JS -->
+      <div class="card">
+        <div class="card-label">Total usuarios</div>
+        <div class="skeleton sk-num"></div>
+        <div class="skeleton sk-sub"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Entrenadores</div>
+        <div class="skeleton sk-num"></div>
+        <div class="skeleton sk-sub"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Monitores (rol 2)</div>
+        <div class="skeleton sk-num"></div>
+        <div class="skeleton sk-sub"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Alumnos (rol 1)</div>
+        <div class="skeleton sk-num"></div>
+        <div class="skeleton sk-sub"></div>
+      </div>
+    </div>
+
+    <div class="grid-4" id="grid-estados">
+      <div class="card">
+        <div class="card-label">Activos</div>
+        <div class="skeleton sk-num"></div>
+        <div class="skeleton sk-sub"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Pendientes</div>
+        <div class="skeleton sk-num"></div>
+        <div class="skeleton sk-sub"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Inactivos</div>
+        <div class="skeleton sk-num"></div>
+        <div class="skeleton sk-sub"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Email verificado</div>
+        <div class="skeleton sk-num"></div>
+        <div class="skeleton sk-sub"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+       SECCIÓN 2 — ENTRENADORES Y GIMNASIOS
+  ══════════════════════════════════════ -->
+    <div class="seccion-label">Entrenadores & Gimnasios</div>
+    <div class="grid-4" id="grid-entrenadores">
+      <div class="card">
+        <div class="card-label">Entrenadores activos</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Disponibles ahora</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Gimnasios activos</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Asignaciones activas</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+       SECCIÓN 3 — SESIONES Y ACTIVIDAD
+  ══════════════════════════════════════ -->
+    <div class="seccion-label">Sesiones & Actividad</div>
+    <div class="grid-4" id="grid-sesiones">
+      <div class="card">
+        <div class="card-label">Total sesiones</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Completadas</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">En progreso</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Prom. duración (min)</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+       SECCIÓN 4 — MÉTRICAS FÍSICAS (IMC)
+  ══════════════════════════════════════ -->
+    <div class="seccion-label">Métricas Físicas — Distribución IMC</div>
+    <div class="grid-3" id="grid-imc">
+      <div class="card">
+        <div class="card-label">Registros totales</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">IMC promedio</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Peso promedio kg</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+    </div>
+
+    <!-- Distribución por categoría IMC -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-label">Distribución por Categoría IMC</div>
+      <div id="imc-distribucion">
+        <div class="vacio">Cargando...</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+       SECCIÓN 5 — EJERCICIOS Y RUTINAS
+  ══════════════════════════════════════ -->
+    <div class="seccion-label">Ejercicios & Rutinas</div>
+    <div class="grid-4" id="grid-ejercicios">
+      <div class="card">
+        <div class="card-label">Ejercicios totales</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Rutinas activas</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Rutinas públicas</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Metas activas</div>
+        <div class="skeleton sk-num"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+       SECCIÓN 6 — TABLAS DETALLE
+  ══════════════════════════════════════ -->
+    <div class="seccion-label">Últimos registros</div>
+
+    <div class="grid-2-1">
+      <!-- Tabla usuarios recientes -->
+      <div class="card">
+        <button class="btn-refresh" onclick="cargarTodoElDashboard()" title="Actualizar">↻ Actualizar</button>
+        <div class="card-label" style="margin-bottom:14px">Usuarios Recientes</div>
+        <div id="tabla-usuarios-recientes">
+          <div class="vacio">Cargando...</div>
+        </div>
+      </div>
+
+      <!-- Sesiones recientes -->
+      <div class="card">
+        <div class="card-label" style="margin-bottom:14px">Sesiones Recientes</div>
+        <div id="lista-sesiones-recientes">
+          <div class="vacio">Cargando...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entrenadores por gimnasio -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-label" style="margin-bottom:14px">Entrenadores por Gimnasio</div>
+      <div id="tabla-entrenadores">
+        <div class="vacio">Cargando...</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+       SECCIÓN 7 — ACCESOS RÁPIDOS
+  ══════════════════════════════════════ -->
+    <div class="seccion-label">Accesos Rápidos</div>
+    <div class="cta-grid">
+      <a href="calculadora-imc.html" class="cta-card">
+        <div class="cta-icono">⚖</div>
+        <div class="cta-nombre">Calculadora IMC</div>
+        <div class="cta-desc">Calcula y guarda tus métricas corporales</div>
+      </a>
+      <a href="login.html" class="cta-card">
+        <div class="cta-icono">🔐</div>
+        <div class="cta-nombre">Gestión Usuarios</div>
+        <div class="cta-desc">Acceder al sistema de autenticación</div>
+      </a>
+      <a href="../index.html" class="cta-card">
+        <div class="cta-icono">🏠</div>
+        <div class="cta-nombre">Inicio</div>
+        <div class="cta-desc">Volver a la página principal</div>
+      </a>
+    </div>
+
+  </div><!-- /pagina -->
+
+
+  <script src="assets/js/dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,592 @@
+body {
+    overflow-y: auto;
+    cursor: none;
+}
+
+/* ── NAV ── */
+.nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--fondo);
+    border-bottom: 1px solid var(--borde);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 32px;
+    height: 56px;
+    transition: background .3s;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none;
+    color: var(--texto);
+}
+
+.nav-nombre {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 18px;
+    letter-spacing: 8px;
+}
+
+.nav-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--borde);
+}
+
+.nav-titulo {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--texto-atenuado);
+}
+
+.nav-esp {
+    flex: 1;
+}
+
+.nav-badge-usuario {
+    font-size: 10px;
+    color: var(--texto-sub);
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.nav-btn {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--texto-atenuado);
+    text-decoration: none;
+    cursor: none;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: color .14s;
+}
+
+.nav-btn:hover {
+    color: var(--texto);
+}
+
+.boton-tema {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: none;
+    color: var(--texto-atenuado);
+    transition: border-color .15s, color .15s;
+}
+
+.boton-tema:hover {
+    border-color: var(--borde-hover);
+    color: var(--texto);
+}
+
+/* ── LAYOUT ── */
+.pagina {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+}
+
+.dash-header {
+    margin-bottom: 28px;
+}
+
+.dash-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4px;
+}
+
+.dash-titulo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 40px;
+    line-height: 1;
+    color: var(--texto);
+}
+
+.dash-fecha {
+    font-size: 10px;
+    color: var(--texto-atenuado);
+    letter-spacing: 1px;
+}
+
+.dash-subtitulo {
+    font-size: 11px;
+    color: var(--texto-atenuado);
+}
+
+/* ── CARD BASE ── */
+.card {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-label {
+    font-size: 7px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--texto-atenuado);
+    margin-bottom: 8px;
+}
+
+.card-valor {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 42px;
+    line-height: 1;
+    color: var(--texto);
+    letter-spacing: .5px;
+}
+
+.card-sub {
+    font-size: 10px;
+    color: var(--texto-atenuado);
+    margin-top: 4px;
+}
+
+.card-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--acento);
+}
+
+[data-tema="claro"] .card-accent::before {
+    background: var(--texto);
+}
+
+/* ── GRIDS ── */
+.grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.grid-2-1 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.seccion-label {
+    font-size: 8px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--acento);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 28px 0 14px;
+}
+
+.seccion-label::before {
+    content: '';
+    width: 16px;
+    height: 1px;
+    background: var(--acento);
+}
+
+[data-tema="claro"] .seccion-label {
+    color: var(--texto-sub);
+}
+
+[data-tema="claro"] .seccion-label::before {
+    background: var(--texto-sub);
+}
+
+/* ── SKELETON ── */
+.skeleton {
+    background: linear-gradient(90deg, var(--borde) 25%, var(--superficie-2) 50%, var(--borde) 75%);
+    background-size: 200% 100%;
+    border-radius: 4px;
+    animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+.sk-num {
+    height: 42px;
+    width: 80%;
+    margin-bottom: 6px;
+}
+
+.sk-sub {
+    height: 12px;
+    width: 50%;
+}
+
+/* ── TABLAS ── */
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla th {
+    font-size: 7px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--texto-atenuado);
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.tabla td {
+    padding: 9px 10px;
+    font-size: 12px;
+    color: var(--texto-sub);
+    border-bottom: 1px solid var(--borde);
+}
+
+.tabla tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla tr:hover td {
+    background: var(--superficie-2);
+}
+
+.tabla-strong {
+    color: var(--texto) !important;
+    font-weight: 500;
+}
+
+.badge-rol {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.rol-admin {
+    background: rgba(200, 244, 0, .12);
+    color: #C8F400;
+}
+
+.rol-entrenador {
+    background: rgba(116, 192, 252, .12);
+    color: #74C0FC;
+}
+
+.rol-usuario {
+    background: rgba(169, 169, 169, .12);
+    color: #A9A9A9;
+}
+
+[data-tema="claro"] .rol-admin {
+    color: #4a7a00;
+    background: rgba(100, 150, 0, .12);
+}
+
+.badge-estado {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.estado-activo {
+    background: rgba(200, 244, 0, .1);
+    color: #C8F400;
+}
+
+.estado-inactivo {
+    background: rgba(255, 101, 101, .1);
+    color: #FF6565;
+}
+
+.estado-pendiente {
+    background: rgba(255, 169, 77, .12);
+    color: #FFA94D;
+}
+
+[data-tema="claro"] .estado-activo {
+    color: #4a7a00;
+    background: rgba(100, 150, 0, .1);
+}
+
+.badge-imc {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.imc-bajo_peso {
+    background: rgba(116, 192, 252, .15);
+    color: #74C0FC;
+}
+
+.imc-normal {
+    background: rgba(200, 244, 0, .12);
+    color: #C8F400;
+}
+
+.imc-sobrepeso {
+    background: rgba(255, 169, 77, .15);
+    color: #FFA94D;
+}
+
+.imc-obesidad_i {
+    background: rgba(255, 140, 66, .15);
+    color: #FF8C42;
+}
+
+.imc-obesidad_ii {
+    background: rgba(255, 101, 101, .15);
+    color: #FF6565;
+}
+
+.imc-obesidad_iii {
+    background: rgba(192, 57, 43, .15);
+    color: #C0392B;
+}
+
+[data-tema="claro"] .imc-normal {
+    color: #4a7a00;
+    background: rgba(100, 150, 0, .12);
+}
+
+.mini-barra-fondo {
+    height: 4px;
+    background: var(--borde);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.mini-barra-relleno {
+    height: 100%;
+    background: var(--acento);
+    border-radius: 2px;
+    transition: width 1s ease;
+}
+
+[data-tema="claro"] .mini-barra-relleno {
+    background: var(--texto);
+}
+
+.sesion-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--borde);
+}
+
+.sesion-row:last-child {
+    border-bottom: none;
+}
+
+.sesion-nombre {
+    font-size: 12px;
+    color: var(--texto);
+}
+
+.sesion-info {
+    font-size: 10px;
+    color: var(--texto-atenuado);
+    margin-top: 2px;
+}
+
+.sesion-dur {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    color: var(--texto-atenuado);
+}
+
+.error-banner {
+    display: none;
+    background: rgba(255, 101, 101, .1);
+    border: 1px solid var(--error);
+    border-radius: 5px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 11px;
+    color: var(--error);
+}
+
+.error-banner.visible {
+    display: block;
+}
+
+.btn-refresh {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: 1px solid var(--borde);
+    border-radius: 4px;
+    color: var(--texto-atenuado);
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    cursor: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color .14s, color .14s;
+}
+
+.btn-refresh:hover {
+    border-color: var(--borde-hover);
+    color: var(--texto);
+}
+
+.btn-refresh.spinning {
+    animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.cta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.cta-card {
+    border: 1px solid var(--borde);
+    border-radius: 7px;
+    padding: 16px;
+    text-decoration: none;
+    color: var(--texto);
+    display: block;
+    transition: border-color .14s, transform .1s;
+}
+
+.cta-card:hover {
+    border-color: var(--acento);
+    transform: translateY(-2px);
+}
+
+[data-tema="claro"] .cta-card:hover {
+    border-color: var(--texto);
+}
+
+.cta-icono {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.cta-nombre {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 18px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.cta-desc {
+    font-size: 10px;
+    color: var(--texto-atenuado);
+}
+
+.vacio {
+    padding: 24px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--texto-atenuado);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+    .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-2-1 {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nav {
+        padding: 0 16px;
+    }
+
+    .pagina {
+        padding: 24px 16px 60px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .grid-4,
+    .grid-3,
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    body {
+        cursor: auto;
+    }
+
+    #cursor-punto {
+        display: none;
+    }
+
+    button,
+    a {
+        cursor: pointer;
+    }
+}
