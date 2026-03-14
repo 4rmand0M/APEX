@@ -23,7 +23,7 @@ async function verificarSesion() {
 
 async function cerrarSesion() {
     await db.auth.signOut();
-    window.location.href = 'login.html';
+    window.location.href = 'pages/login.html';
 }
 
 /* ══════════════════════════════════════════════
