@@ -1,0 +1,50 @@
+[
+  {
+    "topic": "rutinas_principiantes",
+    "content": "Para principiantes se recomienda entrenar 3 días a la semana con al menos un día de descanso entre sesiones. Los mejores ejercicios son los compuestos: sentadilla, peso muerto, press de banca, remo con barra y press militar. Empezar con pesos bajos y enfocarse en la técnica antes de aumentar la carga."
+  },
+  {
+    "topic": "series_repeticiones",
+    "content": "Para ganar fuerza se recomiendan 3 a 5 series de 3 a 6 repeticiones con cargas altas. Para hipertrofia muscular lo ideal es 3 a 4 series de 8 a 12 repeticiones. Para resistencia muscular se usan 2 a 3 series de 15 a 20 repeticiones con cargas moderadas."
+  },
+  {
+    "topic": "imc",
+    "content": "El IMC (Índice de Masa Corporal) se calcula dividiendo el peso en kilogramos entre la altura en metros al cuadrado. Un IMC menor a 18.5 indica bajo peso, entre 18.5 y 24.9 es normal, entre 25 y 29.9 es sobrepeso, y mayor a 30 indica obesidad. APEX ofrece una calculadora de IMC en la sección de métricas."
+  },
+  {
+    "topic": "calentamiento",
+    "content": "El calentamiento debe durar entre 10 y 15 minutos antes de cada sesión. Incluir 5 minutos de cardio ligero (caminata rápida o bicicleta estática), seguido de movilidad articular y estiramientos dinámicos. Un buen calentamiento reduce el riesgo de lesiones y mejora el rendimiento."
+  },
+  {
+    "topic": "nutricion_basica",
+    "content": "Para ganar músculo se necesita un superávit calórico de 300 a 500 calorías sobre el mantenimiento y consumir entre 1.6 y 2.2 gramos de proteína por kilogramo de peso corporal al día. Para perder grasa se necesita un déficit de 300 a 500 calorías. Las proteínas de calidad incluyen pollo, huevo, atún, legumbres y lácteos."
+  },
+  {
+    "topic": "descanso_recuperacion",
+    "content": "El músculo crece durante el descanso, no durante el entrenamiento. Dormir entre 7 y 9 horas es fundamental para la recuperación. Los grupos musculares grandes como piernas y espalda necesitan 48 a 72 horas de recuperación. Entrenar un músculo fatigado aumenta el riesgo de lesión."
+  },
+  {
+    "topic": "cardio",
+    "content": "El cardio de baja intensidad (LISS) como caminar o trotar suave durante 30 a 60 minutos es ideal para quemar grasa sin afectar el músculo. El HIIT (intervalos de alta intensidad) es más eficiente en tiempo: 20 minutos equivalen a 40 minutos de cardio moderado. Se recomienda 150 minutos de cardio moderado por semana según la OMS."
+  },
+  {
+    "topic": "ejercicios_abdomen",
+    "content": "Los mejores ejercicios para el core son el plank (plancha), rueda abdominal, crunch en polea, leg raises y dead bug. El abdomen se define principalmente con dieta y déficit calórico, no haciendo cientos de abdominales. Trabajar el core 2 o 3 veces por semana es suficiente."
+  },
+  {
+    "topic": "apex_plataforma",
+    "content": "APEX Fitness es una plataforma de entrenamiento que conecta entrenadores, monitores y alumnos. Los entrenadores diseñan rutinas personalizadas, los monitores supervisan las sesiones en sala, y los alumnos siguen su plan y registran su progreso. La plataforma incluye calculadora de IMC, historial de métricas y gestión de sesiones."
+  },
+  {
+    "topic": "roles_apex",
+    "content": "APEX tiene tres roles de usuario: Entrenador (diseña y asigna programas de entrenamiento personalizados), Monitor (supervisa sesiones en el gimnasio y apoya a los alumnos en tiempo real) y Alumno (sigue su plan de entrenamiento y registra su progreso). Cada rol tiene acceso a funcionalidades específicas de la plataforma."
+  },
+  {
+    "topic": "lesiones_prevencion",
+    "content": "Para prevenir lesiones: siempre calentar antes de entrenar, respetar los días de descanso, no aumentar el volumen o la carga más de un 10% por semana, mantener buena técnica en todos los ejercicios y escuchar las señales del cuerpo. Ante dolor agudo, detener el ejercicio inmediatamente."
+  },
+  {
+    "topic": "proteinas_suplementos",
+    "content": "Los suplementos más respaldados por la ciencia son la creatina monohidrato (3 a 5 gramos al día mejoran la fuerza y el rendimiento), la proteína en polvo (whey o vegetal, para complementar la dieta si no se alcanza el objetivo proteico con comida), y la cafeína (3 a 6 mg por kg de peso mejora el rendimiento). El resto de suplementos tienen evidencia limitada."
+  }
+]
