@@ -1,0 +1,221 @@
+/* ══════════════════════════════════════════════════════
+       SCROLLBAR — acorde a variables.css (igual que index)
+    ══════════════════════════════════════════════════════ */
+
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: var(--borde-hover) var(--fondo);
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--fondo);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--borde-hover);
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--texto-atenuado);
+    }
+
+    /* Scrollbar dentro del dropdown de Choices */
+    .choices__list--dropdown ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .choices__list--dropdown ::-webkit-scrollbar-track {
+      background: var(--superficie);
+    }
+
+    .choices__list--dropdown ::-webkit-scrollbar-thumb {
+      background: var(--borde-hover);
+      border-radius: 99px;
+    }
+
+
+    /* ══════════════════════════════════════════════════════
+       ÍCONOS LUCIDE EN TARJETAS DE ROL
+    ══════════════════════════════════════════════════════ */
+
+    .rol-icono [data-lucide] {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      stroke-width: 1.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      color: var(--texto-sub);
+      transition: color 0.14s;
+    }
+
+    .tarjeta-rol.seleccionado .rol-icono [data-lucide] {
+      color: var(--acento);
+    }
+
+    [data-tema="claro"] .tarjeta-rol.seleccionado .rol-icono [data-lucide] {
+      color: var(--texto);
+    }
+
+
+    /* ══════════════════════════════════════════════════════
+       CHOICES.JS — OVERRIDE COMPLETO PARA AMBOS TEMAS
+       La librería usa sus propias variables inline; hay que
+       sobreescribir con !important todos los estados.
+    ══════════════════════════════════════════════════════ */
+
+    /* ── Contenedor visible (reemplaza el <select>) ── */
+    .choices__inner {
+      background-color: var(--superficie) !important;
+      border: 1px solid var(--borde) !important;
+      border-radius: 5px !important;
+      padding: 8px 13px !important;
+      font-family: 'DM Sans', sans-serif !important;
+      font-size: 13px !important;
+      min-height: unset !important;
+      transition: border-color 0.14s !important;
+    }
+
+    /* Texto del item seleccionado dentro del contenedor */
+    .choices__inner .choices__item {
+      color: var(--texto) !important;
+      font-size: 13px !important;
+      font-family: 'DM Sans', sans-serif !important;
+    }
+
+    /* Placeholder */
+    .choices__placeholder {
+      color: var(--texto-atenuado) !important;
+      opacity: 1 !important;
+    }
+
+    /* Borde de foco */
+    .choices.is-focused .choices__inner,
+    .choices.is-open .choices__inner {
+      border-color: var(--acento) !important;
+      background-color: var(--superficie-2) !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    [data-tema="claro"] .choices.is-focused .choices__inner,
+    [data-tema="claro"] .choices.is-open .choices__inner {
+      border-color: var(--texto) !important;
+    }
+
+    /* Flecha del desplegable */
+    .choices__list--single .choices__item {
+      padding-right: 0 !important;
+    }
+
+    .choices[data-type*="select-one"]::after {
+      border-color: var(--texto-atenuado) transparent transparent !important;
+      right: 13px !important;
+    }
+
+    .choices[data-type*="select-one"].is-open::after {
+      border-color: transparent transparent var(--texto-atenuado) !important;
+    }
+
+    /* ── Dropdown (lista desplegable) ── */
+    .choices__list--dropdown {
+      background-color: var(--superficie) !important;
+      border: 1px solid var(--borde) !important;
+      border-radius: 5px !important;
+      margin-top: 3px !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+      overflow: hidden !important;
+    }
+
+    /* Campo de búsqueda dentro del dropdown (cuando está habilitado) */
+    .choices__list--dropdown .choices__input {
+      background-color: var(--superficie-2) !important;
+      border-bottom: 1px solid var(--borde) !important;
+      color: var(--texto) !important;
+      font-family: 'DM Sans', sans-serif !important;
+      font-size: 12px !important;
+    }
+
+    /* ── Items individuales del dropdown ── */
+    .choices__item--choice {
+      font-family: 'DM Sans', sans-serif !important;
+      font-size: 12px !important;
+      padding: 8px 14px !important;
+      line-height: 1.4 !important;
+      /* Color de texto explícito para ambos temas */
+      color: var(--texto-sub) !important;
+    }
+
+    /* Item seleccionado actualmente */
+    .choices__item--choice.is-selected {
+      color: var(--texto) !important;
+      background-color: var(--acento-dim) !important;
+    }
+
+    /* Item con hover / foco */
+    .choices__item--choice.is-highlighted {
+      background-color: var(--acento) !important;
+      color: #080808 !important;
+    }
+
+    /* Item deshabilitado (el placeholder "Selecciona...") */
+    .choices__item--choice.choices__item--disabled {
+      color: var(--texto-atenuado) !important;
+      opacity: 0.5 !important;
+    }
+
+    /* ── Correcciones específicas modo CLARO ──
+       En modo claro --superficie es #FFFFFF y --texto es #0A0A0A,
+       por lo que sin override el texto ya sería visible.
+       Pero Choices.js inyecta estilos inline que pueden
+       sobreescribirlo; forzamos el color explícitamente. */
+
+    [data-tema="claro"] .choices__inner {
+      background-color: var(--superficie) !important;
+      /* blanco */
+    }
+
+    [data-tema="claro"] .choices__inner .choices__item {
+      color: var(--texto) !important;
+      /* negro */
+    }
+
+    [data-tema="claro"] .choices__list--dropdown {
+      background-color: var(--superficie) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10) !important;
+    }
+
+    [data-tema="claro"] .choices__item--choice {
+      color: var(--texto-sub) !important;
+      /* gris oscuro legible */
+    }
+
+    [data-tema="claro"] .choices__item--choice.is-selected {
+      color: var(--texto) !important;
+      background-color: var(--acento-dim) !important;
+    }
+
+    [data-tema="claro"] .choices__item--choice.is-highlighted {
+      background-color: var(--texto) !important;
+      /* negro en claro */
+      color: var(--fondo) !important;
+      /* crema sobre negro */
+    }
+
+    [data-tema="claro"] .choices__item--choice.choices__item--disabled {
+      color: var(--texto-atenuado) !important;
+    }
+
+    [data-tema="claro"] .choices[data-type*="select-one"]::after {
+      border-color: var(--texto-atenuado) transparent transparent !important;
+    }
+
+    [data-tema="claro"] .choices[data-type*="select-one"].is-open::after {
+      border-color: transparent transparent var(--texto-atenuado) !important;
+    }
