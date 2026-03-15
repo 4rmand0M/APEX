@@ -25,15 +25,15 @@
   --fondo:           #EEEDE7;
   --superficie:      #FFFFFF;
   --superficie-2:    #E5E4DE;
-  --borde:           #D6D6D0;
-  --borde-hover:     #BCBCB6;
-  --texto:           #0A0A0A;
-  --texto-atenuado:  #9A9A94;
-  --texto-sub:       #666660;
-  --acento:          #0A0A0A;
-  --acento-dim:      rgba(10,10,10,0.055);
-  --acento-rgb:      10,10,10;
+  --borde:           #D4D3CD;        
+  --borde-hover:     #B8B7B1;
+  --texto:           #111111;
+  --texto-atenuado:  #808080;        
+  --texto-sub:       #0f0f0f;
+  --acento:          #080808;        
+  --acento-dim:      rgba(26,26,26,0.06);
+  --acento-rgb:      26,26,26;       
   --fondo-panel:     #E0DFD9;
   --error:           #D93B3B;
-  --texto-boton:     #F0F0F0;
+  --texto-boton:     #EEEDE7;        
 }

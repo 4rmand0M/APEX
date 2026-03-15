@@ -1,21 +1,100 @@
+/* ============================================================
+   APEX FITNESS — Dashboard CSS
+   Secciones:
+     1.  Scrollbar
+     2.  Body base
+     3.  Cursor
+     4.  Nav
+     5.  Layout y página
+     6.  Header del dashboard
+     7.  Cards
+     8.  Grids
+     9.  Etiquetas de sección
+    10.  Skeleton loader
+    11.  Tablas
+    12.  Badges — rol, estado, IMC
+    13.  Barras de progreso
+    14.  Filas de sesión
+    15.  Errores y banners
+    16.  Botón refresh
+    17.  CTA grid (accesos rápidos)
+    18.  Estado vacío
+    19.  Responsive
+============================================================ */
+
+
+/* ─── 1. SCROLLBAR ──────────────────────────────────────── */
+
+html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--borde-hover) var(--fondo);
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--fondo);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--borde-hover);
+    border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--texto-atenuado);
+}
+
+
+/* ─── 2. BODY BASE ──────────────────────────────────────── */
+
 body {
     overflow-y: auto;
     cursor: none;
+    height: auto;
+    transition: background 0.3s, color 0.3s;
 }
 
-/* ── NAV ── */
+
+/* ─── 3. CURSOR ─────────────────────────────────────────── */
+
+#cursor-punto {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: var(--acento);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    will-change: left, top;
+    transition: width 0.12s, height 0.12s;
+}
+
+body.sobre-interactivo #cursor-punto {
+    width: 9px;
+    height: 9px;
+}
+
+
+/* ─── 4. NAV ────────────────────────────────────────────── */
+
 .nav {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: var(--fondo);
-    border-bottom: 1px solid var(--borde);
+    height: 56px;
     display: flex;
     align-items: center;
     gap: 14px;
     padding: 0 32px;
-    height: 56px;
-    transition: background .3s;
+    background: var(--fondo-panel);
+    border-bottom: 1px solid var(--borde);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: background 0.3s, border-color 0.3s;
 }
 
 .nav-logo {
@@ -24,22 +103,25 @@ body {
     gap: 9px;
     text-decoration: none;
     color: var(--texto);
+    flex-shrink: 0;
 }
 
 .nav-nombre {
     font-family: 'Bebas Neue', cursive;
-    font-size: 18px;
+    font-size: 20px;
     letter-spacing: 8px;
+    color: var(--texto);
 }
 
 .nav-sep {
     width: 1px;
     height: 20px;
     background: var(--borde);
+    flex-shrink: 0;
 }
 
 .nav-titulo {
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--texto-atenuado);
@@ -50,25 +132,31 @@ body {
 }
 
 .nav-badge-usuario {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--texto-sub);
     background: var(--superficie);
     border: 1px solid var(--borde);
     padding: 4px 12px;
     border-radius: 20px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background 0.3s, border-color 0.3s;
 }
 
 .nav-btn {
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--texto-atenuado);
-    text-decoration: none;
     cursor: none;
     background: none;
     border: none;
     font-family: 'DM Sans', sans-serif;
-    transition: color .14s;
+    padding: 0;
+    flex-shrink: 0;
+    transition: color 0.14s;
 }
 
 .nav-btn:hover {
@@ -86,20 +174,27 @@ body {
     justify-content: center;
     cursor: none;
     color: var(--texto-atenuado);
-    transition: border-color .15s, color .15s;
+    flex-shrink: 0;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
 .boton-tema:hover {
     border-color: var(--borde-hover);
     color: var(--texto);
+    background: var(--superficie-2);
 }
 
-/* ── LAYOUT ── */
+
+/* ─── 5. LAYOUT Y PÁGINA ────────────────────────────────── */
+
 .pagina {
     max-width: 1100px;
     margin: 0 auto;
     padding: 32px 24px 80px;
 }
+
+
+/* ─── 6. HEADER DEL DASHBOARD ───────────────────────────── */
 
 .dash-header {
     margin-bottom: 28px;
@@ -114,23 +209,27 @@ body {
 
 .dash-titulo {
     font-family: 'Bebas Neue', cursive;
-    font-size: 40px;
+    font-size: 46px;
     line-height: 1;
     color: var(--texto);
 }
 
 .dash-fecha {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--texto-atenuado);
     letter-spacing: 1px;
+    text-transform: capitalize;
 }
 
 .dash-subtitulo {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--texto-atenuado);
+    font-weight: 300;
 }
 
-/* ── CARD BASE ── */
+
+/* ─── 7. CARDS ──────────────────────────────────────────── */
+
 .card {
     background: var(--superficie);
     border: 1px solid var(--borde);
@@ -138,11 +237,12 @@ body {
     padding: 20px 22px;
     position: relative;
     overflow: hidden;
+    transition: background 0.3s, border-color 0.3s;
 }
 
 .card-label {
-    font-size: 7px;
-    letter-spacing: 3px;
+    font-size: 9px;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
     color: var(--texto-atenuado);
     margin-bottom: 8px;
@@ -150,18 +250,20 @@ body {
 
 .card-valor {
     font-family: 'Bebas Neue', cursive;
-    font-size: 42px;
+    font-size: 48px;
     line-height: 1;
     color: var(--texto);
-    letter-spacing: .5px;
+    letter-spacing: 0.5px;
 }
 
 .card-sub {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--texto-atenuado);
     margin-top: 4px;
+    font-weight: 300;
 }
 
+/* Línea de acento en el borde superior */
 .card-accent::before {
     content: '';
     position: absolute;
@@ -176,7 +278,9 @@ body {
     background: var(--texto);
 }
 
-/* ── GRIDS ── */
+
+/* ─── 8. GRIDS ──────────────────────────────────────────── */
+
 .grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -205,8 +309,11 @@ body {
     margin-bottom: 16px;
 }
 
+
+/* ─── 9. ETIQUETAS DE SECCIÓN ───────────────────────────── */
+
 .seccion-label {
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--acento);
@@ -221,6 +328,7 @@ body {
     width: 16px;
     height: 1px;
     background: var(--acento);
+    flex-shrink: 0;
 }
 
 [data-tema="claro"] .seccion-label {
@@ -231,9 +339,14 @@ body {
     background: var(--texto-sub);
 }
 
-/* ── SKELETON ── */
+
+/* ─── 10. SKELETON LOADER ───────────────────────────────── */
+
 .skeleton {
-    background: linear-gradient(90deg, var(--borde) 25%, var(--superficie-2) 50%, var(--borde) 75%);
+    background: linear-gradient(90deg,
+            var(--borde) 25%,
+            var(--superficie-2) 50%,
+            var(--borde) 75%);
     background-size: 200% 100%;
     border-radius: 4px;
     animation: shimmer 1.4s infinite;
@@ -256,27 +369,31 @@ body {
     width: 50%;
 }
 
-/* ── TABLAS ── */
+
+/* ─── 11. TABLAS ────────────────────────────────────────── */
+
 .tabla {
     width: 100%;
     border-collapse: collapse;
 }
 
 .tabla th {
-    font-size: 7px;
-    letter-spacing: 2.5px;
+    font-size: 9px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--texto-atenuado);
     text-align: left;
-    padding: 8px 10px;
+    padding: 9px 10px;
     border-bottom: 1px solid var(--borde);
+    white-space: nowrap;
 }
 
 .tabla td {
     padding: 9px 10px;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--texto-sub);
     border-bottom: 1px solid var(--borde);
+    vertical-align: middle;
 }
 
 .tabla tr:last-child td {
@@ -292,16 +409,24 @@ body {
     font-weight: 500;
 }
 
-.badge-rol {
+
+/* ─── 12. BADGES ────────────────────────────────────────── */
+
+/* Base compartida */
+.badge-rol,
+.badge-estado,
+.badge-imc {
     display: inline-block;
     padding: 3px 8px;
     border-radius: 3px;
-    font-size: 8px;
+    font-size: 9px;
     letter-spacing: 1px;
     text-transform: uppercase;
     font-weight: 600;
+    white-space: nowrap;
 }
 
+/* Roles */
 .rol-admin {
     background: rgba(200, 244, 0, .12);
     color: #C8F400;
@@ -322,16 +447,7 @@ body {
     background: rgba(100, 150, 0, .12);
 }
 
-.badge-estado {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 3px;
-    font-size: 8px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
+/* Estados */
 .estado-activo {
     background: rgba(200, 244, 0, .1);
     color: #C8F400;
@@ -352,16 +468,7 @@ body {
     background: rgba(100, 150, 0, .1);
 }
 
-.badge-imc {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 3px;
-    font-size: 8px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
+/* IMC */
 .imc-bajo_peso {
     background: rgba(116, 192, 252, .15);
     color: #74C0FC;
@@ -397,6 +504,9 @@ body {
     background: rgba(100, 150, 0, .12);
 }
 
+
+/* ─── 13. BARRAS DE PROGRESO ────────────────────────────── */
+
 .mini-barra-fondo {
     height: 4px;
     background: var(--borde);
@@ -416,6 +526,9 @@ body {
     background: var(--texto);
 }
 
+
+/* ─── 14. FILAS DE SESIÓN ───────────────────────────────── */
+
 .sesion-row {
     display: flex;
     justify-content: space-between;
@@ -429,21 +542,28 @@ body {
 }
 
 .sesion-nombre {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--texto);
+    font-weight: 500;
 }
 
 .sesion-info {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--texto-atenuado);
     margin-top: 2px;
+    font-weight: 300;
 }
 
 .sesion-dur {
     font-family: 'Bebas Neue', cursive;
-    font-size: 20px;
+    font-size: 24px;
     color: var(--texto-atenuado);
+    flex-shrink: 0;
+    margin-left: 12px;
 }
+
+
+/* ─── 15. ERRORES Y BANNERS ─────────────────────────────── */
 
 .error-banner {
     display: none;
@@ -451,14 +571,17 @@ body {
     border: 1px solid var(--error);
     border-radius: 5px;
     padding: 10px 14px;
-    margin-bottom: 14px;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--error);
+    font-weight: 400;
 }
 
 .error-banner.visible {
     display: block;
 }
+
+
+/* ─── 16. BOTÓN REFRESH ─────────────────────────────────── */
 
 .btn-refresh {
     position: absolute;
@@ -468,13 +591,13 @@ body {
     border: 1px solid var(--borde);
     border-radius: 4px;
     color: var(--texto-atenuado);
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 1px;
     text-transform: uppercase;
     padding: 5px 10px;
     cursor: none;
     font-family: 'DM Sans', sans-serif;
-    transition: border-color .14s, color .14s;
+    transition: border-color 0.14s, color 0.14s;
 }
 
 .btn-refresh:hover {
@@ -483,14 +606,17 @@ body {
 }
 
 .btn-refresh.spinning {
-    animation: spin .8s linear infinite;
+    animation: girar 0.8s linear infinite;
 }
 
-@keyframes spin {
+@keyframes girar {
     to {
         transform: rotate(360deg);
     }
 }
+
+
+/* ─── 17. CTA GRID ──────────────────────────────────────── */
 
 .cta-grid {
     display: grid;
@@ -501,16 +627,18 @@ body {
 .cta-card {
     border: 1px solid var(--borde);
     border-radius: 7px;
-    padding: 16px;
+    padding: 18px 16px;
     text-decoration: none;
     color: var(--texto);
     display: block;
-    transition: border-color .14s, transform .1s;
+    background: var(--superficie);
+    transition: border-color 0.14s, transform 0.1s, background 0.14s;
 }
 
 .cta-card:hover {
     border-color: var(--acento);
     transform: translateY(-2px);
+    background: var(--superficie-2);
 }
 
 [data-tema="claro"] .cta-card:hover {
@@ -518,30 +646,49 @@ body {
 }
 
 .cta-icono {
-    font-size: 22px;
-    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cta-icono svg {
+    stroke: var(--acento);
+    transition: stroke 0.14s;
+}
+
+[data-tema="claro"] .cta-icono svg {
+    stroke: var(--texto);
 }
 
 .cta-nombre {
     font-family: 'Bebas Neue', cursive;
-    font-size: 18px;
+    font-size: 20px;
     letter-spacing: 1px;
+    color: var(--texto);
     margin-bottom: 4px;
 }
 
 .cta-desc {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--texto-atenuado);
+    font-weight: 300;
 }
+
+
+/* ─── 18. ESTADO VACÍO ──────────────────────────────────── */
 
 .vacio {
     padding: 24px;
     text-align: center;
-    font-size: 10px;
+    font-size: 11px;
     color: var(--texto-atenuado);
     letter-spacing: 2px;
     text-transform: uppercase;
+    font-weight: 300;
 }
+
+
+/* ─── 19. RESPONSIVE ────────────────────────────────────── */
 
 @media (max-width: 900px) {
     .grid-4 {
@@ -567,6 +714,10 @@ body {
     .pagina {
         padding: 24px 16px 60px;
     }
+
+    .nav-badge-usuario {
+        max-width: 140px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -588,5 +739,13 @@ body {
     button,
     a {
         cursor: pointer;
+    }
+
+    .nav-badge-usuario {
+        display: none;
+    }
+
+    .dash-titulo {
+        font-size: 36px;
     }
 }

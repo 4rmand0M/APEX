@@ -24,7 +24,7 @@
      ESTADO INTERNO DEL WIDGET
   ══════════════════════════════════════════════ */
   let knowledge  = [];
-  let geminiKey  = localStorage.getItem('apex_gkey') || '';
+  let geminiKey  = 'AIzaSyCuD0-uYE4HHJnI_UgnjoY77vc8IooM-ok';
   let estaAbierto = false;
 
   /* ══════════════════════════════════════════════
@@ -163,53 +163,6 @@
       background: var(--w-atenuado); flex-shrink: 0;
     }
     .wchat-estado-punto.ok { background: var(--w-acento); }
-    #wchat-btn-config {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: none; border: 1px solid var(--w-borde);
-      color: var(--w-atenuado); cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: border-color 0.14s, color 0.14s; flex-shrink: 0;
-    }
-    #wchat-btn-config:hover { border-color: var(--w-acento); color: var(--w-texto); }
-
-    /* ── Panel config (oculto por defecto) ── */
-    #wchat-panel-config {
-      display: none;
-      flex-direction: column;
-      padding: 14px 16px;
-      gap: 10px;
-      background: var(--w-superficie);
-      border-bottom: 1px solid var(--w-borde);
-      flex-shrink: 0;
-    }
-    #wchat-panel-config.visible { display: flex; }
-    .wchat-campo label {
-      display: block; font-size: 8px; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--w-atenuado); margin-bottom: 4px;
-    }
-    .wchat-campo input {
-      width: 100%; padding: 7px 10px;
-      background: var(--w-fondo); border: 1px solid var(--w-borde);
-      border-radius: 5px; font-family: inherit; font-size: 12px;
-      color: var(--w-texto); outline: none;
-      transition: border-color 0.13s; box-sizing: border-box;
-    }
-    .wchat-campo input:focus { border-color: var(--w-acento); }
-    .wchat-campo input::placeholder { color: var(--w-atenuado); }
-    .wchat-campo-nota {
-      font-size: 9px; color: var(--w-atenuado); line-height: 1.5;
-    }
-    .wchat-campo-nota a { color: var(--w-acento); text-decoration: none; }
-    html[data-tema="claro"] .wchat-campo-nota a { color: var(--w-texto); text-decoration: underline; }
-    #wchat-btn-guardar {
-      width: 100%; padding: 8px;
-      background: var(--w-acento); color: var(--w-boton-txt);
-      border: none; border-radius: 5px; font-family: inherit;
-      font-size: 9px; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; cursor: pointer;
-      transition: opacity 0.14s;
-    }
-    #wchat-btn-guardar:hover { opacity: 0.85; }
 
     /* ── Mensajes ── */
     #wchat-mensajes {
@@ -376,17 +329,6 @@
         </div>
       </div>
 
-      <!-- Panel de configuración (oculto por defecto) -->
-      <div id="wchat-panel-config">
-        <div class="wchat-campo">
-          <label for="wchat-key">API Key de Gemini</label>
-          <input type="password" id="wchat-key" placeholder="AIza..." autocomplete="off"/>
-          <div class="wchat-campo-nota">
-            Gratis en <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com →</a>
-          </div>
-        </div>
-        <button id="wchat-btn-guardar" onclick="apexChatGuardarKey()">Guardar →</button>
-      </div>
 
       <!-- Área de mensajes -->
       <div id="wchat-mensajes">
@@ -420,10 +362,6 @@
     wrapper.innerHTML = HTML;
     document.body.appendChild(wrapper);
 
-    // Restaurar key guardada
-    if (geminiKey) {
-      document.getElementById('wchat-key').value = geminiKey;
-    }
 
     // Listeners
     document.getElementById('apex-chat-btn').addEventListener('click', apexChatToggle);
@@ -433,6 +371,16 @@
     document.getElementById('wchat-campo').addEventListener('input', function () {
       this.style.height = 'auto';
       this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    });
+
+    document.addEventListener('click', (e) => {
+      const widget = document.getElementById('apex-chat-widget');
+      const btn = document.getElementById('apex-chat-btn');
+      
+      // Si el chat está abierto Y el clic NO fue dentro del widget Y NO fue en el botón...
+      if (estaAbierto && !widget.contains(e.target) && !btn.contains(e.target)) {
+        apexChatToggle();
+      }
     });
 
     // Cargar knowledge y actualizar estado
@@ -450,16 +398,10 @@
       const res = await fetch(KNOWLEDGE_URL);
       if (!res.ok) throw new Error();
       knowledge = await res.json();
-      setEstado(geminiKey ? true : false,
-        geminiKey
-          ? `Listo · ${knowledge.length} temas`
-          : `Configura tu API key →`
-      );
+      setEstado(true, `Listo · ${knowledge.length > 0 ? knowledge.length + ' temas' : 'conocimiento general'}`);
     } catch {
       knowledge = [];
-      setEstado(geminiKey ? true : false,
-        geminiKey ? 'Listo · conocimiento general' : 'Configura tu API key →'
-      );
+      setEstado(true, 'Listo · conocimiento general');
     }
   }
 
@@ -487,8 +429,6 @@
         setTimeout(() => document.getElementById('wchat-campo').focus(), 100);
       }, 1200); // 1.2 segundos de animación
 
-      // Si no hay key, abrir config automáticamente (ahora oculto, pero mantenemos la lógica por si acaso)
-      if (!geminiKey && document.getElementById('wchat-panel-config')) apexChatToggleConfig(true);
     } else {
       widget.classList.remove('visible');
       btn.classList.remove('abierto');
@@ -500,41 +440,7 @@
   // Exponer globalmente para que el HTML inline lo llame
   window.apexChatToggle = apexChatToggle;
 
-  /* ══════════════════════════════════════════════
-     MOSTRAR / OCULTAR PANEL CONFIG
-  ══════════════════════════════════════════════ */
-  function apexChatToggleConfig(forzarAbrir) {
-    const panel = document.getElementById('wchat-panel-config');
-    if (forzarAbrir === true) {
-      panel.classList.add('visible');
-    } else {
-      panel.classList.toggle('visible');
-    }
-    if (panel.classList.contains('visible')) {
-      document.getElementById('wchat-key').focus();
-    }
-  }
-  window.apexChatToggleConfig = apexChatToggleConfig;
 
-  /* ══════════════════════════════════════════════
-     GUARDAR API KEY
-  ══════════════════════════════════════════════ */
-  function apexChatGuardarKey() {
-    const key = document.getElementById('wchat-key').value.trim();
-    if (!key) return;
-    if (!key.startsWith('AIza')) {
-      addMsg('⚠ La API key debe comenzar con "AIza".', 'bot');
-      return;
-    }
-    geminiKey = key;
-    localStorage.setItem('apex_gkey', geminiKey);
-    document.getElementById('wchat-panel-config').classList.remove('visible');
-    setEstado(true, `Listo · ${knowledge.length > 0 ? knowledge.length + ' temas' : 'conocimiento general'}`);
-
-    // Confirmar en el chat
-    addMsg('✓ API key guardada. ¿En qué puedo ayudarte?', 'bot');
-  }
-  window.apexChatGuardarKey = apexChatGuardarKey;
 
   /* ══════════════════════════════════════════════
      BUSCAR CONTEXTO EN EL JSON LOCAL
@@ -616,7 +522,7 @@
     if (!pregunta) return;
 
     if (!geminiKey) {
-      apexChatToggleConfig(true);
+      addMsgError('Error: No hay configurada una API key de Gemini.');
       return;
     }
 

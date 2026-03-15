@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-tema="oscuro">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>test</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Términos y Condiciones — APEX Fitness</title>
+    <title>Chatbot Test — APEX Fitness</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="/assets/css/variables.css">
-    <link rel="stylesheet" href="/assets/css/base.css">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/base.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap"
         rel="stylesheet">
@@ -18,7 +15,47 @@
 </head>
 
 <body>
+    <div id="cursor-punto"></div>
+    <div id="cursor-anillo"></div>
+
+    <!-- Indicador de página de chatbot -->
+    <div style="position: fixed; top: 20px; left: 20px; background: var(--superficie); border: 1px solid var(--borde); padding: 10px 15px; border-radius: 5px; font-size: 12px; color: var(--texto-atenuado); z-index: 1000;">
+        🧠 Chatbot Test Page
+    </div>
+
     <script src="../assets/js/chat-widget.js"></script>
+
+    <script>
+        /* ── Cursor ── */
+        (function () {
+            var punto = document.getElementById('cursor-punto');
+            var anillo = document.getElementById('cursor-anillo');
+            var posR = { x: 0, y: 0 };
+            var posA = { x: 0, y: 0 };
+
+            document.addEventListener('mousemove', function (e) {
+                posR.x = e.clientX; posR.y = e.clientY;
+                punto.style.left = e.clientX + 'px';
+                punto.style.top = e.clientY + 'px';
+            });
+
+            (function loop() {
+                posA.x += (posR.x - posA.x) * 0.13;
+                posA.y += (posR.y - posA.y) * 0.13;
+                anillo.style.left = posA.x + 'px';
+                anillo.style.top = posA.y + 'px';
+                requestAnimationFrame(loop);
+            })();
+
+            var sel = 'button, a';
+            document.addEventListener('mouseover', function (e) {
+                if (e.target.closest(sel)) document.body.classList.add('sobre-interactivo');
+            });
+            document.addEventListener('mouseout', function (e) {
+                if (e.target.closest(sel)) document.body.classList.remove('sobre-interactivo');
+            });
+        })();
+    </script>
 </body>
 
 </html>

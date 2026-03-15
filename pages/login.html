@@ -9,15 +9,57 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/variables.css">
   <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/variables.css">
   <link rel="stylesheet" href="../assets/css/auth.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+
   <style>
-    /* Íconos Lucide dentro de tarjetas de rol */
+    /* ══════════════════════════════════════════════════════
+       SCROLLBAR — acorde a variables.css (igual que index)
+    ══════════════════════════════════════════════════════ */
+
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: var(--borde-hover) var(--fondo);
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--fondo);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--borde-hover);
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--texto-atenuado);
+    }
+
+    /* Scrollbar dentro del dropdown de Choices */
+    .choices__list--dropdown ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .choices__list--dropdown ::-webkit-scrollbar-track {
+      background: var(--superficie);
+    }
+
+    .choices__list--dropdown ::-webkit-scrollbar-thumb {
+      background: var(--borde-hover);
+      border-radius: 99px;
+    }
+
+
+    /* ══════════════════════════════════════════════════════
+       ÍCONOS LUCIDE EN TARJETAS DE ROL
+    ══════════════════════════════════════════════════════ */
+
     .rol-icono [data-lucide] {
       width: 22px;
       height: 22px;
@@ -34,47 +76,180 @@
       color: var(--acento);
     }
 
-    /* Color de fondo del contenedor del Select */
-    .choices__inner {
-      background-color: var(--fondo) !important;
-      border: 1px solid var(--borde) !important;
+    [data-tema="claro"] .tarjeta-rol.seleccionado .rol-icono [data-lucide] {
       color: var(--texto);
     }
 
-    /* El color cuando pasas el mouse por encima (Tu efecto verde) */
+
+    /* ══════════════════════════════════════════════════════
+       CHOICES.JS — OVERRIDE COMPLETO PARA AMBOS TEMAS
+       La librería usa sus propias variables inline; hay que
+       sobreescribir con !important todos los estados.
+    ══════════════════════════════════════════════════════ */
+
+    /* ── Contenedor visible (reemplaza el <select>) ── */
+    .choices__inner {
+      background-color: var(--superficie) !important;
+      border: 1px solid var(--borde) !important;
+      border-radius: 5px !important;
+      padding: 8px 13px !important;
+      font-family: 'DM Sans', sans-serif !important;
+      font-size: 13px !important;
+      min-height: unset !important;
+      transition: border-color 0.14s !important;
+    }
+
+    /* Texto del item seleccionado dentro del contenedor */
+    .choices__inner .choices__item {
+      color: var(--texto) !important;
+      font-size: 13px !important;
+      font-family: 'DM Sans', sans-serif !important;
+    }
+
+    /* Placeholder */
+    .choices__placeholder {
+      color: var(--texto-atenuado) !important;
+      opacity: 1 !important;
+    }
+
+    /* Borde de foco */
+    .choices.is-focused .choices__inner,
+    .choices.is-open .choices__inner {
+      border-color: var(--acento) !important;
+      background-color: var(--superficie-2) !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    [data-tema="claro"] .choices.is-focused .choices__inner,
+    [data-tema="claro"] .choices.is-open .choices__inner {
+      border-color: var(--texto) !important;
+    }
+
+    /* Flecha del desplegable */
+    .choices__list--single .choices__item {
+      padding-right: 0 !important;
+    }
+
+    .choices[data-type*="select-one"]::after {
+      border-color: var(--texto-atenuado) transparent transparent !important;
+      right: 13px !important;
+    }
+
+    .choices[data-type*="select-one"].is-open::after {
+      border-color: transparent transparent var(--texto-atenuado) !important;
+    }
+
+    /* ── Dropdown (lista desplegable) ── */
+    .choices__list--dropdown {
+      background-color: var(--superficie) !important;
+      border: 1px solid var(--borde) !important;
+      border-radius: 5px !important;
+      margin-top: 3px !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+      overflow: hidden !important;
+    }
+
+    /* Campo de búsqueda dentro del dropdown (cuando está habilitado) */
+    .choices__list--dropdown .choices__input {
+      background-color: var(--superficie-2) !important;
+      border-bottom: 1px solid var(--borde) !important;
+      color: var(--texto) !important;
+      font-family: 'DM Sans', sans-serif !important;
+      font-size: 12px !important;
+    }
+
+    /* ── Items individuales del dropdown ── */
+    .choices__item--choice {
+      font-family: 'DM Sans', sans-serif !important;
+      font-size: 12px !important;
+      padding: 8px 14px !important;
+      line-height: 1.4 !important;
+      /* Color de texto explícito para ambos temas */
+      color: var(--texto-sub) !important;
+    }
+
+    /* Item seleccionado actualmente */
+    .choices__item--choice.is-selected {
+      color: var(--texto) !important;
+      background-color: var(--acento-dim) !important;
+    }
+
+    /* Item con hover / foco */
     .choices__item--choice.is-highlighted {
       background-color: var(--acento) !important;
-      color: #000 !important;
-      /* Texto negro al resaltar */
+      color: #080808 !important;
     }
 
-    /* Color del menú desplegable */
-    .choices__list--dropdown {
-      background-color: var(--fondo) !important;
-      border: 1px solid var(--borde) !important;
+    /* Item deshabilitado (el placeholder "Selecciona...") */
+    .choices__item--choice.choices__item--disabled {
+      color: var(--texto-atenuado) !important;
+      opacity: 0.5 !important;
     }
 
-    /* Ajustar tamaño de letra y espacio entre líneas de los items del menú */
-    .choices__item--choice {
-      font-size: 12px !important;
-      /* Hace el texto más pequeño */
-      padding: 6px 14px !important;
-      /* Reduce el relleno interno */
-      line-height: 1.3 !important;
-      /* Ajusta la altura de línea para que sea más compacta */
+    /* ── Correcciones específicas modo CLARO ──
+       En modo claro --superficie es #FFFFFF y --texto es #0A0A0A,
+       por lo que sin override el texto ya sería visible.
+       Pero Choices.js inyecta estilos inline que pueden
+       sobreescribirlo; forzamos el color explícitamente. */
+
+    [data-tema="claro"] .choices__inner {
+      background-color: var(--superficie) !important;
+      /* blanco */
+    }
+
+    [data-tema="claro"] .choices__inner .choices__item {
+      color: var(--texto) !important;
+      /* negro */
+    }
+
+    [data-tema="claro"] .choices__list--dropdown {
+      background-color: var(--superficie) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10) !important;
+    }
+
+    [data-tema="claro"] .choices__item--choice {
+      color: var(--texto-sub) !important;
+      /* gris oscuro legible */
+    }
+
+    [data-tema="claro"] .choices__item--choice.is-selected {
+      color: var(--texto) !important;
+      background-color: var(--acento-dim) !important;
+    }
+
+    [data-tema="claro"] .choices__item--choice.is-highlighted {
+      background-color: var(--texto) !important;
+      /* negro en claro */
+      color: var(--fondo) !important;
+      /* crema sobre negro */
+    }
+
+    [data-tema="claro"] .choices__item--choice.choices__item--disabled {
+      color: var(--texto-atenuado) !important;
+    }
+
+    [data-tema="claro"] .choices[data-type*="select-one"]::after {
+      border-color: var(--texto-atenuado) transparent transparent !important;
+    }
+
+    [data-tema="claro"] .choices[data-type*="select-one"].is-open::after {
+      border-color: transparent transparent var(--texto-atenuado) !important;
     }
   </style>
 </head>
 
 <body>
-
   <!-- Cursor personalizado -->
   <div id="cursor-punto"></div>
 
-  <!-- ═══════════════ PANTALLA DE CARGA ═══════════════════ -->
+  <!-- ══════════════════════════════════════════════════════
+       PANTALLA DE CARGA
+  ══════════════════════════════════════════════════════ -->
+
   <div id="pantalla-carga">
     <div class="logo-carga">
-      <svg width="58" height="58" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="58" height="58" viewBox="0 0 68 68" fill="none">
         <polygon class="svg-trazar" points="34,4 62,58 34,44 6,58" fill="none" stroke="#C8F400" stroke-width="2.2"
           stroke-linejoin="round" stroke-linecap="round" />
       </svg>
@@ -86,7 +261,10 @@
     </div>
   </div>
 
-  <!-- ═══════════════ APLICACIÓN PRINCIPAL ════════════════ -->
+  <!-- ══════════════════════════════════════════════════════
+       APLICACIÓN PRINCIPAL
+  ══════════════════════════════════════════════════════ -->
+
   <div id="app">
 
     <!-- ── PANEL IZQUIERDO — MARCA ── -->
@@ -106,7 +284,7 @@
       <div class="contenido-marca">
         <div class="etiqueta-superior">Performance Training</div>
         <h1 class="titular">
-          FORJA TU <br>
+          FORJA TU<br>
           <span class="titular-acento">LIMITE</span>
         </h1>
         <p class="descripcion-marca">
@@ -132,6 +310,7 @@
     <!-- ── PANEL DERECHO — AUTH ── -->
     <div class="panel-auth">
 
+      <!-- Botón toggle de tema -->
       <button class="boton-tema" id="boton-tema" onclick="alternarTema()" title="Cambiar tema">
         <svg id="icono-luna" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           stroke-width="1.7">
@@ -147,7 +326,10 @@
 
       <div class="contenedor-auth">
 
-        <!-- ════ VISTA: INICIO DE SESIÓN ════ -->
+        <!-- ════════════════════════════
+             VISTA: INICIO DE SESIÓN
+        ════════════════════════════ -->
+
         <div class="vista activa" id="vista-login">
           <div class="vista-etiqueta">Bienvenido de vuelta</div>
           <div class="vista-titulo">Iniciar<br>Sesión</div>
@@ -175,13 +357,16 @@
           </div>
         </div>
 
+        <!-- ════════════════════════════
+             VISTA: CREAR CUENTA (4 pasos)
+        ════════════════════════════ -->
 
-        <!-- ════ VISTA: CREAR CUENTA (4 pasos) ════ -->
         <div class="vista" id="vista-registro">
           <button class="boton-volver" onclick="mostrarVista('vista-login')">← Volver</button>
           <div class="vista-etiqueta">Únete a APEX</div>
           <div class="vista-titulo">Crear<br>Cuenta</div>
 
+          <!-- Indicador de progreso (4 pasos) -->
           <div class="indicador-pasos">
             <div class="paso-indicador completado" id="ind-1"></div>
             <div class="paso-indicador" id="ind-2"></div>
@@ -189,31 +374,36 @@
             <div class="paso-indicador" id="ind-4"></div>
           </div>
 
-          <!-- Paso 1: Rol -->
+          <!-- ── PASO 1: Selección de rol ── -->
           <div class="paso-registro activo" id="paso-1">
             <div class="etiqueta-seccion">¿Cuál es tu rol?</div>
             <div class="cuadricula-roles">
+
               <div class="tarjeta-rol" onclick="seleccionarRol(this,'entrenador')">
                 <div class="rol-icono"><i data-lucide="dumbbell"></i></div>
                 <div class="rol-nombre">Entrenador</div>
                 <div class="rol-descripcion">Diseña y gestiona programas de entrenamiento</div>
               </div>
+
               <div class="tarjeta-rol" onclick="seleccionarRol(this,'monitor')">
                 <div class="rol-icono"><i data-lucide="clipboard-list"></i></div>
                 <div class="rol-nombre">Monitor</div>
                 <div class="rol-descripcion">Supervisa sesiones en sala y apoya al alumno</div>
               </div>
+
               <div class="tarjeta-rol" onclick="seleccionarRol(this,'alumno')">
                 <div class="rol-icono"><i data-lucide="zap"></i></div>
                 <div class="rol-nombre">Alumno</div>
                 <div class="rol-descripcion">Sigue tu plan de entrenamiento personalizado</div>
               </div>
+
             </div>
             <div class="campo-error" id="error-rol">Selecciona un rol para continuar.</div>
             <button class="boton-principal" onclick="avanzarPaso(2)">Continuar →</button>
-          </div>
+          </div><!-- /paso-1 -->
 
-          <!-- Paso 2: Datos personales -->
+
+          <!-- ── PASO 2: Datos personales ── -->
           <div class="paso-registro" id="paso-2">
             <div class="campo">
               <label class="campo-etiqueta" for="reg-nombre">Nombre completo</label>
@@ -235,9 +425,10 @@
             <div class="campo-error" id="error-paso2">Completa los campos obligatorios.</div>
             <button class="boton-principal" onclick="avanzarPaso(3)">Continuar →</button>
             <button class="boton-secundario" onclick="avanzarPaso(1)">← Anterior</button>
-          </div>
+          </div><!-- /paso-2 -->
 
-          <!-- Paso 3: Info por rol -->
+
+          <!-- ── PASO 3: Información por rol ── -->
           <div class="paso-registro" id="paso-3">
 
             <!-- Entrenador -->
@@ -276,7 +467,7 @@
                 <textarea class="campo-textarea" id="ent-presentacion"
                   placeholder="Cuéntanos sobre tu enfoque como entrenador..."></textarea>
               </div>
-            </div>
+            </div><!-- /info-entrenador -->
 
             <!-- Monitor -->
             <div class="info-por-rol" id="info-monitor">
@@ -329,7 +520,7 @@
                   <option value="mas300">Más de 300</option>
                 </select>
               </div>
-            </div>
+            </div><!-- /info-monitor -->
 
             <!-- Alumno -->
             <div class="info-por-rol" id="info-alumno">
@@ -372,14 +563,15 @@
                 <textarea class="campo-textarea" id="alu-condicion"
                   placeholder="Ej: lesión de rodilla, hipertensión..."></textarea>
               </div>
-            </div>
+            </div><!-- /info-alumno -->
 
             <div class="campo-error" id="error-paso3">Completa los campos requeridos para continuar.</div>
             <button class="boton-principal" onclick="avanzarPaso(4)">Continuar →</button>
             <button class="boton-secundario" onclick="avanzarPaso(2)">← Anterior</button>
-          </div>
+          </div><!-- /paso-3 -->
 
-          <!-- Paso 4: Contraseña -->
+
+          <!-- ── PASO 4: Contraseña ── -->
           <div class="paso-registro" id="paso-4">
             <div class="campo">
               <label class="campo-etiqueta" for="reg-contrasena">Contraseña</label>
@@ -406,12 +598,14 @@
             </p>
             <button class="boton-principal" id="btn-registro" onclick="manejarRegistro()">Crear Cuenta</button>
             <button class="boton-secundario" onclick="avanzarPaso(3)">← Anterior</button>
-          </div>
+          </div><!-- /paso-4 -->
 
-        </div><!-- /vista-registro -->
+        </div>
 
+        <!-- ════════════════════════════
+             VISTA: OLVIDÉ CONTRASEÑA
+        ════════════════════════════ -->
 
-        <!-- ════ VISTA: OLVIDÉ CONTRASEÑA ════ -->
         <div class="vista" id="vista-olvidaste">
           <button class="boton-volver" onclick="mostrarVista('vista-login')">← Volver</button>
           <div class="vista-etiqueta">Recuperar acceso</div>
@@ -430,6 +624,7 @@
             <button class="boton-secundario" onclick="mostrarVista('vista-login')">Cancelar</button>
           </div>
 
+          <!-- Estado de confirmación tras enviar -->
           <div class="caja-exito" id="exito-recuperacion">
             <div class="circulo-exito">✓</div>
             <div class="exito-titulo">Enviado</div>
@@ -441,24 +636,50 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
 
-      </div><!-- /contenedor-auth -->
-    </div><!-- /panel-auth -->
-  </div><!-- /app -->
+  <!-- ── Scripts externos: deben cargarse ANTES que auth.js ── -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
+  <!-- ── Lógica de autenticación ── -->
   <script src="../assets/js/auth.js"></script>
-  <script>lucide.createIcons();</script>
-  <script>
-    // Seleccionamos todos los elementos con la clase .selector-apex
-    const selects = document.querySelectorAll('.campo-select');
 
-    selects.forEach((select) => {
-      new Choices(select, {
-        searchEnabled: false,
-        itemSelectText: '',
-        shouldSort: false,
+  <script>
+    var _failsafeRed = setTimeout(function () {
+      var pantalla = document.getElementById('pantalla-carga');
+      var app = document.getElementById('app');
+      if (pantalla && pantalla.style.display !== 'none') {
+        pantalla.classList.add('saliendo');
+        setTimeout(function () {
+          pantalla.style.display = 'none';
+          if (app) app.classList.add('visible');
+        }, 600);
+      }
+    }, 5000);
+
+    /* Cancela el failsafe si auth.js cerró el loader antes */
+    document.getElementById('pantalla-carga').addEventListener(
+      'transitionend',
+      function () { clearTimeout(_failsafeRed); },
+      { once: true }
+    );
+
+    /* Inicializar librerías si cargaron correctamente */
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    if (typeof Choices !== 'undefined') {
+      document.querySelectorAll('.campo-select').forEach(function (select) {
+        new Choices(select, {
+          searchEnabled: false,
+          itemSelectText: '',
+          shouldSort: false
+        });
       });
-    });
+    }
   </script>
 </body>
 

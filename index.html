@@ -9,11 +9,44 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/variables.css">
-  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="./assets/css/base.css">
+  <link rel="stylesheet" href="./assets/css/variables.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
   <style>
-    /* Íconos Lucide — tamaño y color heredado del padre */
+    /* ══════════════════════════════════════════════════════
+       SCROLLBAR PERSONALIZADA — acorde a variables.css
+    ══════════════════════════════════════════════════════ */
+
+    /* Firefox */
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: var(--borde-hover) var(--fondo);
+    }
+
+    /* Chrome / Safari / Edge */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--fondo);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--borde-hover);
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--texto-atenuado);
+    }
+
+
+    /* ══════════════════════════════════════════════════════
+       ÍCONOS LUCIDE
+    ══════════════════════════════════════════════════════ */
+
     [data-lucide] {
       width: 1em;
       height: 1em;
@@ -40,14 +73,17 @@
       stroke-width: 1.4;
     }
 
-
-    html,
-    body {
-      overflow: hidden auto;
-      cursor: none;
+    /* En modo claro los iconos de acento usan el texto */
+    [data-tema="claro"] .feature-icono [data-lucide],
+    [data-tema="claro"] .rol-card-icono [data-lucide] {
+      color: var(--texto);
     }
 
-    /* ── NAV ─────────────────────────────────────────────── */
+
+    /* ══════════════════════════════════════════════════════
+       NAV
+    ══════════════════════════════════════════════════════ */
+
     nav {
       position: fixed;
       top: 0;
@@ -57,19 +93,19 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 22px 52px;
+      padding: 20px 52px;
       border-bottom: 1px solid transparent;
-      background: rgba(8, 8, 8, 0.65);
+      background: rgba(8, 8, 8, 0.6);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      /* Añadí el filtro a la transición para que entre suavemente */
-      transition: border-color 0.3s, background 0.3s, backdrop-filter 0.3s, -webkit-backdrop-filter 0.3s;
+      transition: border-color 0.3s, background 0.3s;
+    }
+
+    [data-tema="claro"] nav {
+      background: rgba(238, 237, 231, 0.7);
     }
 
     nav.scrolled {
-      background: rgba(8, 8, 8, 0.65); /* Bajé la opacidad de 0.88 a 0.65 */
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px); /* Magia para Safari/iPhone */
       border-color: var(--borde);
     }
 
@@ -90,7 +126,7 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 32px;
+      gap: 28px;
     }
 
     .nav-link {
@@ -107,6 +143,7 @@
       color: var(--texto);
     }
 
+    /* Botón CTA del nav */
     .nav-cta {
       padding: 9px 22px;
       background: var(--acento);
@@ -128,8 +165,33 @@
       box-shadow: 0 6px 16px rgba(var(--acento-rgb), 0.22);
     }
 
+    /* Botón toggle de tema en el nav */
+    .nav-btn-tema {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid var(--borde);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: none;
+      color: var(--texto-atenuado);
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      flex-shrink: 0;
+    }
 
-    /* ── HERO ────────────────────────────────────────────── */
+    .nav-btn-tema:hover {
+      border-color: var(--borde-hover);
+      color: var(--texto);
+      background: var(--superficie);
+    }
+
+
+    /* ══════════════════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════════════════ */
+
     .hero {
       min-height: 100vh;
       display: flex;
@@ -138,7 +200,6 @@
       position: relative;
       overflow: hidden;
       padding: 120px 52px 80px;
-      z-index: 1;
     }
 
     /* Cuadrícula de fondo */
@@ -151,6 +212,12 @@
         linear-gradient(90deg, rgba(255, 255, 255, 0.013) 1px, transparent 1px);
       background-size: 48px 48px;
       pointer-events: none;
+    }
+
+    [data-tema="claro"] .hero::before {
+      background-image:
+        linear-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.025) 1px, transparent 1px);
     }
 
     /* Gradiente de fade inferior */
@@ -202,11 +269,15 @@
       animation: fadeUp 0.6s 0.1s ease both;
     }
 
+    [data-tema="claro"] .hero-badge {
+      color: var(--texto-sub);
+    }
+
     .hero-badge::before {
       content: '';
       width: 20px;
       height: 1px;
-      background: var(--acento);
+      background: currentColor;
     }
 
     .hero-titulo {
@@ -219,9 +290,16 @@
       animation: fadeUp 0.6s 0.2s ease both;
     }
 
+    /* "TUS LIMITES" en color acento */
     .hero-titulo span {
       color: var(--acento);
       display: block;
+    }
+
+    /* En modo claro el span hace outline en vez de relleno */
+    [data-tema="claro"] .hero-titulo span {
+      color: transparent;
+      -webkit-text-stroke: 2px var(--texto);
     }
 
     .hero-desc {
@@ -239,9 +317,11 @@
       align-items: center;
       gap: 16px;
       animation: fadeUp 0.6s 0.4s ease both;
-      z-index: 10;
+      position: relative;
+      z-index: 2;
     }
 
+    /* Botón primario hero */
     .btn-hero-primario {
       padding: 14px 32px;
       background: var(--acento);
@@ -256,8 +336,6 @@
       cursor: none;
       text-decoration: none;
       transition: transform 0.1s, box-shadow 0.14s;
-      position: relative;
-      z-index: 99999999999999;
     }
 
     .btn-hero-primario:hover {
@@ -265,6 +343,11 @@
       box-shadow: 0 10px 24px rgba(var(--acento-rgb), 0.22);
     }
 
+    .btn-hero-primario:active {
+      transform: translateY(0);
+    }
+
+    /* Botón secundario hero */
     .btn-hero-secundario {
       padding: 14px 32px;
       background: transparent;
@@ -279,7 +362,6 @@
       cursor: none;
       text-decoration: none;
       transition: border-color 0.14s, color 0.14s;
-      z-index: 99999999999999;
     }
 
     .btn-hero-secundario:hover {
@@ -287,7 +369,7 @@
       color: var(--texto);
     }
 
-    /* Número grande decorativo */
+    /* Texto decorativo gigante en el hero */
     .hero-deco {
       position: absolute;
       right: 52px;
@@ -302,8 +384,64 @@
       animation: fadeUp 0.8s 0.5s ease both;
     }
 
+    /* ── LOGO SVG DECORATIVO — derecha del hero (solo escritorio) ── */
+    .hero-logo-deco {
+      position: absolute;
+      right: 6vw;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+      animation: fadeUp 1s 0.6s ease both;
+    }
 
-    /* ── STATS BAR ───────────────────────────────────────── */
+    .hero-logo-deco svg {
+      width: clamp(200px, 26vw, 380px);
+      height: auto;
+      stroke: var(--texto);
+      opacity: 0.07;
+    }
+
+    [data-tema="claro"] .hero-logo-deco svg {
+      opacity: 0.09;
+    }
+
+    [data-tema="claro"] .hero-deco {
+      -webkit-text-stroke: 1px rgba(0, 0, 0, 0.04);
+    }
+
+    /* ══════════════════════════════════════════════════════
+     HERO — imagen al lado del título
+    ══════════════════════════════════════════════════════ */
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .hero-imagen-wrapper {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeUp 0.8s 0.35s ease both;
+    }
+
+    .hero-imagen-wrapper img {
+      width: 100%;
+      max-height: 720px;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       STATS BAR
+    ══════════════════════════════════════════════════════ */
+
     .stats-bar {
       border-top: 1px solid var(--borde);
       border-bottom: 1px solid var(--borde);
@@ -337,7 +475,10 @@
     }
 
 
-    /* ── SECCIÓN CARACTERÍSTICAS ─────────────────────────── */
+    /* ══════════════════════════════════════════════════════
+       SECCIONES GENERALES
+    ══════════════════════════════════════════════════════ */
+
     .seccion {
       padding: 100px 52px;
     }
@@ -357,11 +498,15 @@
       gap: 10px;
     }
 
+    [data-tema="claro"] .seccion-badge {
+      color: var(--texto-sub);
+    }
+
     .seccion-badge::before {
       content: '';
       width: 16px;
       height: 1px;
-      background: var(--acento);
+      background: currentColor;
     }
 
     .seccion-titulo {
@@ -371,6 +516,11 @@
       color: var(--texto);
       max-width: 500px;
     }
+
+
+    /* ══════════════════════════════════════════════════════
+       CARACTERÍSTICAS
+    ══════════════════════════════════════════════════════ */
 
     .grid-features {
       display: grid;
@@ -390,6 +540,7 @@
       overflow: hidden;
     }
 
+    /* Línea de acento superior al hover */
     .feature-card::before {
       content: '';
       position: absolute;
@@ -399,8 +550,12 @@
       height: 1px;
       background: var(--acento);
       transform: scaleX(0);
-      transition: transform 0.3s ease;
       transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    [data-tema="claro"] .feature-card::before {
+      background: var(--texto);
     }
 
     .feature-card:hover {
@@ -432,7 +587,10 @@
     }
 
 
-    /* ── SECCIÓN ROLES ───────────────────────────────────── */
+    /* ══════════════════════════════════════════════════════
+       ROLES
+    ══════════════════════════════════════════════════════ */
+
     .roles-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -455,6 +613,11 @@
       transform: translateY(-3px);
     }
 
+    [data-tema="claro"] .rol-card:hover {
+      border-color: var(--texto);
+    }
+
+    /* Número decorativo en la tarjeta */
     .rol-card-numero {
       font-family: 'Bebas Neue', cursive;
       font-size: 80px;
@@ -465,6 +628,7 @@
       top: 16px;
       right: 20px;
       transition: -webkit-text-stroke-color 0.2s;
+      pointer-events: none;
     }
 
     .rol-card:hover .rol-card-numero {
@@ -505,12 +669,19 @@
       transition: gap 0.14s;
     }
 
+    [data-tema="claro"] .rol-card-link {
+      color: var(--texto);
+    }
+
     .rol-card-link:hover {
       gap: 12px;
     }
 
 
-    /* ── CTA FINAL ───────────────────────────────────────── */
+    /* ══════════════════════════════════════════════════════
+       CTA FINAL
+    ══════════════════════════════════════════════════════ */
+
     .cta-seccion {
       padding: 100px 52px;
       text-align: center;
@@ -545,6 +716,11 @@
       color: var(--acento);
     }
 
+    [data-tema="claro"] .cta-titulo span {
+      color: transparent;
+      -webkit-text-stroke: 2px var(--texto);
+    }
+
     .cta-desc {
       font-size: 13px;
       color: var(--texto-sub);
@@ -561,13 +737,17 @@
     }
 
 
-    /* ── FOOTER ──────────────────────────────────────────── */
+    /* ══════════════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════════════ */
+
     footer {
       border-top: 1px solid var(--borde);
       padding: 32px 52px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: relative;
     }
 
     .footer-logo {
@@ -588,6 +768,9 @@
       font-size: 9px;
       letter-spacing: 2px;
       color: var(--texto-atenuado);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     .footer-links {
@@ -610,7 +793,10 @@
     }
 
 
-    /* ── ANIMACIONES ─────────────────────────────────────── */
+    /* ══════════════════════════════════════════════════════
+       ANIMACIONES
+    ══════════════════════════════════════════════════════ */
+
     @keyframes fadeUp {
       from {
         opacity: 0;
@@ -635,21 +821,187 @@
     }
 
 
-    /* ── RESPONSIVE ──────────────────────────────────────── */
+    /* ══════════════════════════════════════════════════════
+       MENÚ HAMBURGUESA
+    ══════════════════════════════════════════════════════ */
+
+    /* Botón hamburguesa — oculto en escritorio */
+    .nav-hamburguesa {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 36px;
+      height: 36px;
+      background: none;
+      border: 1px solid var(--borde);
+      border-radius: 5px;
+      cursor: none;
+      gap: 5px;
+      flex-shrink: 0;
+      transition: border-color 0.14s;
+    }
+
+    .nav-hamburguesa:hover {
+      border-color: var(--borde-hover);
+    }
+
+    /* Las tres líneas del icono */
+    .ham-linea {
+      display: block;
+      width: 16px;
+      height: 1.5px;
+      background: var(--texto);
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.2s ease, width 0.2s ease;
+      transform-origin: center;
+    }
+
+    /* Línea 1 → diagonal ↘ */
+    .nav-hamburguesa.abierto .ham-linea:nth-child(1) {
+      transform: translateY(6.5px) rotate(45deg);
+    }
+
+    /* Línea 2 → desaparece */
+    .nav-hamburguesa.abierto .ham-linea:nth-child(2) {
+      opacity: 0;
+      width: 0;
+    }
+
+    /* Línea 3 → diagonal ↗ */
+    .nav-hamburguesa.abierto .ham-linea:nth-child(3) {
+      transform: translateY(-6.5px) rotate(-45deg);
+    }
+
+    /* Panel del menú móvil — desliza desde arriba */
+    .nav-menu-movil {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 99;
+      padding-top: 66px;
+      background: var(--fondo);
+      border-bottom: 1px solid var(--borde);
+      transform: translateY(-100%);
+      opacity: 0;
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease;
+    }
+
+    .nav-menu-movil.abierto {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Lista de enlaces dentro del panel */
+    .menu-movil-lista {
+      display: flex;
+      flex-direction: column;
+      padding: 8px 0 20px;
+    }
+
+    .menu-movil-enlace {
+      display: block;
+      padding: 14px 22px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--texto-sub);
+      text-decoration: none;
+      border-bottom: 1px solid var(--borde);
+      transition: color 0.14s, background 0.14s;
+    }
+
+    .menu-movil-enlace:last-child {
+      border-bottom: none;
+    }
+
+    .menu-movil-enlace:hover {
+      color: var(--texto);
+      background: var(--superficie);
+    }
+
+    /* CTA dentro del menú móvil */
+    .menu-movil-cta {
+      display: block;
+      margin: 14px 22px 4px;
+      padding: 13px;
+      background: var(--acento);
+      color: var(--texto-boton);
+      text-align: center;
+      text-decoration: none;
+      border-radius: 5px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      transition: filter 0.14s;
+    }
+
+    .menu-movil-cta:hover {
+      filter: brightness(1.07);
+    }
+
+    /* Overlay oscuro detrás del menú */
+    .nav-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 98;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      opacity: 0;
+      transition: opacity 0.28s ease;
+    }
+
+    .nav-overlay.visible {
+      opacity: 1;
+    }
+
+
+    /* ══════════════════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════════════════ */
+
     @media (max-width: 900px) {
       nav {
-        padding: 18px 24px;
+        padding: 14px 20px;
       }
 
-      .nav-links {
+      /* Ocultar enlaces y CTA del nav de escritorio */
+      .nav-links-interno {
+        display: none !important;
+      }
+
+      .nav-cta {
         display: none;
       }
 
+      /* Mostrar hamburguesa, panel y overlay */
+      .nav-hamburguesa {
+        display: flex;
+      }
+
+      .nav-menu-movil {
+        display: block;
+      }
+
+      .nav-overlay {
+        display: block;
+      }
+
       .hero {
-        padding: 100px 24px 60px;
+        padding: 100px 22px 60px;
       }
 
       .hero-deco {
+        display: none;
+      }
+
+      .hero-logo-deco {
         display: none;
       }
 
@@ -662,7 +1014,7 @@
       }
 
       .seccion {
-        padding: 60px 24px;
+        padding: 60px 22px;
       }
 
       .grid-features {
@@ -674,7 +1026,7 @@
       }
 
       .cta-seccion {
-        padding: 60px 24px;
+        padding: 60px 22px;
       }
 
       .cta-acciones {
@@ -683,20 +1035,39 @@
       }
 
       footer {
+        padding: 24px 22px;
         flex-direction: column;
         gap: 16px;
         text-align: center;
+      }
+
+      .nav-btn-tema {
+        width: 30px;
+        height: 30px;
+      }
+
+      /* Cursor nativo en móvil */
+      body,
+      button,
+      a {
+        cursor: auto;
+      }
+
+      #cursor-punto {
+        display: none;
       }
     }
   </style>
 </head>
 
 <body>
-
   <div id="cursor-punto"></div>
 
-  <!-- ══════════ NAV ══════════ -->
-  <nav id="nav">
+  <!-- ══════════════════════════════════════════════════════
+       NAV — Logo + enlaces + botón tema + CTA
+  ══════════════════════════════════════════════════════ -->
+
+  <nav id="nav" role="navigation" aria-label="Navegación principal">
     <a href="index.html" class="nav-logo">
       <svg width="20" height="20" viewBox="0 0 68 68" fill="none">
         <polygon points="34,4 62,58 34,44 6,58" fill="none" stroke="currentColor" stroke-width="2.8"
@@ -706,66 +1077,118 @@
     </a>
 
     <div class="nav-links">
-      <a href="#caracteristicas" class="nav-link">Características</a>
-      <a href="#roles" class="nav-link">Roles</a>
-      <a href="pages/login.html" class="nav-link">Iniciar sesión</a>
-      <a href="pages/login.html" class="nav-cta">Comenzar →</a>
+      <div class="nav-links-interno" style="display:flex; align-items:center; gap:28px;">
+        <a href="#caracteristicas" class="nav-link">Características</a>
+        <a href="#roles" class="nav-link">Roles</a>
+        <a href="./pages/login.html" class="nav-link">Iniciar sesión</a>
+      </div>
+
+      <button class="nav-btn-tema" id="btn-tema" onclick="alternarTema()" aria-label="Activar modo claro"
+        title="Cambiar tema">
+        <svg id="icono-luna" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <svg id="icono-sol" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8" style="display:none">
+          <circle cx="12" cy="12" r="4" />
+          <path
+            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </svg>
+      </button>
+
+      <button class="nav-hamburguesa" id="nav-hamburguesa" onclick="toggleMenu()" aria-label="Abrir menú"
+        aria-expanded="false">
+        <span class="ham-linea"></span>
+        <span class="ham-linea"></span>
+        <span class="ham-linea"></span>
+      </button>
+      <a href="./pages/login.html" class="nav-cta">Comenzar →</a>
     </div>
   </nav>
 
+  <!-- Panel del menú móvil -->
+  <div class="nav-menu-movil" id="nav-menu-movil" aria-hidden="true">
+    <div class="menu-movil-lista">
+      <a href="#caracteristicas" class="menu-movil-enlace" onclick="cerrarMenu()">Características</a>
+      <a href="#roles" class="menu-movil-enlace" onclick="cerrarMenu()">Roles</a>
+      <a href="./pages/login.html" class="menu-movil-enlace">Iniciar sesión</a>
+    </div>
+    <a href="./pages/login.html" class="menu-movil-cta">Comenzar →</a>
+    <div style="height:20px"></div>
+  </div>
 
-  <!-- ══════════ HERO ══════════ -->
-  <section class="hero">
+  <!-- Overlay — cierra el menú al tocar fuera -->
+  <div class="nav-overlay" id="nav-overlay" onclick="cerrarMenu()"></div>
+
+  <!-- ══════════════════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════════════════ -->
+
+  <section class="hero" aria-label="Presentación principal de APEX Fitness">
     <div class="hero-glow-1"></div>
     <div class="hero-glow-2"></div>
 
-    <div class="hero-badge">Performance Training Platform</div>
+    <!-- Columna izquierda: texto -->
+    <div class="hero-contenido" style="position:relative; z-index:2; display:flex; flex-direction:column;">
+      <div class="hero-badge">Performance Training Platform</div>
 
-    <h1 class="hero-titulo">
-      FORJA<br>
-      <span>TUS LIMITES</span>
-    </h1>
+      <h1 class="hero-titulo">
+        FORJA<br>
+        <span>TUS LIMITES</span>
+      </h1>
 
-    <p class="hero-desc">
-      La plataforma de entrenamiento de élite para atletas, entrenadores y monitores que exigen resultados reales y
-      métricas precisas.
-    </p>
+      <p class="hero-desc">
+        La plataforma de entrenamiento de élite para atletas, entrenadores y monitores
+        que exigen resultados reales y métricas precisas.
+      </p>
 
-    <div class="hero-acciones">
-      <a href="pages/login.html" class="btn-hero-primario">Comenzar ahora →</a>
-      <a href="#caracteristicas" class="btn-hero-secundario">Ver características</a>
+      <div class="hero-acciones">
+        <a href="./pages/login.html" class="btn-hero-primario">Comenzar ahora →</a>
+        <a href="#caracteristicas" class="btn-hero-secundario">Ver características</a>
+      </div>
     </div>
 
-    <div class="hero-deco">APEX</div>
+    <!-- Columna derecha: imagen -->
+    <div class="hero-imagen-wrapper">
+      <img src="assets/media/img/entrenadores.png" alt="Entrenadores APEX" loading="eager" />
+    </div>
+
+    <div class="hero-deco" aria-hidden="true">APEX</div>
   </section>
 
+  <!-- ══════════════════════════════════════════════════════
+       STATS
+  ══════════════════════════════════════════════════════ -->
 
-  <!-- ══════════ STATS ══════════ -->
   <div class="stats-bar reveal">
     <div class="stat-item">
-      <div class="stat-numero">12K+</div>
+      <div class="stat-numero" data-count="12000" data-sufijo="K+">12K+</div>
       <div class="stat-etiqueta">Atletas activos</div>
     </div>
     <div class="stat-item">
-      <div class="stat-numero">480</div>
+      <div class="stat-numero" data-count="480" data-sufijo="">480</div>
       <div class="stat-etiqueta">Entrenadores certificados</div>
     </div>
     <div class="stat-item">
-      <div class="stat-numero">98%</div>
+      <div class="stat-numero" data-count="98" data-sufijo="%">98%</div>
       <div class="stat-etiqueta">Tasa de retención</div>
     </div>
     <div class="stat-item">
-      <div class="stat-numero">2.4M</div>
+      <!-- data-count en décimas (24 = 2.4), data-decimal indica divisor -->
+      <div class="stat-numero" data-count="24" data-decimal="10" data-sufijo="M">2.4M</div>
       <div class="stat-etiqueta">Sesiones registradas</div>
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════════════════
+       CARACTERÍSTICAS
+  ══════════════════════════════════════════════════════ -->
 
-  <!-- ══════════ CARACTERÍSTICAS ══════════ -->
-  <section class="seccion" id="caracteristicas">
+  <section class="seccion" id="caracteristicas" aria-labelledby="titulo-caracteristicas">
     <div class="seccion-header reveal">
       <div class="seccion-badge">Herramientas</div>
-      <h2 class="seccion-titulo">TODO LO QUE NECESITAS</h2>
+      <h2 class="seccion-titulo" id="titulo-caracteristicas">TODO LO QUE NECESITAS</h2>
     </div>
 
     <div class="grid-features reveal">
@@ -811,68 +1234,72 @@
         <p class="feature-desc">Conecta con gimnasios y entrenadores certificados en tu ciudad. Gestiona asignaciones y
           horarios desde la plataforma.</p>
       </div>
-
     </div>
   </section>
 
+  <!-- ══════════════════════════════════════════════════════
+       ROLES
+  ══════════════════════════════════════════════════════ -->
 
-  <!-- ══════════ ROLES ══════════ -->
-  <section class="seccion" id="roles" style="border-top: 1px solid var(--borde); padding-top: 80px;">
+  <section class="seccion" id="roles" aria-labelledby="titulo-roles"
+    style="border-top:1px solid var(--borde); padding-top:80px;">
     <div class="seccion-header reveal">
       <div class="seccion-badge">Acceso por rol</div>
-      <h2 class="seccion-titulo">¿CUÁL ES TU ROL?</h2>
+      <h2 class="seccion-titulo" id="titulo-roles">¿CUÁL ES TU ROL?</h2>
     </div>
 
     <div class="roles-grid reveal">
-
       <div class="rol-card">
-        <div class="rol-card-numero">01</div>
+        <div class="rol-card-numero" aria-hidden="true">01</div>
         <div class="rol-card-icono"><i data-lucide="dumbbell"></i></div>
         <div class="rol-card-titulo">Entrenador</div>
         <p class="rol-card-desc">Diseña programas de entrenamiento personalizados, gestiona tus atletas y accede a
           analíticas avanzadas de rendimiento.</p>
-        <a href="pages/login.html" class="rol-card-link">Registrarse como entrenador →</a>
+        <a href="./pages/login.html" class="rol-card-link">Registrarse como entrenador →</a>
       </div>
 
       <div class="rol-card">
-        <div class="rol-card-numero">02</div>
+        <div class="rol-card-numero" aria-hidden="true">02</div>
         <div class="rol-card-icono"><i data-lucide="clipboard-list"></i></div>
         <div class="rol-card-titulo">Monitor</div>
         <p class="rol-card-desc">Supervisa sesiones en sala, apoya a los alumnos en tiempo real y reporta incidencias
           directamente a los entrenadores.</p>
-        <a href="pages/login.html" class="rol-card-link">Registrarse como monitor →</a>
+        <a href="./pages/login.html" class="rol-card-link">Registrarse como monitor →</a>
       </div>
 
       <div class="rol-card">
-        <div class="rol-card-numero">03</div>
+        <div class="rol-card-numero" aria-hidden="true">03</div>
         <div class="rol-card-icono"><i data-lucide="zap"></i></div>
         <div class="rol-card-titulo">Alumno</div>
         <p class="rol-card-desc">Sigue tu plan de entrenamiento personalizado, registra tu progreso y mantén
           comunicación directa con tu entrenador.</p>
-        <a href="pages/login.html" class="rol-card-link">Crear cuenta gratuita →</a>
+        <a href="./pages/login.html" class="rol-card-link">Crear cuenta gratuita →</a>
       </div>
-
     </div>
   </section>
 
+  <!-- ══════════════════════════════════════════════════════
+       CTA FINAL
+  ══════════════════════════════════════════════════════ -->
 
-  <!-- ══════════ CTA FINAL ══════════ -->
   <section class="cta-seccion reveal">
-    <div class="cta-glow"></div>
+    <div class="cta-glow" aria-hidden="true"></div>
     <h2 class="cta-titulo">
       EMPIEZA A<br>
       <span>ENTRENAR HOY</span>
     </h2>
     <p class="cta-desc">Sin excusas. Sin límites. Solo resultados.</p>
     <div class="cta-acciones">
-      <a href="pages/login.html" class="btn-hero-primario">Crear cuenta gratis →</a>
-      <a href="pages/login.html" class="btn-hero-secundario">Ya tengo cuenta</a>
+      <a href="./pages/login.html" class="btn-hero-primario">Crear cuenta gratis →</a>
+      <a href="./pages/login.html" class="btn-hero-secundario">Ya tengo cuenta</a>
     </div>
   </section>
 
+  <!-- ══════════════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════════════ -->
 
-  <!-- ══════════ FOOTER ══════════ -->
-  <footer>
+  <footer role="contentinfo">
     <a href="index.html" class="footer-logo">
       <svg width="16" height="16" viewBox="0 0 68 68" fill="none">
         <polygon points="34,4 62,58 34,44 6,58" fill="none" stroke="currentColor" stroke-width="2.8"
@@ -886,25 +1313,24 @@
     </span>
 
     <div class="footer-links">
-      <a href="pages/terminos.html" class="footer-link">Términos</a>
-      <a href="pages/privacidad.html" class="footer-link">Privacidad</a>
-      <a href="pages/login.html" class="footer-link">Acceder</a>
+      <a href="./pages/terminos.html" class="footer-link">Términos Y Condiciones</a>
+      <a href="./pages/privacidad.html" class="footer-link">Privacidad</a>
     </div>
   </footer>
 
-
-  <!-- Cursor + Nav scroll + Reveal -->
   <script>
     /* Inicializar íconos Lucide */
     lucide.createIcons();
 
-    /* Cursor */
+    /* ── Cursor personalizado ── */
     (function () {
       var punto = document.getElementById('cursor-punto');
+
       document.addEventListener('mousemove', function (e) {
         punto.style.left = e.clientX + 'px';
         punto.style.top = e.clientY + 'px';
       });
+
       var sel = 'button, a, input, select';
       document.addEventListener('mouseover', function (e) {
         if (e.target.closest(sel)) document.body.classList.add('sobre-interactivo');
@@ -914,17 +1340,33 @@
       });
     })();
 
-    /* Nav sticky */
+    /* ── Toggle de tema oscuro / claro ── */
+    var modoOscuro = true;
+
+    function alternarTema() {
+      modoOscuro = !modoOscuro;
+      document.documentElement.setAttribute('data-tema', modoOscuro ? 'oscuro' : 'claro');
+      document.getElementById('icono-luna').style.display = modoOscuro ? 'block' : 'none';
+      document.getElementById('icono-sol').style.display = modoOscuro ? 'none' : 'block';
+
+      /* ← AÑADIR ESTO: actualiza el aria-label según el modo activo */
+      document.getElementById('btn-tema').setAttribute(
+        'aria-label',
+        modoOscuro ? 'Activar modo claro' : 'Activar modo oscuro'
+      );
+    }
+
+    /* ── Nav: añade clase .scrolled cuando la página baja de 40px ── */
     window.addEventListener('scroll', function () {
       document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
     });
 
-    /* Scroll reveal */
+    /* ── Scroll reveal con IntersectionObserver ── */
     var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          observer.unobserve(e.target);
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
         }
       });
     }, { threshold: 0.1 });
@@ -933,7 +1375,7 @@
       observer.observe(el);
     });
 
-    /* Smooth scroll para anclas */
+    /* ── Smooth scroll para anclas internas ── */
     document.querySelectorAll('a[href^="#"]').forEach(function (a) {
       a.addEventListener('click', function (e) {
         var target = document.querySelector(this.getAttribute('href'));
@@ -944,7 +1386,121 @@
       });
     });
 
-    document.getElementById("year").textContent = new Date().getFullYear();
+    /* ── Año en el footer ── */
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* ── Menú hamburguesa ── */
+    var menuAbierto = false;
+
+    function toggleMenu() {
+      if (menuAbierto) { cerrarMenu(); } else { abrirMenu(); }
+    }
+
+    function abrirMenu() {
+      menuAbierto = true;
+      var btn = document.getElementById('nav-hamburguesa');
+      var menu = document.getElementById('nav-menu-movil');
+      var overlay = document.getElementById('nav-overlay');
+
+      btn.classList.add('abierto');
+      btn.setAttribute('aria-expanded', 'true');
+      menu.classList.add('abierto');
+      menu.setAttribute('aria-hidden', 'false');
+      overlay.classList.add('visible');
+
+      /* Evitar scroll del body mientras el menú está abierto */
+      document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarMenu() {
+      menuAbierto = false;
+      var btn = document.getElementById('nav-hamburguesa');
+      var menu = document.getElementById('nav-menu-movil');
+      var overlay = document.getElementById('nav-overlay');
+
+      btn.classList.remove('abierto');
+      btn.setAttribute('aria-expanded', 'false');
+      menu.classList.remove('abierto');
+      menu.setAttribute('aria-hidden', 'true');
+      overlay.classList.remove('visible');
+
+      document.body.style.overflow = '';
+    }
+
+    /* Cerrar con la tecla Escape */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && menuAbierto) cerrarMenu();
+    });
+
+    /* Cerrar el menú al hacer scroll suave a una sección */
+    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function () {
+        if (menuAbierto) cerrarMenu();
+      });
+    });
+
+    /* ── Contador animado de estadísticas ───────────────── */
+    (function iniciarContadores() {
+      var DURACION = 1400;
+
+      function easeOutQuad(t) {
+        return t * (2 - t);
+      }
+
+      function animarContador(el) {
+        var valorFinal = parseFloat(el.getAttribute('data-count'));
+        var divisor = parseFloat(el.getAttribute('data-decimal') || '1');
+        var sufijo = el.getAttribute('data-sufijo') || '';
+        var inicio = performance.now();
+
+        function tick(ahora) {
+          var transcurrido = ahora - inicio;
+          var progreso = Math.min(transcurrido / DURACION, 1);
+          var progresoEase = easeOutQuad(progreso);
+          var valorActual = valorFinal * progresoEase;
+
+          /* Formato: si hay decimal lo mostramos, si no, entero */
+          var textoNumero = divisor > 1
+            ? (valorActual / divisor).toFixed(1)   /* ej: "2.4" */
+            : Math.round(valorActual).toLocaleString('es');
+
+          el.textContent = textoNumero + sufijo;   /* ej: "2.4M" */
+
+          if (progreso < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            /* Asegurar valor final exacto sin errores de float */
+            var textoFinal = divisor > 1
+              ? (valorFinal / divisor).toFixed(1)
+              : valorFinal.toLocaleString('es');
+            el.textContent = textoFinal + sufijo;
+          }
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      /* Observar la stats-bar — se dispara solo una vez */
+      var statsBar = document.querySelector('.stats-bar');
+      if (!statsBar) return;
+
+      var obsContador = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            /* Animar cada contador con un pequeño stagger visual */
+            var contadores = statsBar.querySelectorAll('[data-count]');
+            contadores.forEach(function (el, i) {
+              setTimeout(function () {
+                animarContador(el);
+              }, i * 80); /* 80ms entre cada número — sutil pero elegante */
+            });
+            obsContador.unobserve(statsBar); /* solo una vez */
+          }
+        });
+      }, { threshold: 0.4 }); /* espera a que el 40% sea visible */
+
+      obsContador.observe(statsBar);
+    })();
   </script>
 </body>
 

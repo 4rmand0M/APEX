@@ -12,8 +12,9 @@
   transition: opacity 0.5s ease;
 }
 
-#app.visible { opacity: 1; }
-
+#app.visible {
+  opacity: 1;
+}
 
 /* ─── PANEL DE MARCA (IZQUIERDA) ───────────────────────── */
 .panel-marca {
@@ -33,15 +34,15 @@
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.013) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.013) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
 [data-tema="claro"] .fondo-cuadricula {
   background-image:
-    linear-gradient(rgba(0,0,0,0.026) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.026) 1px, transparent 1px);
+    linear-gradient(rgba(0, 0, 0, 0.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.026) 1px, transparent 1px);
 }
 
 .resplandor {
@@ -52,15 +53,19 @@
 }
 
 .resplandor-uno {
-  width: 400px; height: 400px;
+  width: 400px;
+  height: 400px;
   background: rgba(var(--acento-rgb), 0.035);
-  top: -90px; right: -60px;
+  top: -90px;
+  right: -60px;
 }
 
 .resplandor-dos {
-  width: 220px; height: 220px;
+  width: 220px;
+  height: 220px;
   background: rgba(var(--acento-rgb), 0.018);
-  bottom: 50px; left: -30px;
+  bottom: 50px;
+  left: -30px;
 }
 
 .logo-superior {
@@ -80,7 +85,10 @@
   color: var(--texto);
 }
 
-.contenido-marca { position: relative; z-index: 2; }
+.contenido-marca {
+  position: relative;
+  z-index: 2;
+}
 
 .etiqueta-superior {
   display: flex;
@@ -101,8 +109,13 @@
   flex-shrink: 0;
 }
 
-[data-tema="claro"] .etiqueta-superior         { color: var(--texto-sub); }
-[data-tema="claro"] .etiqueta-superior::before  { background: var(--texto-sub); }
+[data-tema="claro"] .etiqueta-superior {
+  color: var(--texto-sub);
+}
+
+[data-tema="claro"] .etiqueta-superior::before {
+  background: var(--texto-sub);
+}
 
 .titular {
   font-family: 'Bebas Neue', cursive;
@@ -136,9 +149,12 @@
   border-top: 1px solid var(--borde);
 }
 
-.estadistica         { flex: 1; padding-right: 18px; }
+.estadistica {
+  flex: 1;
+  padding-right: 18px;
+}
 
-.estadistica + .estadistica {
+.estadistica+.estadistica {
   padding-left: 18px;
   border-left: 1px solid var(--borde);
 }
@@ -173,7 +189,9 @@
   transition: background 0.3s;
 }
 
-.panel-auth::-webkit-scrollbar { display: none; }
+.panel-auth::-webkit-scrollbar {
+  display: none;
+}
 
 .boton-tema {
   position: absolute;
@@ -205,16 +223,25 @@
 
 
 /* ─── CAMPOS DE FORMULARIO ─────────────────────────────── */
-.vista { display: none; }
+.vista {
+  display: none;
+}
 
 .vista.activa {
   display: block;
-  animation: animVista 0.22s ease;
+  animation: animVista 0.16s ease;
 }
 
 @keyframes animVista {
-  from { opacity: 0; transform: translateY(7px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .vista-etiqueta {
@@ -251,9 +278,13 @@
   transition: color 0.14s;
 }
 
-.boton-volver:hover { color: var(--texto); }
+.boton-volver:hover {
+  color: var(--texto);
+}
 
-.campo { margin-bottom: 11px; }
+.campo {
+  margin-bottom: 11px;
+}
 
 .campo-etiqueta {
   display: block;
@@ -288,7 +319,10 @@
   accent-color: var(--acento);
 }
 
-.campo-input::placeholder { color: var(--texto-atenuado); font-weight: 300; }
+.campo-input::placeholder {
+  color: var(--texto-atenuado);
+  font-weight: 300;
+}
 
 .campo-select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='6' viewBox='0 0 11 6'%3E%3Cpath d='M0.5 0.5L5.5 5.5L10.5 0.5' stroke='%23666' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
@@ -313,10 +347,18 @@
   transition: border-color 0.14s;
 }
 
-.campo-textarea:focus        { border-color: var(--acento); }
-.campo-textarea::placeholder { color: var(--texto-atenuado); font-weight: 300; }
+.campo-textarea:focus {
+  border-color: var(--acento);
+}
 
-.fila-input { position: relative; }
+.campo-textarea::placeholder {
+  color: var(--texto-atenuado);
+  font-weight: 300;
+}
+
+.fila-input {
+  position: relative;
+}
 
 .boton-ver {
   position: absolute;
@@ -335,9 +377,13 @@
   padding: 4px;
 }
 
-.boton-ver:hover { color: var(--texto); }
+.boton-ver:hover {
+  color: var(--texto);
+}
 
-.campo-input.tiene-boton { padding-right: 56px; }
+.campo-input.tiene-boton {
+  padding-right: 56px;
+}
 
 .campo-error {
   font-size: 10px;
@@ -349,7 +395,10 @@
   transition: opacity 0.16s, max-height 0.18s;
 }
 
-.campo-error.visible { opacity: 1; max-height: 26px; }
+.campo-error.visible {
+  opacity: 1;
+  max-height: 26px;
+}
 
 .barra-fuerza-fondo {
   height: 2px;
@@ -391,7 +440,9 @@
   box-shadow: 0 7px 18px rgba(var(--acento-rgb), 0.16);
 }
 
-.boton-principal:active { transform: translateY(0); }
+.boton-principal:active {
+  transform: translateY(0);
+}
 
 .boton-secundario {
   width: 100%;
@@ -434,8 +485,13 @@
   padding: 0;
 }
 
-.enlace:hover                     { color: var(--acento); }
-[data-tema="claro"] .enlace:hover  { color: var(--texto); }
+.enlace:hover {
+  color: var(--acento);
+}
+
+[data-tema="claro"] .enlace:hover {
+  color: var(--texto);
+}
 
 
 /* ─── TARJETAS DE ROL ───────────────────────────────────── */
@@ -486,9 +542,14 @@
   font-weight: 700;
 }
 
-[data-tema="claro"] .tarjeta-rol.seleccionado::after { color: var(--texto); }
+[data-tema="claro"] .tarjeta-rol.seleccionado::after {
+  color: var(--texto);
+}
 
-.rol-icono       { font-size: 18px; margin-bottom: 7px; }
+.rol-icono {
+  font-size: 18px;
+  margin-bottom: 7px;
+}
 
 .rol-nombre {
   font-size: 8px;
@@ -505,7 +566,6 @@
   font-weight: 300;
   line-height: 1.4;
 }
-
 
 /* ─── INDICADOR DE PASOS ────────────────────────────────── */
 .indicador-pasos {
@@ -530,19 +590,28 @@
 
 
 /* ─── PASOS DEL REGISTRO ────────────────────────────────── */
-.paso-registro        { display: none; }
+.paso-registro {
+  display: none;
+}
 
 .paso-registro.activo {
   display: block;
-  animation: animVista 0.22s ease;
+  animation: animVista 0.16s ease;
 }
 
-.info-por-rol         { display: none; }
-.info-por-rol.visible { display: block; }
+.info-por-rol {
+  display: none;
+}
+
+.info-por-rol.visible {
+  display: block;
+}
 
 
 /* ─── ESTADO DE ÉXITO ───────────────────────────────────── */
-.caja-exito         { display: none; }
+.caja-exito {
+  display: none;
+}
 
 .caja-exito.visible {
   display: block;
@@ -596,10 +665,23 @@
     min-height: 220px;
   }
 
-  .logo-superior    { top: 28px; left: 28px; }
-  .titular          { font-size: 60px; }
-  .descripcion-marca { display: none; }
-  .fila-estadisticas { margin-top: 22px; padding-top: 18px; }
+  .logo-superior {
+    top: 28px;
+    left: 28px;
+  }
+
+  .titular {
+    font-size: 60px;
+  }
+
+  .descripcion-marca {
+    display: none;
+  }
+
+  .fila-estadisticas {
+    margin-top: 22px;
+    padding-top: 18px;
+  }
 
   .panel-auth {
     padding: 36px 28px 50px;

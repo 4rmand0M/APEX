@@ -13,7 +13,6 @@
   <link rel="stylesheet" href="../assets/css/base.css">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 </head>
 
 <body>
@@ -247,24 +246,43 @@
     <div class="seccion-label">Accesos Rápidos</div>
     <div class="cta-grid">
       <a href="../pages/calculadora-imc.html" class="cta-card">
-        <div class="cta-icono">⚖</div>
+        <div class="cta-icono">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20h16" />
+            <path d="M6 20c0-4 2.5-7 6-7s6 3 6 7" />
+            <line x1="12" y1="13" x2="12" y2="20" />
+          </svg>
+        </div>
         <div class="cta-nombre">Calculadora IMC</div>
         <div class="cta-desc">Calcula y guarda tus métricas corporales</div>
       </a>
       <a href="../pages/login.html" class="cta-card">
-        <div class="cta-icono">🔐</div>
+        <div class="cta-icono">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            <circle cx="12" cy="16" r="1" fill="currentColor" />
+          </svg>
+        </div>
         <div class="cta-nombre">Gestión Usuarios</div>
         <div class="cta-desc">Acceder al sistema de autenticación</div>
       </a>
       <a href="../index.html" class="cta-card">
-        <div class="cta-icono">🏠</div>
+        <div class="cta-icono">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
+            <path d="M9 21V12h6v9" />
+          </svg>
+        </div>
         <div class="cta-nombre">Inicio</div>
         <div class="cta-desc">Volver a la página principal</div>
       </a>
     </div>
-
   </div><!-- /pagina -->
-
 
   <script src="../assets/js/dashboard.js"></script>
 </body>
