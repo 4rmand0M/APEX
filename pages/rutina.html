@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APEX FITNESS — Rutinas</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/rutina.css" />
+</head>
+
+<body>
+
+  <!-- Cursor personalizado -->
+  <div id="cursor-punto" aria-hidden="true"></div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       APP SHELL — Grid: sidebar + contenido
+       NOTA: En producción, este shell es compartido.
+       Solo importa rutina.html como la sección .area-contenido
+  ═══════════════════════════════════════════════ -->
+  <div class="contenedor-app" id="app">
+
+    <!-- SIDEBAR (replicada del shell del feed) -->
+    <aside class="barra-lateral" role="navigation" aria-label="Navegación principal">
+      <a href="../index.html" class="logo-barra" aria-label="APEX FITNESS">
+        <svg width="26" height="26" viewBox="0 0 42 42" fill="none">
+          <rect x="3" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="34" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="8" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="30" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-texto">APEX</span>
+      </a>
+      <nav class="nav-principal">
+        <ul class="lista-nav" role="list">
+          <li><a href="../pages/feed.html" class="enlace-nav" data-pagina="feed"><i data-lucide="home"></i><span>Feed</span></a></li>
+          <li><a href="#" class="enlace-nav activo" data-pagina="rutinas" aria-current="page"><i data-lucide="clipboard-list"></i><span>Rutinas</span></a></li>
+          <li><a href="#" class="enlace-nav" data-pagina="ejercicios"><i data-lucide="dumbbell"></i><span>Ejercicios</span></a></li>
+          <li><a href="#" class="enlace-nav" data-pagina="gimnasios"><i data-lucide="map-pin"></i><span>Gimnasios</span></a></li>
+          <li><a href="#" class="enlace-nav" data-pagina="perfil"><i data-lucide="user"></i><span>Perfil</span></a></li>
+        </ul>
+      </nav>
+      <div class="nav-inferior">
+        <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema">
+          <i data-lucide="sun" class="icono-tema icono-claro"></i>
+          <i data-lucide="moon" class="icono-tema icono-oscuro"></i>
+        </button>
+        <hr class="separador-nav" />
+        <!-- BACKEND: Reemplazar con datos del usuario autenticado (JWT) -->
+        <a href="#" class="usuario-barra">
+          <div class="avatar-barra">J</div>
+          <div class="info-usuario-barra">
+            <span class="nombre-usuario-barra">Jeremy Infante</span>
+            <span class="handle-usuario-barra">@jeremyinfante</span>
+          </div>
+          <i data-lucide="log-out" class="icono-logout"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ══════════════════════════════════════════
+         CONTENIDO CENTRAL — MÓDULO DE RUTINAS
+         En producción, solo esta sección se carga
+         dinámicamente dentro del shell compartido.
+    ══════════════════════════════════════════ -->
+    <div class="area-contenido">
+      <main class="contenido-rutinas" id="contenido-rutinas" role="main">
+
+        <!-- ── VISTA: LISTA DE RUTINAS ── -->
+        <!-- BACKEND: GET /routines?user_id={userId} — Renderizar lista dinámica -->
+        <section class="vista-lista-rutinas" id="vista-lista-rutinas">
+
+          <!-- Cabecera de la sección -->
+          <header class="cabecera-seccion">
+            <div class="cabecera-seccion-texto">
+              <h1 class="titulo-seccion">Rutinas</h1>
+              <p class="subtitulo-seccion">Tus programas de entrenamiento</p>
+            </div>
+            <button class="boton-nueva-rutina" id="boton-nueva-rutina" aria-label="Crear nueva rutina">
+              <i data-lucide="plus"></i>
+              <span>Nueva rutina</span>
+            </button>
+          </header>
+
+          <!-- Acordeón "Mis rutinas" -->
+          <div class="acordeon-rutinas">
+            <button class="acordeon-cabecera" id="acordeon-mis-rutinas" aria-expanded="true" aria-controls="lista-mis-rutinas">
+              <i data-lucide="chevron-down" class="acordeon-icono"></i>
+              <!-- BACKEND: {{usuario.rutinas.length}} -->
+              <span>Mis Rutinas <span class="badge-contador" id="badge-total-rutinas">4</span></span>
+            </button>
+
+            <!-- BACKEND: Iterar array de rutinas del usuario -->
+            <ul class="lista-rutinas" id="lista-mis-rutinas" role="list">
+
+              <!-- Tarjeta de rutina (repetir por cada rutina) -->
+              <!-- BACKEND: data-rutina-id="{{rutina.id}}" -->
+              <li class="tarjeta-rutina" data-rutina-id="rutina-jueves" tabindex="0" role="button" aria-label="Abrir rutina Jueves">
+                <div class="tarjeta-rutina-info" onclick="abrirRutina('rutina-jueves')">
+                  <h3 class="tarjeta-rutina-nombre">Jueves</h3>
+                  <!-- BACKEND: {{rutina.ejercicios.map(e => e.nombre).join(', ')}} truncado -->
+                  <p class="tarjeta-rutina-ejercicios">Bench Press (Barbell), Standing Military Press (Barbell), Chest Dip, Bench Press - Close Grip...</p>
+                </div>
+                <button class="boton-opciones-rutina" aria-label="Opciones de la rutina Jueves" aria-haspopup="true">
+                  <i data-lucide="more-horizontal"></i>
+                </button>
+              </li>
+
+              <li class="tarjeta-rutina" data-rutina-id="rutina-pata" tabindex="0" role="button" aria-label="Abrir rutina Pata">
+                <div class="tarjeta-rutina-info" onclick="abrirRutina('rutina-pata')">
+                  <h3 class="tarjeta-rutina-nombre">Pata</h3>
+                  <p class="tarjeta-rutina-ejercicios">Squat (Barbell), Leg Press (Machine), Lying Leg Curl (Machine), Romanian Deadlift...</p>
+                </div>
+                <button class="boton-opciones-rutina" aria-label="Opciones de la rutina Pata" aria-haspopup="true">
+                  <i data-lucide="more-horizontal"></i>
+                </button>
+              </li>
+
+              <li class="tarjeta-rutina" data-rutina-id="rutina-lunes" tabindex="0" role="button" aria-label="Abrir rutina Lunes">
+                <div class="tarjeta-rutina-info" onclick="abrirRutina('rutina-lunes')">
+                  <h3 class="tarjeta-rutina-nombre">Lunes</h3>
+                  <p class="tarjeta-rutina-ejercicios">Bench Press (Barbell), Incline Bench Press (Dumbbell), Lateral Raise (Dumbbell), Chest...</p>
+                </div>
+                <button class="boton-opciones-rutina" aria-label="Opciones de la rutina Lunes" aria-haspopup="true">
+                  <i data-lucide="more-horizontal"></i>
+                </button>
+              </li>
+
+              <li class="tarjeta-rutina" data-rutina-id="rutina-martes" tabindex="0" role="button" aria-label="Abrir rutina Martes">
+                <div class="tarjeta-rutina-info" onclick="abrirRutina('rutina-martes')">
+                  <h3 class="tarjeta-rutina-nombre">Martes</h3>
+                  <p class="tarjeta-rutina-ejercicios">Pull Up, Bent Over Row (Barbell), Face Pull, Bicep Curl (Barbell), Hammer Curl...</p>
+                </div>
+                <button class="boton-opciones-rutina" aria-label="Opciones de la rutina Martes" aria-haspopup="true">
+                  <i data-lucide="more-horizontal"></i>
+                </button>
+              </li>
+
+            </ul>
+          </div>
+
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════
+             VISTA DETALLE DE RUTINA
+             Se activa al hacer clic en una tarjeta de la lista.
+             Contiene el layout de dos columnas: ejercicios + panel.
+        ══════════════════════════════════════════════════════ -->
+        <section class="vista-detalle-rutina oculto" id="vista-detalle-rutina" aria-label="Detalle de rutina">
+
+          <!-- ── CABECERA DEL DETALLE ── -->
+          <header class="cabecera-detalle">
+            <div class="cabecera-detalle-izquierda">
+              <button class="boton-volver" id="boton-volver" aria-label="Volver a mis rutinas">
+                <i data-lucide="arrow-left"></i>
+              </button>
+              <!-- BACKEND: {{rutina.nombre}} -->
+              <h1 class="titulo-detalle" id="titulo-rutina-actual">Jueves</h1>
+            </div>
+
+            <!-- Controles de modo -->
+            <div class="controles-modo" role="group" aria-label="Modo de visualización">
+              <!-- Toggle Edición / Entrenamiento -->
+              <div class="toggle-modo" id="toggle-modo" role="switch" aria-checked="false" tabindex="0" aria-label="Activar modo edición">
+                <span class="toggle-etiqueta toggle-etiqueta-izq">Entrenar</span>
+                <div class="toggle-pista">
+                  <div class="toggle-pulgar"></div>
+                </div>
+                <span class="toggle-etiqueta toggle-etiqueta-der">Editar</span>
+              </div>
+
+              <button class="boton-opciones-detalle" aria-label="Más opciones de la rutina" aria-haspopup="true">
+                <i data-lucide="more-vertical"></i>
+              </button>
+            </div>
+          </header>
+
+          <!-- ── LAYOUT BENTO: Lista ejercicios + Panel resumen ── -->
+          <div class="layout-bento" id="layout-bento">
+
+            <!-- ════ COLUMNA IZQUIERDA: Lista de ejercicios ════ -->
+            <div class="columna-ejercicios">
+
+              <!-- Tarjeta de bienvenida al modo edición (solo visible en edición) -->
+              <div class="aviso-modo-edicion oculto" id="aviso-modo-edicion" role="alert">
+                <i data-lucide="pencil"></i>
+                <span>Modo edición activo. Los cambios no se guardan hasta que presiones <strong>Guardar</strong>.</span>
+              </div>
+
+              <!-- LISTA DE EJERCICIOS -->
+              <!-- BACKEND: GET /routines/{routineId}/exercises -->
+              <ul class="lista-ejercicios-rutina" id="lista-ejercicios-rutina" role="list" aria-label="Ejercicios de la rutina">
+
+                <!-- ══ ARTÍCULO DE EJERCICIO ══ -->
+                <!-- BACKEND: data-ejercicio-id="{{ejercicio.id}}" data-nombre="{{ejercicio.nombre}}" -->
+                <article class="tarjeta-ejercicio" data-ejercicio-id="ej-001" data-nombre="Bench Press (Barbell)" role="listitem">
+
+                  <!-- Cabecera del ejercicio -->
+                  <div class="cabecera-ejercicio">
+                    <!-- Imagen/ícono del ejercicio -->
+                    <div class="imagen-ejercicio-wrap">
+                      <!-- BACKEND: <img src="{{ejercicio.imagen_url}}" alt="{{ejercicio.nombre}}" /> -->
+                      <div class="imagen-ejercicio-placeholder" aria-hidden="true">
+                        <i data-lucide="dumbbell"></i>
+                      </div>
+                    </div>
+
+                    <div class="info-ejercicio-cabecera">
+                      <h2 class="nombre-ejercicio">Bench Press (Barbell)</h2>
+                      <!-- BACKEND: {{ejercicio.grupo_muscular}} -->
+                      <span class="grupo-muscular-badge">Pecho</span>
+                    </div>
+
+                    <!-- Botones de control (modo edición) -->
+                    <div class="controles-ejercicio-edicion oculto">
+                      <button class="boton-eliminar-ejercicio" aria-label="Eliminar ejercicio Bench Press" data-ejercicio-id="ej-001">
+                        <i data-lucide="trash-2"></i>
+                      </button>
+                    </div>
+
+                    <!-- Indicador de completado (modo entrenamiento) -->
+                    <div class="indicador-completado-ejercicio" aria-hidden="true">
+                      <i data-lucide="check-circle"></i>
+                    </div>
+                  </div>
+
+                  <!-- Nota del ejercicio -->
+                  <!-- BACKEND: {{ejercicio.nota}} -->
+                  <div class="contenedor-nota">
+                    <!-- Modo lectura -->
+                    <p class="nota-ejercicio-lectura oculto-si-vacio" data-campo="nota">—</p>
+                    <!-- Modo edición -->
+                    <textarea class="nota-ejercicio-input campo-edicion oculto" placeholder="Añadir nota al ejercicio..." rows="2" aria-label="Nota del ejercicio"></textarea>
+                  </div>
+
+                  <!-- Timer de descanso del ejercicio (edición) -->
+                  <div class="fila-descanso-edicion campo-edicion oculto">
+                    <label class="etiqueta-campo">
+                      <i data-lucide="timer"></i>
+                      Descanso entre series
+                    </label>
+                    <div class="selector-descanso">
+                      <button class="btn-descanso-dec" aria-label="Reducir descanso">−</button>
+                      <!-- BACKEND: {{ejercicio.descanso_segundos}} -->
+                      <input type="number" class="input-descanso" value="70" min="0" max="600" step="5" aria-label="Segundos de descanso" />
+                      <span class="unidad-descanso">seg</span>
+                      <button class="btn-descanso-inc" aria-label="Aumentar descanso">+</button>
+                    </div>
+                  </div>
+
+                  <!-- Tabla de series -->
+                  <div class="contenedor-tabla-series">
+                    <table class="tabla-series" aria-label="Series del ejercicio">
+                      <thead>
+                        <tr>
+                          <th scope="col" class="col-set">SET</th>
+                          <th scope="col" class="col-tipo">TIPO</th>
+                          <th scope="col" class="col-kg">KG</th>
+                          <th scope="col" class="col-reps">REPS</th>
+                          <!-- Columna check (modo entrenamiento) -->
+                          <th scope="col" class="col-check modo-entrenamiento-col">✓</th>
+                          <!-- Columna eliminar (modo edición) -->
+                          <th scope="col" class="col-eliminar-serie modo-edicion-col oculto" aria-label="Eliminar serie"></th>
+                        </tr>
+                      </thead>
+                      <!-- BACKEND: Iterar {{ejercicio.series}} -->
+                      <tbody class="cuerpo-series" id="series-ej-001">
+
+                        <!-- Fila de serie -->
+                        <!-- BACKEND: data-serie-id="{{serie.id}}" data-tipo="{{serie.tipo}}" -->
+                        <tr class="fila-serie" data-serie-id="serie-001-1" data-tipo="warmup">
+                          <td class="celda-set">
+                            <span class="numero-set">1</span>
+                          </td>
+                          <td class="celda-tipo">
+                            <!-- Lectura: badge de tipo -->
+                            <!-- BACKEND: {{serie.tipo}} → 'warmup' | 'normal' | 'dropset' | 'failure' -->
+                            <span class="badge-tipo badge-tipo-warmup modo-lectura-tipo">W</span>
+                            <!-- Edición: selector de tipo -->
+                            <select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo de serie">
+                              <option value="warmup" selected>Warm-up</option>
+                              <option value="normal">Normal</option>
+                              <option value="dropset">Drop Set</option>
+                              <option value="failure">Failure</option>
+                            </select>
+                          </td>
+                          <td class="celda-kg">
+                            <!-- BACKEND: {{serie.peso_kg}} -->
+                            <span class="valor-lectura">60</span>
+                            <input type="number" class="input-serie campo-edicion oculto" value="60" min="0" step="0.5" aria-label="Peso en kilogramos" placeholder="kg" />
+                          </td>
+                          <td class="celda-reps">
+                            <!-- BACKEND: {{serie.repeticiones}} -->
+                            <span class="valor-lectura">12</span>
+                            <input type="number" class="input-serie campo-edicion oculto" value="12" min="1" step="1" aria-label="Repeticiones" placeholder="reps" />
+                          </td>
+                          <td class="celda-check modo-entrenamiento-col">
+                            <button class="boton-check-serie" aria-label="Marcar serie 1 como completada" aria-pressed="false">
+                              <i data-lucide="check"></i>
+                            </button>
+                          </td>
+                          <td class="celda-eliminar-serie modo-edicion-col oculto">
+                            <button class="boton-eliminar-serie" aria-label="Eliminar serie 1">
+                              <i data-lucide="x"></i>
+                            </button>
+                          </td>
+                        </tr>
+
+                        <tr class="fila-serie" data-serie-id="serie-001-2" data-tipo="normal">
+                          <td class="celda-set"><span class="numero-set">2</span></td>
+                          <td class="celda-tipo">
+                            <span class="badge-tipo badge-tipo-normal modo-lectura-tipo">N</span>
+                            <select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo de serie">
+                              <option value="warmup">Warm-up</option>
+                              <option value="normal" selected>Normal</option>
+                              <option value="dropset">Drop Set</option>
+                              <option value="failure">Failure</option>
+                            </select>
+                          </td>
+                          <td class="celda-kg">
+                            <span class="valor-lectura">80</span>
+                            <input type="number" class="input-serie campo-edicion oculto" value="80" min="0" step="0.5" aria-label="Peso en kilogramos" />
+                          </td>
+                          <td class="celda-reps">
+                            <span class="valor-lectura">8</span>
+                            <input type="number" class="input-serie campo-edicion oculto" value="8" min="1" step="1" aria-label="Repeticiones" />
+                          </td>
+                          <td class="celda-check modo-entrenamiento-col">
+                            <button class="boton-check-serie" aria-label="Marcar serie 2 como completada" aria-pressed="false">
+                              <i data-lucide="check"></i>
+                            </button>
+                          </td>
+                          <td class="celda-eliminar-serie modo-edicion-col oculto">
+                            <button class="boton-eliminar-serie" aria-label="Eliminar serie 2"><i data-lucide="x"></i></button>
+                          </td>
+                        </tr>
+
+                        <tr class="fila-serie" data-serie-id="serie-001-3" data-tipo="normal">
+                          <td class="celda-set"><span class="numero-set">3</span></td>
+                          <td class="celda-tipo">
+                            <span class="badge-tipo badge-tipo-normal modo-lectura-tipo">N</span>
+                            <select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo de serie">
+                              <option value="warmup">Warm-up</option>
+                              <option value="normal" selected>Normal</option>
+                              <option value="dropset">Drop Set</option>
+                              <option value="failure">Failure</option>
+                            </select>
+                          </td>
+                          <td class="celda-kg">
+                            <span class="valor-lectura">80</span>
+                            <input type="number" class="input-serie campo-edicion oculto" value="80" min="0" step="0.5" aria-label="Peso en kilogramos" />
+                          </td>
+                          <td class="celda-reps">
+                            <span class="valor-lectura">8</span>
+                            <input type="number" class="input-serie campo-edicion oculto" value="8" min="1" step="1" aria-label="Repeticiones" />
+                          </td>
+                          <td class="celda-check modo-entrenamiento-col">
+                            <button class="boton-check-serie" aria-label="Marcar serie 3 como completada" aria-pressed="false">
+                              <i data-lucide="check"></i>
+                            </button>
+                          </td>
+                          <td class="celda-eliminar-serie modo-edicion-col oculto">
+                            <button class="boton-eliminar-serie" aria-label="Eliminar serie 3"><i data-lucide="x"></i></button>
+                          </td>
+                        </tr>
+
+                        <tr class="fila-serie" data-serie-id="serie-001-4" data-tipo="failure">
+                          <td class="celda-set"><span class="numero-set">4</span></td>
+                          <td class="celda-tipo">
+                            <span class="badge-tipo badge-tipo-failure modo-lectura-tipo">F</span>
+                            <select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo de serie">
+                              <option value="warmup">Warm-up</option>
+                              <option value="normal">Normal</option>
+                              <option value="dropset">Drop Set</option>
+                              <option value="failure" selected>Failure</option>
+                            </select>
+                          </td>
+                          <td class="celda-kg">
+                            <span class="valor-lectura">85</span>
+                            <input type="number" class="input-serie campo-edicion oculto" value="85" min="0" step="0.5" aria-label="Peso en kilogramos" />
+                          </td>
+                          <td class="celda-reps">
+                            <span class="valor-lectura">—</span>
+                            <input type="number" class="input-serie campo-edicion oculto" value="" min="1" step="1" aria-label="Repeticiones" placeholder="—" />
+                          </td>
+                          <td class="celda-check modo-entrenamiento-col">
+                            <button class="boton-check-serie" aria-label="Marcar serie 4 como completada" aria-pressed="false">
+                              <i data-lucide="check"></i>
+                            </button>
+                          </td>
+                          <td class="celda-eliminar-serie modo-edicion-col oculto">
+                            <button class="boton-eliminar-serie" aria-label="Eliminar serie 4"><i data-lucide="x"></i></button>
+                          </td>
+                        </tr>
+
+                        <tr class="fila-serie" data-serie-id="serie-001-5" data-tipo="dropset">
+                          <td class="celda-set"><span class="numero-set">5</span></td>
+                          <td class="celda-tipo">
+                            <span class="badge-tipo badge-tipo-dropset modo-lectura-tipo">D</span>
+                            <select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo de serie">
+                              <option value="warmup">Warm-up</option>
+                              <option value="normal">Normal</option>
+                              <option value="dropset" selected>Drop Set</option>
+                              <option value="failure">Failure</option>
+                            </select>
+                          </td>
+                          <td class="celda-kg">
+                            <span class="valor-lectura">70</span>
+                            <input type="number" class="input-serie campo-edicion oculto" value="70" min="0" step="0.5" aria-label="Peso en kilogramos" />
+                          </td>
+                          <td class="celda-reps">
+                            <span class="valor-lectura">12</span>
+                            <input type="number" class="input-serie campo-edicion oculto" value="12" min="1" step="1" aria-label="Repeticiones" />
+                          </td>
+                          <td class="celda-check modo-entrenamiento-col">
+                            <button class="boton-check-serie" aria-label="Marcar serie 5 como completada" aria-pressed="false">
+                              <i data-lucide="check"></i>
+                            </button>
+                          </td>
+                          <td class="celda-eliminar-serie modo-edicion-col oculto">
+                            <button class="boton-eliminar-serie" aria-label="Eliminar serie 5"><i data-lucide="x"></i></button>
+                          </td>
+                        </tr>
+
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Botón añadir serie (solo edición) -->
+                  <button class="boton-anadir-serie campo-edicion oculto" data-ejercicio-id="ej-001" aria-label="Añadir serie al ejercicio">
+                    <i data-lucide="plus"></i> Añadir serie
+                  </button>
+
+                </article>
+                <!-- /TARJETA EJERCICIO 1 -->
+
+                <!-- ══ EJERCICIO 2 ══ -->
+                <article class="tarjeta-ejercicio" data-ejercicio-id="ej-002" data-nombre="Standing Military Press (Barbell)" role="listitem">
+                  <div class="cabecera-ejercicio">
+                    <div class="imagen-ejercicio-wrap">
+                      <div class="imagen-ejercicio-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                    </div>
+                    <div class="info-ejercicio-cabecera">
+                      <h2 class="nombre-ejercicio">Standing Military Press (Barbell)</h2>
+                      <span class="grupo-muscular-badge">Hombros</span>
+                    </div>
+                    <div class="controles-ejercicio-edicion oculto">
+                      <button class="boton-eliminar-ejercicio" aria-label="Eliminar ejercicio Standing Military Press" data-ejercicio-id="ej-002">
+                        <i data-lucide="trash-2"></i>
+                      </button>
+                    </div>
+                    <div class="indicador-completado-ejercicio" aria-hidden="true"><i data-lucide="check-circle"></i></div>
+                  </div>
+                  <div class="contenedor-nota">
+                    <p class="nota-ejercicio-lectura oculto-si-vacio" data-campo="nota">—</p>
+                    <textarea class="nota-ejercicio-input campo-edicion oculto" placeholder="Añadir nota al ejercicio..." rows="2" aria-label="Nota del ejercicio"></textarea>
+                  </div>
+                  <div class="fila-descanso-edicion campo-edicion oculto">
+                    <label class="etiqueta-campo"><i data-lucide="timer"></i> Descanso entre series</label>
+                    <div class="selector-descanso">
+                      <button class="btn-descanso-dec" aria-label="Reducir descanso">−</button>
+                      <input type="number" class="input-descanso" value="70" min="0" max="600" step="5" aria-label="Segundos de descanso" />
+                      <span class="unidad-descanso">seg</span>
+                      <button class="btn-descanso-inc" aria-label="Aumentar descanso">+</button>
+                    </div>
+                  </div>
+                  <div class="contenedor-tabla-series">
+                    <table class="tabla-series" aria-label="Series del ejercicio">
+                      <thead>
+                        <tr>
+                          <th scope="col" class="col-set">SET</th>
+                          <th scope="col" class="col-tipo">TIPO</th>
+                          <th scope="col" class="col-kg">KG</th>
+                          <th scope="col" class="col-reps">REPS</th>
+                          <th scope="col" class="col-check modo-entrenamiento-col">✓</th>
+                          <th scope="col" class="col-eliminar-serie modo-edicion-col oculto" aria-label="Eliminar"></th>
+                        </tr>
+                      </thead>
+                      <tbody class="cuerpo-series" id="series-ej-002">
+                        <tr class="fila-serie" data-tipo="normal">
+                          <td class="celda-set"><span class="numero-set">1</span></td>
+                          <td class="celda-tipo">
+                            <span class="badge-tipo badge-tipo-normal modo-lectura-tipo">N</span>
+                            <select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo de serie"><option value="warmup">Warm-up</option><option value="normal" selected>Normal</option><option value="dropset">Drop Set</option><option value="failure">Failure</option></select>
+                          </td>
+                          <td class="celda-kg"><span class="valor-lectura">50</span><input type="number" class="input-serie campo-edicion oculto" value="50" min="0" step="0.5" aria-label="kg" /></td>
+                          <td class="celda-reps"><span class="valor-lectura">6</span><input type="number" class="input-serie campo-edicion oculto" value="6" min="1" step="1" aria-label="reps" /></td>
+                          <td class="celda-check modo-entrenamiento-col"><button class="boton-check-serie" aria-label="Marcar serie como completada" aria-pressed="false"><i data-lucide="check"></i></button></td>
+                          <td class="celda-eliminar-serie modo-edicion-col oculto"><button class="boton-eliminar-serie" aria-label="Eliminar serie"><i data-lucide="x"></i></button></td>
+                        </tr>
+                        <tr class="fila-serie" data-tipo="normal">
+                          <td class="celda-set"><span class="numero-set">2</span></td>
+                          <td class="celda-tipo">
+                            <span class="badge-tipo badge-tipo-normal modo-lectura-tipo">N</span>
+                            <select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo de serie"><option value="warmup">Warm-up</option><option value="normal" selected>Normal</option><option value="dropset">Drop Set</option><option value="failure">Failure</option></select>
+                          </td>
+                          <td class="celda-kg"><span class="valor-lectura">55</span><input type="number" class="input-serie campo-edicion oculto" value="55" min="0" step="0.5" aria-label="kg" /></td>
+                          <td class="celda-reps"><span class="valor-lectura">6</span><input type="number" class="input-serie campo-edicion oculto" value="6" min="1" step="1" aria-label="reps" /></td>
+                          <td class="celda-check modo-entrenamiento-col"><button class="boton-check-serie" aria-label="Marcar serie como completada" aria-pressed="false"><i data-lucide="check"></i></button></td>
+                          <td class="celda-eliminar-serie modo-edicion-col oculto"><button class="boton-eliminar-serie" aria-label="Eliminar serie"><i data-lucide="x"></i></button></td>
+                        </tr>
+                        <tr class="fila-serie" data-tipo="normal">
+                          <td class="celda-set"><span class="numero-set">3</span></td>
+                          <td class="celda-tipo">
+                            <span class="badge-tipo badge-tipo-normal modo-lectura-tipo">N</span>
+                            <select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo de serie"><option value="warmup">Warm-up</option><option value="normal" selected>Normal</option><option value="dropset">Drop Set</option><option value="failure">Failure</option></select>
+                          </td>
+                          <td class="celda-kg"><span class="valor-lectura">55</span><input type="number" class="input-serie campo-edicion oculto" value="55" min="0" step="0.5" aria-label="kg" /></td>
+                          <td class="celda-reps"><span class="valor-lectura">6</span><input type="number" class="input-serie campo-edicion oculto" value="6" min="1" step="1" aria-label="reps" /></td>
+                          <td class="celda-check modo-entrenamiento-col"><button class="boton-check-serie" aria-label="Marcar serie como completada" aria-pressed="false"><i data-lucide="check"></i></button></td>
+                          <td class="celda-eliminar-serie modo-edicion-col oculto"><button class="boton-eliminar-serie" aria-label="Eliminar serie"><i data-lucide="x"></i></button></td>
+                        </tr>
+                        <tr class="fila-serie" data-tipo="normal">
+                          <td class="celda-set"><span class="numero-set">4</span></td>
+                          <td class="celda-tipo">
+                            <span class="badge-tipo badge-tipo-normal modo-lectura-tipo">N</span>
+                            <select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo de serie"><option value="warmup">Warm-up</option><option value="normal" selected>Normal</option><option value="dropset">Drop Set</option><option value="failure">Failure</option></select>
+                          </td>
+                          <td class="celda-kg"><span class="valor-lectura">55</span><input type="number" class="input-serie campo-edicion oculto" value="55" min="0" step="0.5" aria-label="kg" /></td>
+                          <td class="celda-reps"><span class="valor-lectura">6</span><input type="number" class="input-serie campo-edicion oculto" value="6" min="1" step="1" aria-label="reps" /></td>
+                          <td class="celda-check modo-entrenamiento-col"><button class="boton-check-serie" aria-label="Marcar serie como completada" aria-pressed="false"><i data-lucide="check"></i></button></td>
+                          <td class="celda-eliminar-serie modo-edicion-col oculto"><button class="boton-eliminar-serie" aria-label="Eliminar serie"><i data-lucide="x"></i></button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <button class="boton-anadir-serie campo-edicion oculto" data-ejercicio-id="ej-002" aria-label="Añadir serie"><i data-lucide="plus"></i> Añadir serie</button>
+                </article>
+
+                <!-- ══ EJERCICIO 3 ══ -->
+                <article class="tarjeta-ejercicio" data-ejercicio-id="ej-003" data-nombre="Chest Dip" role="listitem">
+                  <div class="cabecera-ejercicio">
+                    <div class="imagen-ejercicio-wrap"><div class="imagen-ejercicio-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div></div>
+                    <div class="info-ejercicio-cabecera">
+                      <h2 class="nombre-ejercicio">Chest Dip</h2>
+                      <span class="grupo-muscular-badge">Pecho</span>
+                    </div>
+                    <div class="controles-ejercicio-edicion oculto"><button class="boton-eliminar-ejercicio" aria-label="Eliminar ejercicio Chest Dip" data-ejercicio-id="ej-003"><i data-lucide="trash-2"></i></button></div>
+                    <div class="indicador-completado-ejercicio" aria-hidden="true"><i data-lucide="check-circle"></i></div>
+                  </div>
+                  <div class="contenedor-nota">
+                    <p class="nota-ejercicio-lectura" data-campo="nota">Mantener el torso inclinado hacia adelante</p>
+                    <textarea class="nota-ejercicio-input campo-edicion oculto" placeholder="Añadir nota..." rows="2" aria-label="Nota del ejercicio">Mantener el torso inclinado hacia adelante</textarea>
+                  </div>
+                  <div class="fila-descanso-edicion campo-edicion oculto">
+                    <label class="etiqueta-campo"><i data-lucide="timer"></i> Descanso entre series</label>
+                    <div class="selector-descanso">
+                      <button class="btn-descanso-dec" aria-label="Reducir descanso">−</button>
+                      <input type="number" class="input-descanso" value="90" min="0" max="600" step="5" aria-label="Segundos de descanso" />
+                      <span class="unidad-descanso">seg</span>
+                      <button class="btn-descanso-inc" aria-label="Aumentar descanso">+</button>
+                    </div>
+                  </div>
+                  <div class="contenedor-tabla-series">
+                    <table class="tabla-series" aria-label="Series del ejercicio">
+                      <thead><tr><th class="col-set">SET</th><th class="col-tipo">TIPO</th><th class="col-kg">KG</th><th class="col-reps">REPS</th><th class="col-check modo-entrenamiento-col">✓</th><th class="col-eliminar-serie modo-edicion-col oculto"></th></tr></thead>
+                      <tbody class="cuerpo-series" id="series-ej-003">
+                        <tr class="fila-serie" data-tipo="normal"><td class="celda-set"><span class="numero-set">1</span></td><td class="celda-tipo"><span class="badge-tipo badge-tipo-normal modo-lectura-tipo">N</span><select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo"><option value="warmup">Warm-up</option><option value="normal" selected>Normal</option><option value="dropset">Drop Set</option><option value="failure">Failure</option></select></td><td class="celda-kg"><span class="valor-lectura">BW</span><input type="number" class="input-serie campo-edicion oculto" value="" placeholder="BW" min="0" step="0.5" aria-label="kg" /></td><td class="celda-reps"><span class="valor-lectura">8</span><input type="number" class="input-serie campo-edicion oculto" value="8" min="1" step="1" aria-label="reps" /></td><td class="celda-check modo-entrenamiento-col"><button class="boton-check-serie" aria-label="Marcar serie como completada" aria-pressed="false"><i data-lucide="check"></i></button></td><td class="celda-eliminar-serie modo-edicion-col oculto"><button class="boton-eliminar-serie" aria-label="Eliminar"><i data-lucide="x"></i></button></td></tr>
+                        <tr class="fila-serie" data-tipo="normal"><td class="celda-set"><span class="numero-set">2</span></td><td class="celda-tipo"><span class="badge-tipo badge-tipo-normal modo-lectura-tipo">N</span><select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo"><option value="warmup">Warm-up</option><option value="normal" selected>Normal</option><option value="dropset">Drop Set</option><option value="failure">Failure</option></select></td><td class="celda-kg"><span class="valor-lectura">BW</span><input type="number" class="input-serie campo-edicion oculto" value="" placeholder="BW" min="0" step="0.5" aria-label="kg" /></td><td class="celda-reps"><span class="valor-lectura">10</span><input type="number" class="input-serie campo-edicion oculto" value="10" min="1" step="1" aria-label="reps" /></td><td class="celda-check modo-entrenamiento-col"><button class="boton-check-serie" aria-label="Marcar serie como completada" aria-pressed="false"><i data-lucide="check"></i></button></td><td class="celda-eliminar-serie modo-edicion-col oculto"><button class="boton-eliminar-serie" aria-label="Eliminar"><i data-lucide="x"></i></button></td></tr>
+                        <tr class="fila-serie" data-tipo="failure"><td class="celda-set"><span class="numero-set">3</span></td><td class="celda-tipo"><span class="badge-tipo badge-tipo-failure modo-lectura-tipo">F</span><select class="selector-tipo-serie campo-edicion oculto" aria-label="Tipo"><option value="warmup">Warm-up</option><option value="normal">Normal</option><option value="dropset">Drop Set</option><option value="failure" selected>Failure</option></select></td><td class="celda-kg"><span class="valor-lectura">BW</span><input type="number" class="input-serie campo-edicion oculto" value="" placeholder="BW" min="0" step="0.5" aria-label="kg" /></td><td class="celda-reps"><span class="valor-lectura">—</span><input type="number" class="input-serie campo-edicion oculto" value="" min="1" step="1" aria-label="reps" placeholder="—" /></td><td class="celda-check modo-entrenamiento-col"><button class="boton-check-serie" aria-label="Marcar serie como completada" aria-pressed="false"><i data-lucide="check"></i></button></td><td class="celda-eliminar-serie modo-edicion-col oculto"><button class="boton-eliminar-serie" aria-label="Eliminar"><i data-lucide="x"></i></button></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <button class="boton-anadir-serie campo-edicion oculto" data-ejercicio-id="ej-003" aria-label="Añadir serie"><i data-lucide="plus"></i> Añadir serie</button>
+                </article>
+
+              </ul>
+              <!-- /LISTA DE EJERCICIOS -->
+
+              <!-- ── BOTÓN AÑADIR EJERCICIO (solo en modo edición) ── -->
+              <!-- BACKEND: Abre un modal/drawer para buscar ejercicios en GET /exercises -->
+              <button class="boton-anadir-ejercicio campo-edicion oculto" id="boton-anadir-ejercicio" aria-label="Añadir ejercicio a la rutina">
+                <i data-lucide="plus-circle"></i>
+                <span>Añadir ejercicio</span>
+              </button>
+
+              <!-- ── BARRA STICKY DE ACCIONES MODO EDICIÓN ── -->
+              <div class="barra-acciones-edicion oculto" id="barra-acciones-edicion" role="toolbar" aria-label="Acciones de edición">
+                <button class="boton-cancelar-edicion" id="boton-cancelar-edicion" aria-label="Cancelar cambios">
+                  Cancelar
+                </button>
+                <!-- BACKEND: PUT /routines/{routineId} con el payload generado por recopilarDatosRutina() -->
+                <button class="boton-guardar-cambios" id="boton-guardar-cambios" aria-label="Guardar cambios de la rutina">
+                  <i data-lucide="save"></i>
+                  <span>Guardar cambios</span>
+                </button>
+              </div>
+
+            </div>
+            <!-- /COLUMNA EJERCICIOS -->
+
+            <!-- ════ PANEL LATERAL DE RESUMEN ════ -->
+            <aside class="panel-resumen" aria-label="Resumen de la rutina">
+
+              <!-- Tarjeta: Creado por -->
+              <!-- BACKEND: {{rutina.creador.handle}} y {{rutina.creador.avatar}} -->
+              <div class="tarjeta-panel creador-rutina-panel">
+                <div class="creador-avatar-wrap">
+                  <div class="creador-avatar">J</div>
+                </div>
+                <div class="creador-info">
+                  <span class="creador-etiqueta">Creado por</span>
+                  <span class="creador-handle">jeremyinfante</span>
+                </div>
+              </div>
+
+              <!-- Tarjeta: Acciones primarias -->
+              <div class="tarjeta-panel acciones-panel">
+                <button class="boton-editar-rutina-panel" id="boton-editar-rutina-panel" aria-label="Editar rutina">
+                  <i data-lucide="pencil"></i>
+                  Editar rutina
+                </button>
+                <button class="boton-copiar-enlace-panel" id="boton-copiar-enlace" aria-label="Copiar enlace de la rutina">
+                  <i data-lucide="link"></i>
+                  Copiar enlace
+                </button>
+              </div>
+
+              <!-- Tarjeta: Resumen de la rutina -->
+              <!-- BACKEND: Calcular dinámicamente desde {{rutina.ejercicios}} -->
+              <div class="tarjeta-panel resumen-stats-panel" aria-label="Estadísticas de la rutina">
+                <h3 class="titulo-tarjeta-panel">Resumen</h3>
+                <div class="grid-stats-resumen">
+                  <div class="stat-resumen">
+                    <span class="stat-resumen-numero" id="stat-total-ejercicios">4</span>
+                    <span class="stat-resumen-etiqueta">Ejercicios</span>
+                  </div>
+                  <div class="stat-resumen">
+                    <span class="stat-resumen-numero" id="stat-total-series">15</span>
+                    <span class="stat-resumen-etiqueta">Series totales</span>
+                  </div>
+                  <div class="stat-resumen">
+                    <span class="stat-resumen-numero" id="stat-duracion-estimada">29min</span>
+                    <span class="stat-resumen-etiqueta">Duración est.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tarjeta: Progreso de la sesión (solo modo entrenamiento) -->
+              <div class="tarjeta-panel progreso-sesion-panel" id="panel-progreso-sesion" aria-label="Progreso del entrenamiento">
+                <h3 class="titulo-tarjeta-panel">Progreso</h3>
+                <div class="barra-progreso-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="barra-progreso-wrap">
+                  <div class="barra-progreso-fondo">
+                    <div class="barra-progreso-relleno" id="barra-progreso-relleno" style="width: 0%"></div>
+                  </div>
+                  <span class="texto-progreso" id="texto-progreso">0 / 15 series</span>
+                </div>
+
+                <!-- Indicadores de ejercicios completados -->
+                <div class="indicadores-progreso" id="indicadores-progreso" aria-label="Estado de ejercicios">
+                  <!-- BACKEND: Se generan dinámicamente por JS -->
+                </div>
+              </div>
+
+              <!-- Tarjeta: Músculos trabajados (placeholder visual) -->
+              <div class="tarjeta-panel musculos-panel" aria-label="Músculos trabajados">
+                <h3 class="titulo-tarjeta-panel">Músculos</h3>
+                <ul class="lista-musculos" id="lista-musculos-panel" aria-label="Lista de músculos trabajados">
+                  <!-- BACKEND: Calcular desde {{rutina.ejercicios.map(e => e.grupo_muscular)}} -->
+                  <li class="item-musculo">
+                    <span class="nombre-musculo">Hombros</span>
+                    <div class="barra-musculo-fondo"><div class="barra-musculo-relleno" style="width: 75%"></div></div>
+                    <span class="series-musculo">9.5 sets</span>
+                  </li>
+                  <li class="item-musculo">
+                    <span class="nombre-musculo">Pecho</span>
+                    <div class="barra-musculo-fondo"><div class="barra-musculo-relleno" style="width: 60%"></div></div>
+                    <span class="series-musculo">7 sets</span>
+                  </li>
+                  <li class="item-musculo">
+                    <span class="nombre-musculo">Tríceps</span>
+                    <div class="barra-musculo-fondo"><div class="barra-musculo-relleno" style="width: 40%"></div></div>
+                    <span class="series-musculo">4.5 sets</span>
+                  </li>
+                </ul>
+              </div>
+
+            </aside>
+            <!-- /PANEL RESUMEN -->
+
+          </div>
+          <!-- /LAYOUT BENTO -->
+
+        </section>
+        <!-- /VISTA DETALLE -->
+
+      </main>
+    </div>
+    <!-- /AREA CONTENIDO -->
+
+    <!-- Bottom nav móvil -->
+    <nav class="nav-movil" aria-label="Navegación móvil">
+      <a href="../pages/feed.html" class="enlace-nav-movil" aria-label="Feed"><i data-lucide="home"></i><span>Feed</span></a>
+      <a href="#" class="enlace-nav-movil activo" aria-current="page" aria-label="Rutinas"><i data-lucide="clipboard-list"></i><span>Rutinas</span></a>
+      <a href="#" class="enlace-nav-movil enlace-nav-movil-central" aria-label="Nuevo entreno"><i data-lucide="plus"></i></a>
+      <a href="#" class="enlace-nav-movil" aria-label="Ejercicios"><i data-lucide="dumbbell"></i><span>Ejercicios</span></a>
+      <a href="#" class="enlace-nav-movil" aria-label="Perfil"><i data-lucide="user"></i><span>Perfil</span></a>
+    </nav>
+
+  </div>
+  <!-- /CONTENEDOR APP -->
+
+  <!-- Menú contextual (se renderiza desde JS) -->
+  <!-- El HTML se inserta dinámicamente para evitar duplicar el menú en cada tarjeta -->
+
+  <!-- Toast de notificación -->
+  <div class="toast-notificacion" id="toast-notificacion" role="alert" aria-live="polite" aria-atomic="true">
+    <i data-lucide="check-circle" class="toast-icono"></i>
+    <span class="toast-mensaje" id="toast-mensaje">Cambios guardados</span>
+  </div>
+
+  <script src="../assets/js/rutina.js"></script>
+</body>
+</html>

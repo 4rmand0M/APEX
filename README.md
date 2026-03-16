@@ -1,5 +1,5 @@
 
-## 📦 Próximas páginas sugeridas
+# 📦 Próximas páginas sugeridas
 
 - `pages/rutinas.html`   — Gestión de rutinas
 - `pages/sesion.html`    — Registro de sesión activa

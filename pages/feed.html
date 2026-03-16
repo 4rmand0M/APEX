@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APEX FITNESS — Feed</title>
+
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
+    rel="stylesheet" />
+
+  <!-- Iconos Lucide -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- Estilos en orden -->
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/feed.css" />
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       CURSOR PERSONALIZADO (punto)
+  ═══════════════════════════════════════════════ -->
+  <div id="cursor-punto" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════════
+       PANTALLA DE CARGA
+  ═══════════════════════════════════════════════ -->
+  <div id="pantalla-carga" role="status" aria-label="Cargando APEX FITNESS">
+    <div class="logo-carga">
+      <!-- Ícono SVG de la barra de pesas -->
+      <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true">
+        <rect class="svg-trazar" x="3" y="18" width="5" height="6" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
+        <rect class="svg-trazar" x="34" y="18" width="5" height="6" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
+        <rect class="svg-trazar" x="8" y="15" width="4" height="12" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
+        <rect class="svg-trazar" x="30" y="15" width="4" height="12" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
+        <line class="svg-trazar" x1="12" y1="21" x2="30" y2="21" stroke="#C8F400" stroke-width="1.8"
+          stroke-linecap="round" />
+      </svg>
+      <span class="carga-nombre">APEX</span>
+      <span class="carga-slogan">Performance Tracking</span>
+    </div>
+    <div class="barra-carga-fondo">
+      <div class="barra-carga-relleno"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       LAYOUT PRINCIPAL (grid: sidebar + contenido)
+  ═══════════════════════════════════════════════ -->
+  <div class="contenedor-app" id="app">
+
+    <!-- ─────────────────────────────────────────
+         SIDEBAR DE NAVEGACIÓN
+    ───────────────────────────────────────── -->
+    <aside class="barra-lateral" role="navigation" aria-label="Navegación principal">
+
+      <!-- Logo -->
+      <a href="#" class="logo-barra" aria-label="APEX FITNESS - Inicio">
+        <svg width="26" height="26" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true">
+          <rect x="3" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+          <rect x="34" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+          <rect x="8" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+          <rect x="30" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+          <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <span class="logo-texto">APEX</span>
+      </a>
+
+      <!-- Navegación principal -->
+      <nav class="nav-principal">
+        <ul class="lista-nav" role="list">
+          <li>
+            <a href="feed.html" class="enlace-nav activo" data-pagina="feed" aria-current="page">
+              <i data-lucide="home" aria-hidden="true"></i>
+              <span>Feed</span>
+            </a>
+          </li>
+          <li>
+            <a href="../pages/rutina.html" class="enlace-nav" data-pagina="rutinas">
+              <i data-lucide="clipboard-list" aria-hidden="true"></i>
+              <span>Rutinas</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="enlace-nav" data-pagina="ejercicios">
+              <i data-lucide="dumbbell" aria-hidden="true"></i>
+              <span>Ejercicios</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="enlace-nav" data-pagina="gimnasios">
+              <i data-lucide="map-pin" aria-hidden="true"></i>
+              <span>Gimnasios</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="enlace-nav" data-pagina="perfil">
+              <i data-lucide="user" aria-hidden="true"></i>
+              <span>Perfil</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Acciones inferiores de la barra -->
+      <div class="nav-inferior">
+        <!-- Botón cambio de tema -->
+        <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema" title="Cambiar tema">
+          <i data-lucide="sun" class="icono-tema icono-claro" aria-hidden="true"></i>
+          <i data-lucide="moon" class="icono-tema icono-oscuro" aria-hidden="true"></i>
+        </button>
+
+        <!-- Separador -->
+        <hr class="separador-nav" />
+
+        <!-- Usuario actual -->
+        <!-- BACKEND: Reemplazar datos estáticos con los del usuario autenticado (sesión/JWT) -->
+        <a href="#" class="usuario-barra" aria-label="Ver perfil de usuario">
+          <div class="avatar-barra" aria-hidden="true">J</div>
+          <div class="info-usuario-barra">
+            <span class="nombre-usuario-barra">Jeremy Infante</span>
+            <span class="handle-usuario-barra">@jeremyinfante</span>
+          </div>
+          <i data-lucide="log-out" class="icono-logout" aria-hidden="true"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ─────────────────────────────────────────
+         CONTENIDO PRINCIPAL
+    ───────────────────────────────────────── -->
+    <div class="area-contenido">
+
+      <!-- ── FEED CENTRAL ── -->
+      <main class="columna-feed" id="columna-feed" role="main">
+
+        <!-- Cabecera del feed -->
+        <header class="cabecera-feed">
+          <h1 class="titulo-feed">Feed</h1>
+
+          <!-- Botón registrar entreno (mobile: visible aquí; desktop: en panel derecho) -->
+          <button class="boton-registrar-entreno boton-registrar-movil" id="boton-nuevo-entreno-movil"
+            aria-label="Registrar nuevo entrenamiento">
+            <i data-lucide="plus" aria-hidden="true"></i>
+            <span>Registrar entreno</span>
+          </button>
+        </header>
+
+        <!-- ════════════════════════════════
+             ESTADO NORMAL: LISTA DE PUBLICACIONES
+             BACKEND: Fetch a GET /feed?page=1&limit=10
+                      Iterar y renderizar tarjetas dinámicamente
+        ════════════════════════════════ -->
+        <section class="lista-publicaciones" id="lista-publicaciones" aria-label="Publicaciones del feed">
+
+          <!-- ── TARJETA DE PUBLICACIÓN ── -->
+          <!-- BACKEND: Componente reutilizable. Generar una <article> por cada sesión del feed -->
+          <article class="tarjeta-publicacion" data-id="pub-001">
+            <header class="cabecera-publicacion">
+              <a href="#" class="enlace-autor" aria-label="Ver perfil de jeremyinfante">
+                <div class="avatar-publicacion" aria-hidden="true">J</div>
+              </a>
+              <div class="meta-publicacion">
+                <div class="fila-meta-superior">
+                  <!-- BACKEND: {{usuario.handle}} -->
+                  <a href="#" class="nombre-publicacion">jeremyinfante</a>
+                  <!-- BACKEND: Badge de privacidad: "Solo yo" / "Seguidores" / "Público" -->
+                  <span class="badge-privacidad">
+                    <i data-lucide="lock" aria-hidden="true"></i>
+                    Solo tú
+                  </span>
+                </div>
+                <!-- BACKEND: {{sesion.fecha}} formateada con Intl.DateTimeFormat -->
+                <time class="fecha-publicacion" datetime="2025-06-21T19:00">21 Jun 2025, 19:00</time>
+              </div>
+              <!-- Menú de opciones de la publicación -->
+              <button class="boton-opciones-pub" aria-label="Opciones de publicación" aria-haspopup="true">
+                <i data-lucide="more-horizontal" aria-hidden="true"></i>
+              </button>
+            </header>
+
+            <div class="cuerpo-publicacion">
+              <!-- BACKEND: {{sesion.nombre}} y {{sesion.hashtags}} -->
+              <h2 class="titulo-publicacion">Lunes</h2>
+              <p class="hashtags-publicacion">#hoytocapecho</p>
+
+              <!-- Estadísticas de la sesión -->
+              <!-- BACKEND: {{sesion.duracion_min}} y {{sesion.volumen_kg}} -->
+              <div class="estadisticas-sesion" role="list" aria-label="Estadísticas del entrenamiento">
+                <div class="stat-sesion" role="listitem">
+                  <i data-lucide="timer" aria-hidden="true"></i>
+                  <div>
+                    <span class="stat-etiqueta">Duración</span>
+                    <span class="stat-valor">22min</span>
+                  </div>
+                </div>
+                <div class="stat-sesion" role="listitem">
+                  <i data-lucide="weight" aria-hidden="true"></i>
+                  <div>
+                    <span class="stat-etiqueta">Volumen</span>
+                    <span class="stat-valor">2,100 kg</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lista de ejercicios realizados -->
+              <!-- BACKEND: Iterar {{sesion.ejercicios}}, mostrar máx. 3 y un enlace "Ver N más" -->
+              <ul class="lista-ejercicios-sesion" aria-label="Ejercicios realizados">
+                <li class="item-ejercicio-sesion">
+                  <div class="imagen-ejercicio" aria-hidden="true">
+                    <!-- BACKEND: <img src="{{ejercicio.imagen_url}}" alt="{{ejercicio.nombre}}" /> -->
+                    <i data-lucide="dumbbell"></i>
+                  </div>
+                  <span>4 series · Bench Press (Barbell)</span>
+                </li>
+                <li class="item-ejercicio-sesion">
+                  <div class="imagen-ejercicio" aria-hidden="true">
+                    <i data-lucide="dumbbell"></i>
+                  </div>
+                  <span>3 series · Incline Bench Press (Dumbbell)</span>
+                </li>
+                <li class="item-ejercicio-sesion">
+                  <div class="imagen-ejercicio" aria-hidden="true">
+                    <i data-lucide="dumbbell"></i>
+                  </div>
+                  <span>4 series · Lateral Raise (Dumbbell)</span>
+                </li>
+              </ul>
+
+              <!-- BACKEND: Si sesion.ejercicios.length > 3, mostrar este enlace -->
+              <button class="boton-ver-mas-ejercicios" aria-label="Ver 2 ejercicios más">
+                Ver 2 ejercicios más
+              </button>
+            </div>
+
+            <!-- Acciones de la tarjeta -->
+            <footer class="pie-publicacion">
+              <div class="acciones-publicacion">
+                <!-- BACKEND: POST /feed/{id}/like — Toggle clase "activo" según estado -->
+                <button class="accion-pub" id="btn-like-001" aria-label="Me gusta" aria-pressed="false">
+                  <i data-lucide="thumbs-up" aria-hidden="true"></i>
+                  <span class="contador-accion">0</span>
+                </button>
+                <!-- BACKEND: Abrir sección de comentarios -->
+                <button class="accion-pub" aria-label="Comentarios">
+                  <i data-lucide="message-circle" aria-hidden="true"></i>
+                  <span class="contador-accion">0</span>
+                </button>
+                <!-- BACKEND: Compartir enlace de sesión -->
+                <button class="accion-pub" aria-label="Compartir">
+                  <i data-lucide="share-2" aria-hidden="true"></i>
+                </button>
+              </div>
+            </footer>
+
+            <!-- Sección de comentarios -->
+            <!-- BACKEND: GET /feed/{id}/comments y POST /feed/{id}/comments -->
+            <div class="seccion-comentarios">
+              <!-- BACKEND: Reemplazar avatar con el del usuario autenticado -->
+              <div class="avatar-comentario" aria-hidden="true">J</div>
+              <div class="campo-comentario">
+                <input type="text" placeholder="Escribe un comentario..." class="input-comentario"
+                  aria-label="Escribe un comentario" />
+                <button class="boton-enviar-comentario" aria-label="Enviar comentario">Publicar</button>
+              </div>
+            </div>
+          </article>
+          <!-- /FIN TARJETA DE PUBLICACIÓN -->
+
+          <!-- BACKEND: Aquí se insertarán más <article> dinámicamente vía JS -->
+          <!-- Ejemplo: feed.forEach(pub => listaPublicaciones.insertAdjacentHTML('beforeend', renderTarjeta(pub))) -->
+
+        </section>
+
+        <!-- ════════════════════════════════
+             ESTADO VACÍO (Empty State)
+             BACKEND: Mostrar este bloque si feed.length === 0
+                      Añadir clase "visible" o quitar "oculto"
+        ════════════════════════════════ -->
+        <section class="estado-vacio oculto" id="estado-vacio" aria-label="Feed vacío" aria-hidden="true">
+          <div class="estado-vacio-icono" aria-hidden="true">
+            <svg width="52" height="52" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+              <rect x="34" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+              <rect x="8" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+              <rect x="30" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+              <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" />
+            </svg>
+          </div>
+          <h2 class="estado-vacio-titulo">Tu feed está vacío</h2>
+          <p class="estado-vacio-descripcion">Registra tu primer entrenamiento para verlo aquí, o sigue a otros atletas para ver su actividad.</p>
+          <button class="boton-principal estado-vacio-cta" id="boton-primer-entreno">
+            <i data-lucide="plus" aria-hidden="true"></i>
+            Registrar primer entreno
+          </button>
+        </section>
+
+        <!-- ════════════════════════════════
+             INDICADOR DE CARGA PAGINACIÓN
+             BACKEND: Mostrar mientras se hace fetch de más publicaciones
+        ════════════════════════════════ -->
+        <div class="cargando-mas oculto" id="cargando-mas" role="status" aria-label="Cargando más publicaciones">
+          <div class="spinner-carga" aria-hidden="true"></div>
+          <span>Cargando más...</span>
+        </div>
+
+        <!-- Sentinel para Intersection Observer (infinite scroll) -->
+        <!-- BACKEND: El JS observa este elemento para disparar la carga de más publicaciones -->
+        <div id="sentinel-scroll" aria-hidden="true"></div>
+
+      </main>
+
+      <!-- ── PANEL LATERAL DERECHO ── -->
+      <aside class="panel-lateral-derecho" aria-label="Panel de información del usuario">
+
+        <!-- Tarjeta del perfil del usuario -->
+        <section class="tarjeta-perfil-panel" aria-label="Tu perfil">
+          <!-- BACKEND: Todos los datos aquí vienen del endpoint GET /users/{id} -->
+          <div class="cabecera-perfil-panel">
+            <div class="avatar-perfil-panel" aria-hidden="true">J</div>
+            <div class="info-perfil-panel">
+              <a href="#" class="nombre-perfil-panel">jeremyinfante</a>
+              <span class="nombre-real-panel">Jeremy Infante</span>
+            </div>
+          </div>
+
+          <!-- Estadísticas del perfil -->
+          <div class="estadisticas-perfil-panel" role="list" aria-label="Estadísticas de tu perfil">
+            <!-- BACKEND: {{usuario.total_entrenos}} -->
+            <div class="stat-perfil" role="listitem">
+              <span class="stat-perfil-numero">1</span>
+              <span class="stat-perfil-etiqueta">Entrenos</span>
+            </div>
+            <!-- BACKEND: {{usuario.seguidores.length}} -->
+            <div class="stat-perfil" role="listitem">
+              <span class="stat-perfil-numero">0</span>
+              <span class="stat-perfil-etiqueta">Seguidores</span>
+            </div>
+            <!-- BACKEND: {{usuario.seguidos.length}} -->
+            <div class="stat-perfil" role="listitem">
+              <span class="stat-perfil-numero">0</span>
+              <span class="stat-perfil-etiqueta">Siguiendo</span>
+            </div>
+          </div>
+
+          <a href="#" class="boton-ver-perfil">Ver tu perfil</a>
+        </section>
+
+        <!-- Botón de registrar nuevo entrenamiento (desktop) -->
+        <button class="boton-registrar-entreno boton-registrar-desktop" id="boton-nuevo-entreno-desktop"
+          aria-label="Registrar nuevo entrenamiento">
+          <i data-lucide="plus" aria-hidden="true"></i>
+          Registrar entreno
+        </button>
+
+        <!-- Actividad reciente -->
+        <!-- BACKEND: GET /users/{id}/sessions?limit=3 -->
+        <section class="tarjeta-actividad-panel" aria-label="Actividad reciente">
+          <h3 class="titulo-panel-lateral">Actividad reciente</h3>
+          <ul class="lista-actividad" role="list">
+            <!-- BACKEND: Iterar sesiones recientes -->
+            <li class="item-actividad">
+              <div class="punto-actividad" aria-hidden="true"></div>
+              <div class="info-actividad">
+                <span class="nombre-actividad">Lunes</span>
+                <!-- BACKEND: {{sesion.fecha}} -->
+                <time class="fecha-actividad" datetime="2025-06-21T19:00">21 Jun 2025, 19:00</time>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Atletas sugeridos -->
+        <!-- BACKEND: GET /users/suggestions?limit=3 — Basado en gimnasio o nivel -->
+        <section class="tarjeta-sugeridos-panel" aria-label="Atletas sugeridos">
+          <h3 class="titulo-panel-lateral">Atletas sugeridos</h3>
+          <ul class="lista-sugeridos" role="list">
+            <!-- BACKEND: Iterar usuarios sugeridos -->
+            <li class="item-sugerido">
+              <a href="#" class="enlace-sugerido" aria-label="Ver perfil de heyjm">
+                <div class="avatar-sugerido avatar-color-1" aria-hidden="true">H</div>
+                <div class="info-sugerido">
+                  <span class="handle-sugerido">heyjm</span>
+                  <span class="nombre-sugerido">HJ</span>
+                </div>
+              </a>
+              <!-- BACKEND: POST /users/{id}/follow — Toggle texto "Seguir" / "Siguiendo" -->
+              <button class="boton-seguir" aria-label="Seguir a heyjm">Seguir</button>
+            </li>
+            <li class="item-sugerido">
+              <a href="#" class="enlace-sugerido" aria-label="Ver perfil de robynrocks">
+                <div class="avatar-sugerido avatar-color-2" aria-hidden="true">R</div>
+                <div class="info-sugerido">
+                  <span class="handle-sugerido">robynrocks</span>
+                  <span class="nombre-sugerido">Robyn Rocks</span>
+                </div>
+              </a>
+              <button class="boton-seguir" aria-label="Seguir a robynrocks">Seguir</button>
+            </li>
+            <li class="item-sugerido">
+              <a href="#" class="enlace-sugerido" aria-label="Ver perfil de sj1111">
+                <div class="avatar-sugerido avatar-color-3" aria-hidden="true">S</div>
+                <div class="info-sugerido">
+                  <span class="handle-sugerido">sj1111</span>
+                  <span class="nombre-sugerido">SJ</span>
+                </div>
+              </a>
+              <button class="boton-seguir" aria-label="Seguir a sj1111">Seguir</button>
+            </li>
+          </ul>
+        </section>
+
+      </aside>
+    </div>
+    <!-- /area-contenido -->
+
+    <!-- ─────────────────────────────────────────
+         BARRA DE NAVEGACIÓN MÓVIL (bottom nav)
+    ───────────────────────────────────────── -->
+    <nav class="nav-movil" aria-label="Navegación móvil" role="navigation">
+      <a href="#" class="enlace-nav-movil activo" data-pagina="feed" aria-current="page" aria-label="Feed">
+        <i data-lucide="home" aria-hidden="true"></i>
+        <span>Feed</span>
+      </a>
+      <a href="#" class="enlace-nav-movil" data-pagina="rutinas" aria-label="Rutinas">
+        <i data-lucide="clipboard-list" aria-hidden="true"></i>
+        <span>Rutinas</span>
+      </a>
+      <a href="#" class="enlace-nav-movil enlace-nav-movil-central" data-pagina="nuevo" aria-label="Nuevo entreno">
+        <i data-lucide="plus" aria-hidden="true"></i>
+      </a>
+      <a href="#" class="enlace-nav-movil" data-pagina="ejercicios" aria-label="Ejercicios">
+        <i data-lucide="dumbbell" aria-hidden="true"></i>
+        <span>Ejercicios</span>
+      </a>
+      <a href="#" class="enlace-nav-movil" data-pagina="perfil" aria-label="Perfil">
+        <i data-lucide="user" aria-hidden="true"></i>
+        <span>Perfil</span>
+      </a>
+    </nav>
+
+  </div>
+  <!-- /contenedor-app -->
+
+  <!-- Script principal del feed -->
+  <script src="/assets/js/feed.js"></script>
+
+</body>
+</html>
