@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APEX FITNESS — Ejercicios</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
+    rel="stylesheet" />
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <!-- Chart.js para gráficas de estadísticas -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/ejercicios.css" />
+</head>
+
+<body>
+
+  <div id="cursor-punto" aria-hidden="true"></div>
+
+  <!-- ══ PANTALLA DE CARGA ══ -->
+  <div id="pantalla-carga" role="status" aria-label="Cargando">
+    <div class="logo-carga">
+      <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+        <rect class="svg-trazar" x="3" y="18" width="5" height="6" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
+        <rect class="svg-trazar" x="34" y="18" width="5" height="6" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
+        <rect class="svg-trazar" x="8" y="15" width="4" height="12" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
+        <rect class="svg-trazar" x="30" y="15" width="4" height="12" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
+        <line class="svg-trazar" x1="12" y1="21" x2="30" y2="21" stroke="#C8F400" stroke-width="1.8"
+          stroke-linecap="round" />
+      </svg>
+      <span class="carga-nombre">APEX</span>
+      <span class="carga-slogan">Performance Tracking</span>
+    </div>
+    <div class="barra-carga-fondo">
+      <div class="barra-carga-relleno"></div>
+    </div>
+  </div>
+
+  <!-- ══ APP SHELL ══ -->
+  <div class="contenedor-app" id="app">
+
+    <!-- SIDEBAR -->
+    <aside class="barra-lateral" role="navigation" aria-label="Navegación principal">
+      <a href="../index.html" class="logo-barra" aria-label="APEX FITNESS">
+        <svg width="26" height="26" viewBox="0 0 42 42" fill="none">
+          <rect x="3" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+          <rect x="34" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+          <rect x="8" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+          <rect x="30" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+          <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <span class="logo-texto">APEX</span>
+      </a>
+      <nav class="nav-principal">
+        <ul class="lista-nav" role="list">
+          <li><a href="feed.html" class="enlace-nav" data-pagina="feed"><i data-lucide="home"></i><span>Feed</span></a>
+          </li>
+          <li><a href="rutina.html" class="enlace-nav" data-pagina="rutinas"><i
+                data-lucide="clipboard-list"></i><span>Rutinas</span></a></li>
+          <li><a href="#" class="enlace-nav activo" data-pagina="ejercicios" aria-current="page"><i
+                data-lucide="dumbbell"></i><span>Ejercicios</span></a></li>
+          <li><a href="#" class="enlace-nav" data-pagina="gimnasios"><i
+                data-lucide="map-pin"></i><span>Gimnasios</span></a></li>
+          <li><a href="#" class="enlace-nav" data-pagina="perfil"><i data-lucide="user"></i><span>Perfil</span></a></li>
+        </ul>
+      </nav>
+      <div class="nav-inferior">
+        <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema">
+          <i data-lucide="sun" class="icono-tema icono-claro"></i>
+          <i data-lucide="moon" class="icono-tema icono-oscuro"></i>
+        </button>
+        <hr class="separador-nav" />
+        <!-- BACKEND: Sustituir con datos del usuario autenticado (JWT) -->
+        <a href="#" class="usuario-barra">
+          <div class="avatar-barra">J</div>
+          <div class="info-usuario-barra">
+            <span class="nombre-usuario-barra">Jeremy Infante</span>
+            <span class="handle-usuario-barra">@jeremyinfante</span>
+          </div>
+          <i data-lucide="log-out" class="icono-logout"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ══ CONTENIDO ══ -->
+    <div class="area-contenido">
+      <main class="contenido-ejercicios" id="contenido-ejercicios" role="main">
+
+        <!-- ════════════════════════════
+             PANEL IZQUIERDO — DETALLE
+        ════════════════════════════ -->
+        <section class="panel-detalle" id="panel-detalle" aria-label="Detalle del ejercicio">
+
+          <!-- Estado vacío -->
+          <div class="detalle-vacio" id="detalle-vacio">
+            <div class="detalle-vacio-icono" aria-hidden="true">
+              <svg width="56" height="56" viewBox="0 0 42 42" fill="none">
+                <rect x="3" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4" />
+                <rect x="34" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4" />
+                <rect x="8" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4" />
+                <rect x="30" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4" />
+                <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+            </div>
+            <h2 class="detalle-vacio-titulo">Selecciona un ejercicio</h2>
+            <p class="detalle-vacio-desc">Haz clic en cualquier ejercicio de la biblioteca para ver sus estadísticas,
+              historial e instrucciones.</p>
+          </div>
+
+          <!-- Contenido (oculto hasta selección) -->
+          <!-- BACKEND: Poblar desde GET /exercises/{exerciseId} -->
+          <div class="detalle-contenido oculto" id="detalle-contenido">
+
+            <!-- Cabecera -->
+            <header class="detalle-cabecera">
+              <div class="detalle-cabecera-top">
+                <!-- Imagen del ejercicio -->
+                <div class="detalle-imagen-wrap" id="detalle-imagen-wrap">
+                  <!-- BACKEND: Reemplazar div por <img id="detalle-img" src="{{ejercicio.imagen_url}}" alt="{{ejercicio.nombre}}" /> -->
+                  <div class="detalle-imagen-placeholder" aria-hidden="true">
+                    <i data-lucide="dumbbell"></i>
+                  </div>
+                </div>
+                <div class="detalle-meta">
+                  <!-- BACKEND: {{ejercicio.nombre}} -->
+                  <h1 class="detalle-nombre" id="detalle-nombre">Bench Press (Barbell)</h1>
+                  <div class="detalle-badges" id="detalle-badges">
+                    <!-- BACKEND: {{ejercicio.equipo}} -->
+                    <span class="badge-detalle badge-equipo">
+                      <i data-lucide="settings-2"></i>
+                      <span id="detalle-equipo-texto">Barbell</span>
+                    </span>
+                    <!-- BACKEND: {{ejercicio.musculo_primario}} -->
+                    <span class="badge-detalle badge-musculo">
+                      <i data-lucide="zap"></i>
+                      <span id="detalle-musculo-texto">Pecho</span>
+                    </span>
+                  </div>
+                </div>
+                <!-- Botón añadir a rutina -->
+                <!-- BACKEND: Abre dropdown con GET /routines?user_id={userId} -->
+                <button class="boton-anadir-rutina" id="boton-anadir-rutina" aria-label="Añadir a una rutina"
+                  aria-haspopup="true" aria-expanded="false">
+                  <i data-lucide="plus"></i>
+                  <span>Añadir a rutina</span>
+                </button>
+              </div>
+
+              <!-- Pestañas -->
+              <nav class="pestanas-detalle" aria-label="Secciones" role="tablist">
+                <button class="pestana-btn activa" data-pestana="estadisticas" role="tab" aria-selected="true"
+                  aria-controls="panel-estadisticas">Estadísticas</button>
+                <button class="pestana-btn" data-pestana="historial" role="tab" aria-selected="false"
+                  aria-controls="panel-historial">Historial</button>
+                <button class="pestana-btn" data-pestana="como-hacerlo" role="tab" aria-selected="false"
+                  aria-controls="panel-como-hacerlo">Cómo hacerlo</button>
+                <button class="pestana-btn" data-pestana="musculos" role="tab" aria-selected="false"
+                  aria-controls="panel-musculos">Músculos</button>
+              </nav>
+            </header>
+
+            <!-- ── TAB: ESTADÍSTICAS ── -->
+            <!-- BACKEND: GET /metrics/exercise/{exerciseId}?user_id={userId}&range={range} -->
+            <section class="panel-pestana" id="panel-estadisticas" role="tabpanel">
+
+              <div class="fila-rango">
+                <select class="selector-rango" id="selector-rango" aria-label="Periodo de tiempo">
+                  <option value="4w">Últimas 4 semanas</option>
+                  <option value="12w" selected>Últimas 12 semanas</option>
+                  <option value="6m">Últimos 6 meses</option>
+                  <option value="1y">Último año</option>
+                  <option value="all">Todo el tiempo</option>
+                </select>
+              </div>
+
+              <!-- Métricas rápidas -->
+              <!-- BACKEND: Calcular desde historial de sessions filtrado por exercise_id -->
+              <div class="grid-metricas" role="list">
+                <div class="tarjeta-metrica" role="listitem">
+                  <span class="metrica-etiqueta">Mejor peso</span>
+                  <span class="metrica-valor" id="stat-mejor-peso">85 kg</span>
+                </div>
+                <div class="tarjeta-metrica" role="listitem">
+                  <span class="metrica-etiqueta">1RM estimado</span>
+                  <span class="metrica-valor" id="stat-1rm">102 kg</span>
+                </div>
+                <div class="tarjeta-metrica" role="listitem">
+                  <span class="metrica-etiqueta">Volumen total</span>
+                  <span class="metrica-valor" id="stat-volumen">12,400 kg</span>
+                </div>
+                <div class="tarjeta-metrica" role="listitem">
+                  <span class="metrica-etiqueta">Sesiones</span>
+                  <span class="metrica-valor" id="stat-sesiones">18</span>
+                </div>
+              </div>
+
+              <!-- Gráfica Chart.js -->
+              <div class="grafica-wrap">
+                <div class="grafica-top">
+                  <h3 class="grafica-titulo" id="grafica-titulo-texto">Peso máximo por sesión</h3>
+                  <div class="selector-metrica" role="group" aria-label="Métrica">
+                    <button class="btn-metrica activo" data-metrica="peso" aria-pressed="true">Peso</button>
+                    <button class="btn-metrica" data-metrica="reps" aria-pressed="false">Reps</button>
+                    <button class="btn-metrica" data-metrica="1rm" aria-pressed="false">1RM</button>
+                    <button class="btn-metrica" data-metrica="volumen" aria-pressed="false">Volumen</button>
+                  </div>
+                </div>
+                <div class="canvas-wrap">
+                  <!-- BACKEND: chartData proviene de GET /metrics/exercise/{id}?range={range}&metric={metric} -->
+                  <canvas id="grafica-ejercicio" aria-label="Gráfica de progreso" role="img"></canvas>
+                  <div class="grafica-sin-datos oculto" id="grafica-sin-datos" aria-live="polite">
+                    <i data-lucide="bar-chart-2"></i>
+                    <span>Sin datos para este periodo</span>
+                  </div>
+                </div>
+              </div>
+
+            </section>
+
+            <!-- ── TAB: HISTORIAL ── -->
+            <!-- BACKEND: GET /sessions?exercise_id={id}&user_id={userId}&limit=20&page=1 -->
+            <section class="panel-pestana oculto" id="panel-historial" role="tabpanel">
+              <ul class="historial-lista" id="historial-lista" role="list" aria-label="Historial de sesiones">
+
+                <li class="historial-item" role="listitem">
+                  <div class="historial-cabecera">
+                    <!-- BACKEND: {{sesion.fecha}} formateada -->
+                    <time class="historial-fecha" datetime="2025-06-21">21 Jun 2025</time>
+                    <!-- BACKEND: {{sesion.rutina.nombre}} -->
+                    <span class="historial-rutina">Lunes · Pecho</span>
+                  </div>
+                  <ul class="historial-series" aria-label="Series">
+                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-warmup">W</span><span>60 kg ×
+                        12</span></li>
+                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>80 kg ×
+                        8</span></li>
+                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>80 kg ×
+                        8</span></li>
+                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-failure">F</span><span>85 kg ×
+                        —</span></li>
+                  </ul>
+                  <div class="historial-footer">
+                    <span>Volumen: 1,980 kg</span>
+                    <span class="historial-mejor">Mejor: 85 kg</span>
+                  </div>
+                </li>
+
+                <li class="historial-item" role="listitem">
+                  <div class="historial-cabecera">
+                    <time class="historial-fecha" datetime="2025-06-14">14 Jun 2025</time>
+                    <span class="historial-rutina">Lunes · Pecho</span>
+                  </div>
+                  <ul class="historial-series" aria-label="Series">
+                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-warmup">W</span><span>60 kg ×
+                        12</span></li>
+                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>77.5 kg ×
+                        8</span></li>
+                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>77.5 kg ×
+                        8</span></li>
+                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-dropset">D</span><span>60 kg ×
+                        12</span></li>
+                  </ul>
+                  <div class="historial-footer">
+                    <span>Volumen: 1,740 kg</span>
+                    <span class="historial-mejor">Mejor: 77.5 kg</span>
+                  </div>
+                </li>
+
+                <li class="historial-item" role="listitem">
+                  <div class="historial-cabecera">
+                    <time class="historial-fecha" datetime="2025-06-07">7 Jun 2025</time>
+                    <span class="historial-rutina">Lunes · Pecho</span>
+                  </div>
+                  <ul class="historial-series" aria-label="Series">
+                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-warmup">W</span><span>60 kg ×
+                        12</span></li>
+                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>75 kg ×
+                        8</span></li>
+                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>75 kg ×
+                        8</span></li>
+                  </ul>
+                  <div class="historial-footer">
+                    <span>Volumen: 1,320 kg</span>
+                    <span class="historial-mejor">Mejor: 75 kg</span>
+                  </div>
+                </li>
+
+              </ul>
+              <!-- BACKEND: GET /sessions?...&page=2 al hacer clic -->
+              <button class="boton-cargar-mas" id="boton-cargar-mas" aria-label="Cargar más sesiones">
+                Ver más sesiones
+              </button>
+            </section>
+
+            <!-- ── TAB: CÓMO HACERLO ── -->
+            <!-- BACKEND: GET /exercises/{exerciseId}/instructions -->
+            <section class="panel-pestana oculto" id="panel-como-hacerlo" role="tabpanel">
+
+              <!--
+                BACKEND — Animación del ejercicio
+                ──────────────────────────────────
+                Este div es el contenedor preparado para la animación.
+                Cuando integres la BD:
+                  1. Endpoint:  GET /exercises/{exerciseId}/media
+                  2. Campo BD:  exercises.animation_url  (string, URL al GIF o MP4)
+                  3. Reemplaza el .animacion-placeholder por:
+                     <img src="{{ejercicio.animation_url}}" alt="{{ejercicio.nombre}} — animación" class="animacion-img" />
+                     o bien un <video autoplay loop muted playsinline> si es MP4.
+              -->
+              <div class="animacion-wrap" id="animacion-ejercicio">
+                <div class="animacion-placeholder" aria-label="Animación pendiente de integración con BD">
+                  <button class="animacion-cerrar-btn" id="animacion-cerrar" aria-label="Cerrar animación">
+                    <i data-lucide="x"></i>
+                  </button>
+                  <div class="animacion-icono-wrap" aria-hidden="true">
+                    <i data-lucide="play-circle"></i>
+                  </div>
+                  <p class="animacion-label">
+                    Animación · <code>exercises.animation_url</code>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Pasos -->
+              <!-- BACKEND: Iterar {{ejercicio.instrucciones}} (array de { titulo, descripcion }) -->
+              <ol class="lista-pasos" id="lista-pasos">
+                <li class="paso">
+                  <span class="paso-num">01</span>
+                  <div class="paso-cuerpo">
+                    <h4 class="paso-titulo">Posición inicial</h4>
+                    <p class="paso-desc">Acuéstate en el banco con los pies planos en el suelo. Agarra la barra con un
+                      agarre ligeramente más amplio que el ancho de los hombros; los pulgares rodean la barra (agarre
+                      cerrado).</p>
+                  </div>
+                </li>
+                <li class="paso">
+                  <span class="paso-num">02</span>
+                  <div class="paso-cuerpo">
+                    <h4 class="paso-titulo">Descenso controlado</h4>
+                    <p class="paso-desc">Baja la barra lentamente hacia el pecho, sobre el esternón inferior. Los codos
+                      deben formar un ángulo de 45–75° con el torso; evita abrirlos en exceso para proteger los hombros.
+                    </p>
+                  </div>
+                </li>
+                <li class="paso">
+                  <span class="paso-num">03</span>
+                  <div class="paso-cuerpo">
+                    <h4 class="paso-titulo">Empuje explosivo</h4>
+                    <p class="paso-desc">Empuja la barra hacia arriba y ligeramente hacia atrás hasta la extensión
+                      completa de los brazos. Aprieta el pecho en la parte superior del movimiento para maximizar la
+                      contracción.</p>
+                  </div>
+                </li>
+                <li class="paso">
+                  <span class="paso-num">04</span>
+                  <div class="paso-cuerpo">
+                    <h4 class="paso-titulo">Respiración y postura</h4>
+                    <p class="paso-desc">Inhala durante el descenso, exhala durante el empuje. Mantén la espalda baja
+                      ligeramente arqueada y los omóplatos retraídos y deprimidos a lo largo de todo el movimiento.</p>
+                  </div>
+                </li>
+              </ol>
+
+              <!-- Consejos -->
+              <!-- BACKEND: {{ejercicio.consejos}} array de strings -->
+              <div class="bloque-consejos">
+                <h3 class="consejos-titulo"><i data-lucide="lightbulb"></i> Consejos clave</h3>
+                <ul class="lista-consejos" id="lista-consejos">
+                  <li>Mantén los omóplatos retraídos durante todo el movimiento para proteger los hombros.</li>
+                  <li>No reboces la barra en el pecho; el descenso debe ser siempre controlado.</li>
+                  <li>Usa agarre cerrado (pulgar rodeando la barra) para mayor seguridad.</li>
+                </ul>
+              </div>
+
+            </section>
+
+            <!-- ── TAB: MÚSCULOS ── -->
+            <!-- BACKEND: GET /exercises/{exerciseId}/muscles -->
+            <section class="panel-pestana oculto" id="panel-musculos" role="tabpanel">
+              <div class="musculos-layout">
+
+                <!--
+                  BACKEND — Mapa visual del cuerpo
+                  ─────────────────────────────────
+                  Este div es el contenedor preparado para el mapa muscular.
+                  Cuando integres la BD:
+                    1. Endpoint:  GET /exercises/{exerciseId}/muscle-map
+                    2. Campo BD:  exercises.muscle_map_url (SVG o imagen PNG del cuerpo)
+                    3. Los músculos primarios se pintan en --acento
+                       Los secundarios en rgba(var(--acento-rgb), 0.35)
+                    4. Reemplaza .visual-musculos-placeholder por el SVG o
+                       <img src="{{ejercicio.muscle_map_url}}" alt="Mapa muscular" />
+                -->
+                <div class="visual-musculos-wrap" id="visual-musculos">
+                  <div class="visual-musculos-placeholder" aria-label="Mapa muscular pendiente de BD">
+                    <i data-lucide="user"></i>
+                    <span>Mapa muscular<br /><code>exercises.muscle_map_url</code></span>
+                  </div>
+                </div>
+
+                <!-- Listas de músculos -->
+                <div class="musculos-listas">
+                  <div class="musculo-grupo">
+                    <h3 class="musculo-grupo-titulo">
+                      <span class="dot-primario" aria-hidden="true"></span>
+                      Primarios
+                    </h3>
+                    <!-- BACKEND: {{ejercicio.musculos_primarios}} array de strings -->
+                    <ul class="lista-musculos-detalle" id="musculos-primarios">
+                      <li class="item-musculo primario">Pectoral mayor</li>
+                      <li class="item-musculo primario">Pectoral menor</li>
+                    </ul>
+                  </div>
+                  <div class="musculo-grupo">
+                    <h3 class="musculo-grupo-titulo">
+                      <span class="dot-secundario" aria-hidden="true"></span>
+                      Secundarios
+                    </h3>
+                    <!-- BACKEND: {{ejercicio.musculos_secundarios}} array de strings -->
+                    <ul class="lista-musculos-detalle" id="musculos-secundarios">
+                      <li class="item-musculo secundario">Deltoides anterior</li>
+                      <li class="item-musculo secundario">Tríceps braquial</li>
+                      <li class="item-musculo secundario">Serrato anterior</li>
+                    </ul>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+          </div><!-- /detalle-contenido -->
+        </section><!-- /panel-detalle -->
+
+        <!-- ════════════════════════════
+             PANEL DERECHO — BIBLIOTECA
+        ════════════════════════════ -->
+        <aside class="panel-biblioteca" aria-label="Biblioteca de ejercicios">
+
+          <div class="biblioteca-cabecera">
+            <div class="biblioteca-titulo-fila">
+              <h2 class="biblioteca-titulo">Biblioteca</h2>
+              <!-- BACKEND: POST /exercises → ejercicio personalizado -->
+              <button class="boton-ejercicio-custom" id="boton-ejercicio-custom"
+                aria-label="Crear ejercicio personalizado">
+                <i data-lucide="plus"></i>
+                <span>Ejercicio</span>
+              </button>
+            </div>
+
+            <!-- Chips de músculo con scroll horizontal -->
+            <!-- BACKEND: GET /exercises?muscle={musculo} al cambiar el chip -->
+            <div class="chips-musculo-wrap" role="group" aria-label="Filtrar por músculo">
+              <div class="chips-musculo" id="chips-musculo">
+                <button class="chip-musculo activo" data-musculo="todos" aria-pressed="true">Todos</button>
+                <button class="chip-musculo" data-musculo="pecho" aria-pressed="false">Pecho</button>
+                <button class="chip-musculo" data-musculo="espalda" aria-pressed="false">Espalda</button>
+                <button class="chip-musculo" data-musculo="hombros" aria-pressed="false">Hombros</button>
+                <button class="chip-musculo" data-musculo="biceps" aria-pressed="false">Bíceps</button>
+                <button class="chip-musculo" data-musculo="triceps" aria-pressed="false">Tríceps</button>
+                <button class="chip-musculo" data-musculo="cuadriceps" aria-pressed="false">Cuádriceps</button>
+                <button class="chip-musculo" data-musculo="isquiotibiales" aria-pressed="false">Isquiotibiales</button>
+                <button class="chip-musculo" data-musculo="gluteos" aria-pressed="false">Glúteos</button>
+                <button class="chip-musculo" data-musculo="gemelos" aria-pressed="false">Gemelos</button>
+                <button class="chip-musculo" data-musculo="abdominales" aria-pressed="false">Abdominales</button>
+                <button class="chip-musculo" data-musculo="antebrazos" aria-pressed="false">Antebrazos</button>
+                <button class="chip-musculo" data-musculo="espalda-baja" aria-pressed="false">Espalda baja</button>
+                <button class="chip-musculo" data-musculo="cardio" aria-pressed="false">Cardio</button>
+              </div>
+            </div>
+
+            <!-- Buscador -->
+            <!-- BACKEND: GET /exercises?query={valor}&muscle={musculo} (debounce 350ms) -->
+            <div class="buscador-wrap">
+              <i data-lucide="search" class="buscador-icono" aria-hidden="true"></i>
+              <input type="search" class="buscador-input" id="buscador-ejercicios" placeholder="Buscar ejercicios..."
+                aria-label="Buscar ejercicios" autocomplete="off" />
+              <button class="buscador-limpiar oculto" id="buscador-limpiar" aria-label="Limpiar búsqueda">
+                <i data-lucide="x"></i>
+              </button>
+            </div>
+
+            <!-- Contador de resultados -->
+            <p class="biblioteca-contador" id="contador-resultados" aria-live="polite" aria-atomic="true">
+              Todos los ejercicios
+            </p>
+          </div><!-- /biblioteca-cabecera -->
+
+          <!-- Lista de ejercicios -->
+          <!-- BACKEND: Renderizar dinámicamente con renderListaEjercicios(data) -->
+          <ul class="lista-biblioteca" id="lista-biblioteca" role="list" aria-label="Ejercicios">
+
+            <!-- Cada <li> tiene data-musculo para filtrado client-side mientras no hay backend -->
+            <!-- BACKEND: data-ejercicio-id="{{ejercicio.id}}" data-musculo="{{ejercicio.musculo_primario}}" -->
+            <li class="item-biblioteca activo" data-ejercicio-id="ej-001" data-musculo="pecho">
+              <button class="boton-item" aria-label="Ver Bench Press (Barbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info">
+                  <span class="item-nombre">Bench Press (Barbell)</span>
+                  <span class="item-musculo">Pecho</span>
+                </div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-002" data-musculo="hombros">
+              <button class="boton-item" aria-label="Ver Arnold Press (Dumbbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Arnold Press (Dumbbell)</span><span
+                    class="item-musculo">Hombros</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-003" data-musculo="espalda">
+              <button class="boton-item" aria-label="Ver Bent Over Row (Barbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Bent Over Row (Barbell)</span><span
+                    class="item-musculo">Espalda</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-004" data-musculo="biceps">
+              <button class="boton-item" aria-label="Ver Bicep Curl (Barbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Bicep Curl (Barbell)</span><span
+                    class="item-musculo">Bíceps</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-005" data-musculo="cuadriceps">
+              <button class="boton-item" aria-label="Ver Squat (Barbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Squat (Barbell)</span><span
+                    class="item-musculo">Cuádriceps</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-006" data-musculo="pecho">
+              <button class="boton-item" aria-label="Ver Incline Bench Press (Dumbbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Incline Bench Press (Dumbbell)</span><span
+                    class="item-musculo">Pecho</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-007" data-musculo="espalda">
+              <button class="boton-item" aria-label="Ver Pull Up">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Pull Up</span><span class="item-musculo">Espalda</span>
+                </div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-008" data-musculo="hombros">
+              <button class="boton-item" aria-label="Ver Lateral Raise (Dumbbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Lateral Raise (Dumbbell)</span><span
+                    class="item-musculo">Hombros</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-009" data-musculo="triceps">
+              <button class="boton-item" aria-label="Ver Tricep Pushdown (Cable)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Tricep Pushdown (Cable)</span><span
+                    class="item-musculo">Tríceps</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-010" data-musculo="isquiotibiales">
+              <button class="boton-item" aria-label="Ver Romanian Deadlift">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Romanian Deadlift</span><span
+                    class="item-musculo">Isquiotibiales</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-011" data-musculo="gluteos">
+              <button class="boton-item" aria-label="Ver Hip Thrust (Barbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Hip Thrust (Barbell)</span><span
+                    class="item-musculo">Glúteos</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-012" data-musculo="abdominales">
+              <button class="boton-item" aria-label="Ver Hanging Leg Raise">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Hanging Leg Raise</span><span
+                    class="item-musculo">Abdominales</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-013" data-musculo="cuadriceps">
+              <button class="boton-item" aria-label="Ver Leg Press (Machine)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Leg Press (Machine)</span><span
+                    class="item-musculo">Cuádriceps</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-014" data-musculo="espalda-baja">
+              <button class="boton-item" aria-label="Ver Deadlift (Barbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Deadlift (Barbell)</span><span
+                    class="item-musculo">Espalda baja</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-015" data-musculo="gemelos">
+              <button class="boton-item" aria-label="Ver Standing Calf Raise">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Standing Calf Raise</span><span
+                    class="item-musculo">Gemelos</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-016" data-musculo="antebrazos">
+              <button class="boton-item" aria-label="Ver Wrist Curl (Barbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Wrist Curl (Barbell)</span><span
+                    class="item-musculo">Antebrazos</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-017" data-musculo="cardio">
+              <button class="boton-item" aria-label="Ver Air Bike">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Air Bike</span><span class="item-musculo">Cardio</span>
+                </div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-018" data-musculo="hombros">
+              <button class="boton-item" aria-label="Ver Face Pull (Cable)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Face Pull (Cable)</span><span
+                    class="item-musculo">Hombros</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-019" data-musculo="triceps">
+              <button class="boton-item" aria-label="Ver Skull Crusher (Barbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Skull Crusher (Barbell)</span><span
+                    class="item-musculo">Tríceps</span></div>
+              </button>
+            </li>
+            <li class="item-biblioteca" data-ejercicio-id="ej-020" data-musculo="biceps">
+              <button class="boton-item" aria-label="Ver Hammer Curl (Dumbbell)">
+                <div class="item-img-wrap">
+                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
+                </div>
+                <div class="item-info"><span class="item-nombre">Hammer Curl (Dumbbell)</span><span
+                    class="item-musculo">Bíceps</span></div>
+              </button>
+            </li>
+
+            <!-- Estado sin resultados (búsqueda/filtro vacío) -->
+            <li class="sin-resultados oculto" id="sin-resultados" aria-live="polite">
+              <div class="sin-resultados-contenido">
+                <i data-lucide="search-x"></i>
+                <span>Sin resultados</span>
+                <p>Prueba con otro nombre o músculo</p>
+              </div>
+            </li>
+
+          </ul><!-- /lista-biblioteca -->
+
+        </aside><!-- /panel-biblioteca -->
+
+      </main>
+    </div><!-- /area-contenido -->
+
+    <!-- Bottom nav móvil -->
+    <nav class="nav-movil" aria-label="Navegación móvil">
+      <a href="feed.html" class="enlace-nav-movil" aria-label="Feed"><i data-lucide="home"></i><span>Feed</span></a>
+      <a href="rutina.html" class="enlace-nav-movil" aria-label="Rutinas"><i
+          data-lucide="clipboard-list"></i><span>Rutinas</span></a>
+      <a href="#" class="enlace-nav-movil enlace-nav-movil-central" aria-label="Nuevo"><i data-lucide="plus"></i></a>
+      <a href="#" class="enlace-nav-movil activo" aria-current="page" aria-label="Ejercicios"><i
+          data-lucide="dumbbell"></i><span>Ejercicios</span></a>
+      <a href="#" class="enlace-nav-movil" aria-label="Perfil"><i data-lucide="user"></i><span>Perfil</span></a>
+    </nav>
+
+  </div><!-- /contenedor-app -->
+
+  <!-- Dropdown "Añadir a rutina" -->
+  <!-- BACKEND: Poblar con GET /routines?user_id={userId} -->
+  <div class="dropdown-rutinas oculto" id="dropdown-rutinas" role="dialog" aria-modal="true"
+    aria-label="Seleccionar rutina">
+    <div class="dropdown-cabecera">
+      <span class="dropdown-titulo">Añadir a rutina</span>
+      <button class="dropdown-cerrar" id="dropdown-cerrar" aria-label="Cerrar"><i data-lucide="x"></i></button>
+    </div>
+    <!-- BACKEND: Iterar GET /routines?user_id={userId} y renderizar items -->
+    <ul class="dropdown-lista" id="dropdown-lista" role="list">
+      <li><button class="dropdown-item" data-rutina-id="rutina-jueves"><i data-lucide="clipboard-list"></i>
+          Jueves</button></li>
+      <li><button class="dropdown-item" data-rutina-id="rutina-pata"><i data-lucide="clipboard-list"></i> Pata</button>
+      </li>
+      <li><button class="dropdown-item" data-rutina-id="rutina-lunes"><i data-lucide="clipboard-list"></i>
+          Lunes</button></li>
+      <li><button class="dropdown-item" data-rutina-id="rutina-martes"><i data-lucide="clipboard-list"></i>
+          Martes</button></li>
+    </ul>
+  </div>
+  <div class="dropdown-overlay oculto" id="dropdown-overlay"></div>
+
+  <!-- Toast global -->
+  <div class="toast-notificacion" id="toast-notificacion" role="alert" aria-live="polite" aria-atomic="true">
+    <i data-lucide="check-circle" class="toast-icono"></i>
+    <span class="toast-mensaje" id="toast-mensaje">Listo</span>
+  </div>
+
+  <script src="../assets/js/ejercicios.js"></script>
+</body>
+
+</html>
