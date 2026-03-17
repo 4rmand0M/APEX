@@ -24,7 +24,7 @@
      ESTADO INTERNO DEL WIDGET
   ══════════════════════════════════════════════ */
   let knowledge  = [];
-  let geminiKey  = 'AIzaSyCuD0-uYE4HHJnI_UgnjoY77vc8IooM-ok';
+  let geminiKey  = localStorage.getItem('apex_gkey') || 'AIzaSyCuD0-uYE4HHJnI_UgnjoY77vc8IooM-ok';
   let estaAbierto = false;
 
   /* ══════════════════════════════════════════════
