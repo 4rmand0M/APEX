@@ -1,0 +1,399 @@
+/* ============================================================
+   APEX FITNESS — Calendario (calendario.css)
+   Tres vistas: Mensual · Lista · Semana
+   Menú lateral deslizable desde hamburguesa.
+============================================================ */
+
+/* ─── SCROLLBAR ─────────────────────────────────────────── */
+html { scrollbar-width: thin; scrollbar-color: var(--borde-hover) var(--fondo); }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--fondo); }
+::-webkit-scrollbar-thumb { background: var(--borde-hover); border-radius: 99px; }
+
+/* ─── UTILS ──────────────────────────────────────────────── */
+.oculto { display: none !important; }
+
+/* ════════════════════════════════════════════════════════════
+   APP SHELL (reutilizado de workout.css)
+════════════════════════════════════════════════════════════ */
+.contenedor-app { display: flex; flex-direction: column; min-height: 100dvh; background: var(--fondo); }
+.area-contenido { display: flex; flex-direction: column; flex: 1; padding-bottom: 64px; }
+.barra-lateral { display: none; }
+
+/* sidebar textos */
+.logo-barra { display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--texto);padding:0 4px 28px;transition:opacity .14s; }
+.logo-barra:hover { opacity:.75; }
+.logo-texto { font-family:'Bebas Neue',cursive;font-size:24px;letter-spacing:5px; }
+.lista-nav { list-style:none;display:flex;flex-direction:column;gap:2px; }
+.enlace-nav { display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;text-decoration:none;color:var(--texto-atenuado);font-size:14px;font-weight:500;transition:color .14s,background .14s; }
+.enlace-nav i { width:20px;height:20px;stroke-width:1.8;flex-shrink:0; }
+.enlace-nav:hover { color:var(--texto);background:var(--superficie-2); }
+.enlace-nav.activo { color:var(--texto);background:var(--superficie-2);font-weight:600; }
+.nav-inferior { margin-top:auto; }
+.separador-nav { border:none;border-top:1px solid var(--borde);margin:12px 0; }
+.usuario-barra { display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;text-decoration:none;transition:background .14s; }
+.usuario-barra:hover { background:var(--superficie-2); }
+.avatar-barra { width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7B5EA7,#5E4B8B);color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.info-usuario-barra { flex:1;min-width:0;overflow:hidden; }
+.nombre-usuario-barra { display:block;font-size:13px;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.handle-usuario-barra { display:block;font-size:11px;color:var(--texto-atenuado); }
+.icono-logout { width:16px;height:16px;stroke-width:1.8;color:var(--texto-atenuado);flex-shrink:0;transition:color .14s; }
+.usuario-barra:hover .icono-logout { color:var(--error); }
+.boton-tema { display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--borde);border-radius:8px;width:36px;height:36px;color:var(--texto-atenuado);cursor:none;margin-bottom:8px;transition:color .14s,border-color .14s,background .14s; }
+.boton-tema:hover { color:var(--texto);border-color:var(--borde-hover);background:var(--superficie-2); }
+.icono-tema { width:16px;height:16px;stroke-width:1.8; }
+[data-tema="oscuro"] .icono-claro  { display: block; }
+[data-tema="oscuro"] .icono-oscuro { display: none; }
+[data-tema="claro"]  .icono-claro  { display: none; }
+[data-tema="claro"]  .icono-oscuro { display: block; }
+
+/* ─── BOTTOM NAV ─────────────────────────────────────────── */
+.nav-movil { position:fixed;bottom:0;left:0;right:0;background:var(--superficie);border-top:1px solid var(--borde);display:flex;align-items:center;justify-content:space-around;padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:100;backdrop-filter:blur(12px); }
+.enlace-nav-movil { display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--texto-atenuado);text-decoration:none;font-size:10px;font-weight:500;padding:6px 10px;border-radius:10px;transition:color .14s;min-width:48px;background:none;border:none;cursor:none; }
+.enlace-nav-movil i { width:22px;height:22px;stroke-width:1.8; }
+.enlace-nav-movil.activo { color:var(--acento); }
+[data-tema="claro"] .enlace-nav-movil.activo { color:var(--texto); }
+.enlace-nav-movil-central { background:var(--acento);color:var(--texto-boton) !important;border-radius:16px;padding:12px 18px;transition:opacity .18s,transform .18s; }
+.enlace-nav-movil-central:hover { opacity:.88;transform:scale(1.05); }
+
+/* ════════════════════════════════════════════════════════════
+   CALENDARIO — CONTENIDO
+════════════════════════════════════════════════════════════ */
+.contenido-calendario {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: calc(100dvh - 64px);
+  overflow: hidden;
+}
+
+/* CABECERA */
+.cal-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--borde);
+  background: var(--superficie);
+  flex-shrink: 0;
+  gap: 12px;
+}
+.cal-cabecera-izq { display:flex;align-items:center;gap:10px; }
+.cal-titulo { font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:4px;color:var(--texto);line-height:1; }
+.cal-hamburguesa {
+  background:none;border:none;color:var(--texto-atenuado);cursor:none;
+  display:flex;align-items:center;padding:6px;border-radius:8px;
+  transition:color .14s,background .14s;
+}
+.cal-hamburguesa i { width:22px;height:22px;stroke-width:2; }
+.cal-hamburguesa:hover { color:var(--texto);background:var(--superficie-2); }
+.cal-cabecera-der { display:flex;align-items:center;gap:8px; }
+.cal-nav-btn { background:none;border:none;color:var(--acento);cursor:none;display:flex;align-items:center;padding:4px;border-radius:7px;transition:background .14s; }
+.cal-nav-btn i { width:20px;height:20px;stroke-width:2.5; }
+.cal-nav-btn:hover { background:var(--superficie-2); }
+[data-tema="claro"] .cal-nav-btn { color:var(--texto); }
+.cal-periodo-label { font-size:14px;font-weight:700;color:var(--texto);text-transform:uppercase;letter-spacing:.5px;min-width:120px;text-align:center; }
+
+/* BODY */
+.cal-body { flex:1;overflow:hidden;display:flex;flex-direction:column; }
+
+/* ════════════════════════════════════════════════════════════
+   VISTA MENSUAL
+════════════════════════════════════════════════════════════ */
+.vista-mensual { display:flex;flex-direction:column;flex:1; }
+
+.cal-semana-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 8px 8px 4px;
+  flex-shrink: 0;
+}
+.cal-semana-header span {
+  text-align:center;font-size:11px;font-weight:700;
+  color:var(--texto-atenuado);letter-spacing:.8px;text-transform:uppercase;
+}
+
+.cal-dias-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  flex: 1;
+  padding: 0 8px;
+  gap: 2px 0;
+  overflow-y: auto;
+}
+
+/* Celda de día */
+.cal-dia-celda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 2px;
+  cursor: none;
+  border-radius: 10px;
+  transition: background .14s;
+  min-height: 52px;
+}
+.cal-dia-celda:hover { background: var(--superficie-2); }
+
+.cal-dia-num {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--texto);
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background .14s, color .14s;
+}
+.cal-dia-celda.hoy .cal-dia-num {
+  background: var(--acento);
+  color: var(--texto-boton);
+  font-weight: 700;
+}
+[data-tema="claro"] .cal-dia-celda.hoy .cal-dia-num { background: var(--texto); color: var(--fondo); }
+.cal-dia-celda.otro-mes .cal-dia-num { color: var(--texto-atenuado); opacity: .4; }
+.cal-dia-celda.seleccionado .cal-dia-num {
+  background: var(--superficie-2);
+  border: 2px solid var(--acento);
+}
+[data-tema="claro"] .cal-dia-celda.seleccionado .cal-dia-num { border-color: var(--texto); }
+
+/* Puntos de músculo debajo del número */
+.cal-dia-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+  max-width: 36px;
+}
+.cal-dia-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c, #888);
+}
+
+/* Barra inferior de mes */
+.cal-barra-mes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--borde);
+  background: var(--superficie);
+  flex-shrink: 0;
+}
+.cal-mes-nav {
+  background: none; border: none; color: var(--acento); cursor: none;
+  display: flex; align-items: center; padding: 6px; border-radius: 8px;
+  transition: background .14s;
+}
+.cal-mes-nav i { width: 22px; height: 22px; stroke-width: 2.5; }
+.cal-mes-nav:hover { background: var(--superficie-2); }
+[data-tema="claro"] .cal-mes-nav { color: var(--texto); }
+.cal-mes-contador {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   VISTA LISTA
+════════════════════════════════════════════════════════════ */
+.vista-lista { flex: 1; overflow-y: auto; padding: 0; }
+
+.cal-lista-entrenos { list-style: none; }
+.cal-lista-grupo {
+  background: var(--superficie);
+  border-bottom: 8px solid var(--fondo);
+  padding: 16px 18px;
+}
+.cal-lista-fecha-header { margin-bottom: 14px; }
+.cal-lista-fecha-titulo {
+  font-size: 14px; font-weight: 700; color: var(--acento);
+  letter-spacing: -.1px;
+}
+[data-tema="claro"] .cal-lista-fecha-titulo { color: var(--texto-sub); }
+
+.cal-lista-sesiones { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.cal-lista-ejercicio {
+  display: flex;
+  gap: 10px;
+}
+.cal-lista-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--c, #888); flex-shrink: 0; margin-top: 4px;
+}
+.cal-lista-ej-detalle { flex: 1; }
+.cal-lista-ej-nombre { font-size: 14px; font-weight: 600; color: var(--texto); display: block; margin-bottom: 5px; }
+.cal-lista-ej-series { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.cal-lista-ej-series li { font-size: 12.5px; color: var(--texto-atenuado); }
+
+.cal-lista-chips {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--borde);
+}
+.cal-chip { font-size: 10.5px; font-weight: 700; letter-spacing: .8px; color: var(--c, #888); text-transform: uppercase; }
+
+/* ════════════════════════════════════════════════════════════
+   VISTA SEMANA
+════════════════════════════════════════════════════════════ */
+.vista-semana { display: flex; flex-direction: column; flex: 1; }
+
+.sem-dias-fila {
+  display: flex;
+  gap: 4px;
+  padding: 12px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--borde);
+  background: var(--superficie);
+  flex-shrink: 0;
+}
+.sem-dias-fila::-webkit-scrollbar { display: none; }
+
+.sem-dia-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 8px 10px; border-radius: 12px; border: none; background: none; cursor: none;
+  min-width: 48px; transition: background .14s;
+}
+.sem-dia-btn:hover { background: var(--superficie-2); }
+.sem-dia-btn.activo { background: var(--acento); }
+[data-tema="claro"] .sem-dia-btn.activo { background: var(--texto); }
+.sem-dia-nombre { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--texto-atenuado); }
+.sem-dia-btn.activo .sem-dia-nombre { color: var(--texto-boton); }
+.sem-dia-num { font-size: 16px; font-weight: 700; color: var(--texto); }
+.sem-dia-btn.activo .sem-dia-num { color: var(--texto-boton); }
+.sem-dia-btn.hoy .sem-dia-num { color: var(--acento); }
+.sem-dia-btn.activo.hoy .sem-dia-num { color: var(--texto-boton); }
+.sem-dia-dots {
+  display: flex; gap: 2px;
+}
+.sem-dia-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--c, #888); }
+.sem-dia-btn.activo .sem-dia-dot { opacity: .7; }
+
+/* Detalle del día en vista semana */
+.sem-detalle { flex: 1; overflow-y: auto; padding: 16px 18px; }
+.sem-detalle-vacio {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 60px 24px; color: var(--texto-atenuado); font-size: 14px;
+}
+.sem-detalle-vacio i { width: 28px; height: 28px; stroke-width: 1.5; }
+
+/* ════════════════════════════════════════════════════════════
+   MENÚ LATERAL DESLIZANTE (hamburguesa)
+════════════════════════════════════════════════════════════ */
+.cal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  backdrop-filter: blur(2px); z-index: 198; cursor: none;
+}
+.cal-menu-lateral {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: min(80vw, 320px);
+  background: var(--superficie);
+  border-right: 1px solid var(--borde);
+  z-index: 199;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform .3s cubic-bezier(0.34, 1.1, 0.64, 1);
+}
+.cal-menu-lateral.abierto { transform: translateX(0); }
+
+.cal-menu-inner { padding: 20px 0 32px; }
+.cal-menu-seccion { padding: 8px 0; }
+.cal-menu-sep { border: none; border-top: 1px solid var(--borde); margin: 8px 0; }
+
+/* Opciones de vista */
+.cal-vista-opcion {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; background: none; border: none;
+  padding: 14px 22px; text-align: left; cursor: none;
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500;
+  color: var(--texto); transition: background .14s;
+}
+.cal-vista-opcion i { width: 20px; height: 20px; stroke-width: 1.8; color: var(--texto-atenuado); }
+.cal-vista-opcion:hover { background: var(--superficie-2); }
+.cal-vista-opcion.activa { font-weight: 700; background: var(--acento-dim); }
+.cal-vista-opcion.activa i { color: var(--acento); }
+[data-tema="claro"] .cal-vista-opcion.activa i { color: var(--texto); }
+
+/* Título de sección */
+.cal-menu-seccion-titulo {
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  color: var(--texto-atenuado); text-transform: uppercase;
+  padding: 8px 22px 4px;
+}
+
+/* Filtros de músculo */
+.cal-filtros-lista { list-style: none; }
+.cal-filtro-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 22px; border-bottom: 1px solid var(--borde);
+}
+.cal-filtro-item:last-child { border-bottom: none; }
+.cal-filtro-label { display: flex; align-items: center; gap: 12px; flex: 1; cursor: none; }
+.cal-filtro-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--c, #888); flex-shrink: 0; }
+.cal-filtro-nombre { font-size: 15px; font-weight: 400; color: var(--texto); }
+.cal-filtro-check {
+  width: 18px; height: 18px; cursor: none; accent-color: var(--acento);
+  border-radius: 4px;
+}
+[data-tema="claro"] .cal-filtro-check { accent-color: var(--texto); }
+
+/* Filtro de ejercicio */
+.cal-menu-ej-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 22px 4px;
+}
+.cal-menu-ej-add {
+  background: none; border: none; color: var(--acento); cursor: none;
+  display: flex; align-items: center;
+}
+.cal-menu-ej-add i { width: 18px; height: 18px; stroke-width: 2.5; }
+[data-tema="claro"] .cal-menu-ej-add { color: var(--texto); }
+.cal-ej-filtros { padding: 0 22px; display: flex; flex-direction: column; gap: 6px; }
+
+/* ════════════════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════════════════ */
+.toast-notificacion { position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);display:flex;align-items:center;gap:10px;background:var(--texto);color:var(--fondo);border-radius:12px;padding:12px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.22);z-index:9999;pointer-events:none;transition:transform .35s cubic-bezier(0.34,1.45,0.64,1),opacity .3s;opacity:0;white-space:nowrap; }
+.toast-notificacion.visible { transform:translateX(-50%) translateY(0);opacity:1; }
+.toast-icono { width:16px;height:16px;stroke-width:2.5; }
+
+/* ════════════════════════════════════════════════════════════
+   ACCESIBILIDAD
+════════════════════════════════════════════════════════════ */
+:focus-visible { outline:2px solid var(--acento);outline-offset:3px;border-radius:4px; }
+[data-tema="claro"] :focus-visible { outline-color:var(--texto); }
+
+/* ════════════════════════════════════════════════════════════
+   DESKTOP (≥820px)
+════════════════════════════════════════════════════════════ */
+@media (min-width: 820px) {
+  .contenedor-app { display:grid;grid-template-columns:240px 1fr;min-height:100dvh; }
+  .barra-lateral { display:flex;flex-direction:column;position:sticky;top:0;height:100dvh;padding:28px 16px 24px;border-right:1px solid var(--borde);background:var(--superficie);overflow-y:auto; }
+  .area-contenido { grid-column:2;padding-bottom:0;overflow:hidden;height:100dvh; }
+  .contenido-calendario { height:100dvh; }
+  .nav-movil { display:none; }
+
+  /* El menú lateral en desktop parte desde la columna de contenido */
+  .cal-menu-lateral { left: 240px; }
+}
+
+@media (min-width: 1200px) {
+  .contenedor-app { grid-template-columns:260px 1fr; }
+  .cal-menu-lateral { left: 260px; }
+}
+
+@media (hover: none), (max-width: 820px) {
+  html, body { cursor: auto; }
+  #cursor-punto { display: none !important; }
+  button, a { cursor: auto; }
+}

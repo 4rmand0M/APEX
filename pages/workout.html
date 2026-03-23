@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APEX FITNESS — Workout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/workout.css" />
+</head>
+<body>
+
+<div id="cursor-punto" aria-hidden="true"></div>
+
+<!-- APP SHELL -->
+<div class="contenedor-app" id="app">
+
+  <!-- SIDEBAR DESKTOP -->
+  <aside class="barra-lateral" role="navigation" aria-label="Navegación principal">
+    <a href="#" class="logo-barra" aria-label="APEX FITNESS">
+      <svg width="26" height="26" viewBox="0 0 42 42" fill="none">
+        <rect x="3"  y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="34" y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="8"  y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="30" y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-texto">APEX</span>
+    </a>
+    <nav class="nav-principal">
+      <ul class="lista-nav" role="list">
+        <li><a href="workout.html"    class="enlace-nav activo" aria-current="page"><i data-lucide="dumbbell"></i><span>Workout</span></a></li>
+        <li><a href="calendario.html" class="enlace-nav"><i data-lucide="calendar"></i><span>Calendario</span></a></li>
+        <li><a href="ejercicios.html" class="enlace-nav"><i data-lucide="layers"></i><span>Ejercicios</span></a></li>
+        <li><a href="#"               class="enlace-nav"><i data-lucide="user"></i><span>Perfil</span></a></li>
+      </ul>
+    </nav>
+    <div class="nav-inferior">
+      <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema">
+        <i data-lucide="sun"  class="icono-tema icono-claro"></i>
+        <i data-lucide="moon" class="icono-tema icono-oscuro"></i>
+      </button>
+      <hr class="separador-nav"/>
+      <!-- BACKEND: datos del usuario autenticado (JWT) -->
+      <a href="#" class="usuario-barra">
+        <div class="avatar-barra">J</div>
+        <div class="info-usuario-barra">
+          <span class="nombre-usuario-barra">Jeremy Infante</span>
+          <span class="handle-usuario-barra">@jeremyinfante</span>
+        </div>
+        <i data-lucide="log-out" class="icono-logout"></i>
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO -->
+  <div class="area-contenido">
+    <main class="contenido-workout" id="contenido-workout" role="main">
+
+      <!-- CABECERA FIJA con navegación de fecha -->
+      <header class="cabecera-workout" id="cabecera-workout">
+        <div class="cabecera-workout-inner">
+          <button class="btn-fecha-nav" id="btn-fecha-prev" aria-label="Día anterior">
+            <i data-lucide="chevron-left"></i>
+          </button>
+          <div class="fecha-centro">
+            <span class="fecha-label" id="label-fecha">HOY</span>
+          </div>
+          <button class="btn-fecha-nav" id="btn-fecha-next" aria-label="Día siguiente">
+            <i data-lucide="chevron-right"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- ════════════════════════════════════════
+           SCROLL FEED — cards apiladas verticalmente
+           BACKEND: GET /sessions?user_id={userId}&date={fecha}
+      ════════════════════════════════════════ -->
+      <div class="workout-feed" id="workout-feed" role="feed" aria-label="Historial de entrenos">
+
+        <!-- ── ENTRENO CARD ── -->
+        <!-- BACKEND: Iterar sesiones. data-session-id="{{sesion.id}}" -->
+        <article class="entreno-card" data-session-id="ses-001">
+          <div class="entreno-card-inner">
+
+            <header class="entreno-card-cabecera">
+              <div class="entreno-fecha-bloque">
+                <time class="entreno-dia-num" datetime="2026-03-20">20</time>
+                <div>
+                  <span class="entreno-dia-nombre">Viernes</span>
+                  <span class="entreno-mes">Marzo 2026</span>
+                </div>
+              </div>
+              <!-- puntos de músculo trabajado (colores de la BD) -->
+              <div class="entreno-musculo-dots">
+                <!-- BACKEND: por cada musculo único de la sesión -->
+                <span class="musculo-dot" style="--c:#7EB8A4" title="Espalda"></span>
+                <span class="musculo-dot" style="--c:#5CB85C" title="Bíceps"></span>
+                <span class="musculo-dot" style="--c:#5CB85C" title="Trapecios"></span>
+                <span class="musculo-dot" style="--c:#5B9BD5" title="Antebrazos"></span>
+              </div>
+              <!-- Solo compartir, sin likes ni comentarios -->
+              <button class="btn-compartir" aria-label="Compartir entreno">
+                <i data-lucide="share-2"></i>
+              </button>
+            </header>
+
+            <!-- Lista de ejercicios -->
+            <ul class="entreno-ejercicios" aria-label="Ejercicios realizados">
+
+              <!-- BACKEND: Iterar ejercicios de la sesión -->
+              <li class="ejercicio-bloque">
+                <div class="ejercicio-titulo-fila">
+                  <!-- BACKEND: color del músculo desde la BD -->
+                  <span class="ejercicio-dot" style="--c:#7EB8A4"></span>
+                  <span class="ejercicio-nombre">Jalón Al Pecho Neutro</span>
+                </div>
+                <!-- BACKEND: Iterar series del ejercicio -->
+                <ul class="series-lista">
+                  <li class="serie-fila serie-pr">
+                    <i data-lucide="trophy" class="icono-trofeo" aria-label="Récord personal"></i>
+                    <span class="serie-peso">120.0 lbs</span>
+                    <span class="serie-reps">10 reps</span>
+                  </li>
+                  <li class="serie-fila">
+                    <span class="serie-peso">120.0 lbs</span>
+                    <span class="serie-reps">7 reps</span>
+                  </li>
+                  <li class="serie-fila">
+                    <span class="serie-peso">105.0 lbs</span>
+                    <span class="serie-reps">10 reps</span>
+                  </li>
+                </ul>
+              </li>
+
+              <li class="ejercicio-bloque">
+                <div class="ejercicio-titulo-fila">
+                  <span class="ejercicio-dot" style="--c:#7EB8A4"></span>
+                  <span class="ejercicio-nombre">Remo Cerrado En Polea</span>
+                </div>
+                <ul class="series-lista">
+                  <li class="serie-fila serie-pr">
+                    <i data-lucide="trophy" class="icono-trofeo"></i>
+                    <span class="serie-peso">111.0 lbs</span>
+                    <span class="serie-reps">15 reps</span>
+                  </li>
+                  <li class="serie-fila serie-pr">
+                    <i data-lucide="trophy" class="icono-trofeo"></i>
+                    <span class="serie-peso">133.0 lbs</span>
+                    <span class="serie-reps">10 reps</span>
+                  </li>
+                  <li class="serie-fila">
+                    <span class="serie-peso">133.0 lbs</span>
+                    <span class="serie-reps">10 reps</span>
+                  </li>
+                </ul>
+              </li>
+
+              <li class="ejercicio-bloque">
+                <div class="ejercicio-titulo-fila">
+                  <span class="ejercicio-dot" style="--c:#5CB85C"></span>
+                  <span class="ejercicio-nombre">Curl Bíceps Mancuerna</span>
+                </div>
+                <ul class="series-lista">
+                  <li class="serie-fila serie-pr">
+                    <i data-lucide="trophy" class="icono-trofeo"></i>
+                    <span class="serie-peso">22.0 lbs</span>
+                    <span class="serie-reps">12 reps</span>
+                  </li>
+                  <li class="serie-fila">
+                    <span class="serie-peso">22.0 lbs</span>
+                    <span class="serie-reps">10 reps</span>
+                  </li>
+                  <li class="serie-fila">
+                    <span class="serie-peso">22.0 lbs</span>
+                    <span class="serie-reps">10 reps</span>
+                  </li>
+                </ul>
+              </li>
+
+              <li class="ejercicio-bloque">
+                <div class="ejercicio-titulo-fila">
+                  <span class="ejercicio-dot" style="--c:#7EB8A4"></span>
+                  <span class="ejercicio-nombre">Jalón Unilateral Con Polea</span>
+                </div>
+                <ul class="series-lista">
+                  <li class="serie-fila serie-pr">
+                    <i data-lucide="trophy" class="icono-trofeo"></i>
+                    <span class="serie-peso">45.0 lbs</span>
+                    <span class="serie-reps">12 reps</span>
+                  </li>
+                  <li class="serie-fila">
+                    <span class="serie-peso">45.0 lbs</span>
+                    <span class="serie-reps">12 reps</span>
+                  </li>
+                  <li class="serie-fila">
+                    <span class="serie-peso">45.0 lbs</span>
+                    <span class="serie-reps">12 reps</span>
+                  </li>
+                </ul>
+              </li>
+
+            </ul>
+
+            <!-- Footer: etiquetas musculares -->
+            <!-- BACKEND: {{sesion.musculos_unicos}} array -->
+            <footer class="entreno-card-footer">
+              <span class="etiqueta-musculo" style="--c:#7EB8A4">ESPALDA</span>
+              <span class="etiqueta-musculo" style="--c:#5CB85C">BÍCEPS</span>
+              <span class="etiqueta-musculo" style="--c:#5CB85C">TRAPECIOS</span>
+              <span class="etiqueta-musculo" style="--c:#5B9BD5">ANTEBRAZOS</span>
+            </footer>
+
+          </div>
+        </article>
+        <!-- /ENTRENO CARD 1 -->
+
+        <!-- Segunda card de ejemplo -->
+        <article class="entreno-card" data-session-id="ses-002">
+          <div class="entreno-card-inner">
+            <header class="entreno-card-cabecera">
+              <div class="entreno-fecha-bloque">
+                <time class="entreno-dia-num" datetime="2026-03-19">19</time>
+                <div>
+                  <span class="entreno-dia-nombre">Jueves</span>
+                  <span class="entreno-mes">Marzo 2026</span>
+                </div>
+              </div>
+              <div class="entreno-musculo-dots">
+                <span class="musculo-dot" style="--c:#5CB85C" title="Pecho"></span>
+                <span class="musculo-dot" style="--c:#5B9BD5" title="Hombro"></span>
+                <span class="musculo-dot" style="--c:#9B59B6" title="Tríceps"></span>
+              </div>
+              <button class="btn-compartir" aria-label="Compartir entreno">
+                <i data-lucide="share-2"></i>
+              </button>
+            </header>
+            <ul class="entreno-ejercicios">
+              <li class="ejercicio-bloque">
+                <div class="ejercicio-titulo-fila">
+                  <span class="ejercicio-dot" style="--c:#5CB85C"></span>
+                  <span class="ejercicio-nombre">Press Inclinado Mancuerna</span>
+                </div>
+                <ul class="series-lista">
+                  <li class="serie-fila serie-pr"><i data-lucide="trophy" class="icono-trofeo"></i><span class="serie-peso">45.0 lbs</span><span class="serie-reps">9 reps</span></li>
+                  <li class="serie-fila"><span class="serie-peso">40.0 lbs</span><span class="serie-reps">9 reps</span></li>
+                  <li class="serie-fila serie-pr"><i data-lucide="trophy" class="icono-trofeo"></i><span class="serie-peso">40.0 lbs</span><span class="serie-reps">10 reps</span></li>
+                </ul>
+              </li>
+              <li class="ejercicio-bloque">
+                <div class="ejercicio-titulo-fila">
+                  <span class="ejercicio-dot" style="--c:#5CB85C"></span>
+                  <span class="ejercicio-nombre">Apertura De Pecho Maquina</span>
+                </div>
+                <ul class="series-lista">
+                  <li class="serie-fila"><span class="serie-peso">90.0 lbs</span><span class="serie-reps">10 reps</span></li>
+                  <li class="serie-fila"><span class="serie-peso">90.0 lbs</span><span class="serie-reps">10 reps</span></li>
+                  <li class="serie-fila serie-pr"><i data-lucide="trophy" class="icono-trofeo"></i><span class="serie-peso">110.0 lbs</span><span class="serie-reps">10 reps</span></li>
+                </ul>
+              </li>
+              <li class="ejercicio-bloque">
+                <div class="ejercicio-titulo-fila">
+                  <span class="ejercicio-dot" style="--c:#5B9BD5"></span>
+                  <span class="ejercicio-nombre">Elevaciones Laterales</span>
+                </div>
+                <ul class="series-lista">
+                  <li class="serie-fila serie-pr"><i data-lucide="trophy" class="icono-trofeo"></i><span class="serie-peso">11.0 lbs</span><span class="serie-reps">20 reps</span></li>
+                  <li class="serie-fila"><span class="serie-peso">11.0 lbs</span><span class="serie-reps">20 reps</span></li>
+                </ul>
+              </li>
+            </ul>
+            <footer class="entreno-card-footer">
+              <span class="etiqueta-musculo" style="--c:#5CB85C">PECHO</span>
+              <span class="etiqueta-musculo" style="--c:#5B9BD5">HOMBRO</span>
+              <span class="etiqueta-musculo" style="--c:#9B59B6">TRÍCEPS</span>
+            </footer>
+          </div>
+        </article>
+
+        <!-- Estado vacío — BACKEND: mostrar si sesiones.length === 0 -->
+        <div class="workout-vacio oculto" id="workout-vacio">
+          <div class="workout-vacio-icono" aria-hidden="true">
+            <svg width="56" height="56" viewBox="0 0 42 42" fill="none">
+              <rect x="3"  y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+              <rect x="34" y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+              <rect x="8"  y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+              <rect x="30" y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+              <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p class="workout-vacio-titulo">Workout Log Empty</p>
+          <!-- BACKEND: al clic abre drawer de nuevo entreno -->
+          <button class="btn-vacio-nuevo" id="btn-vacio-nuevo">
+            <i data-lucide="plus"></i> Start New Workout
+          </button>
+          <button class="btn-vacio-copiar" id="btn-vacio-copiar">
+            <i data-lucide="copy"></i> Copy Previous Workout
+          </button>
+        </div>
+
+        <!-- Sentinel scroll infinito -->
+        <!-- BACKEND: Intersection Observer dispara GET /sessions?page={n+1} -->
+        <div id="sentinel-scroll" aria-hidden="true"></div>
+
+      </div><!-- /workout-feed -->
+
+    </main>
+  </div><!-- /area-contenido -->
+
+  <!-- BOTTOM NAV MÓVIL -->
+  <nav class="nav-movil" aria-label="Navegación móvil">
+    <a href="workout.html"    class="enlace-nav-movil activo" aria-current="page" aria-label="Workout">
+      <i data-lucide="dumbbell"></i><span>Workout</span>
+    </a>
+    <a href="calendario.html" class="enlace-nav-movil" aria-label="Calendario">
+      <i data-lucide="calendar"></i><span>Calendario</span>
+    </a>
+    <!-- Botón central: abre drawer nuevo entreno -->
+    <button class="enlace-nav-movil enlace-nav-movil-central" id="btn-nuevo-workout-nav" aria-label="Nuevo entreno">
+      <i data-lucide="plus"></i>
+    </button>
+    <a href="ejercicios.html" class="enlace-nav-movil" aria-label="Ejercicios">
+      <i data-lucide="layers"></i><span>Ejercicios</span>
+    </a>
+    <a href="#" class="enlace-nav-movil" aria-label="Perfil">
+      <i data-lucide="user"></i><span>Perfil</span>
+    </a>
+  </nav>
+
+</div><!-- /contenedor-app -->
+
+<!-- ════════════════════════════════════════════════════
+     DRAWER — NUEVO ENTRENO
+     Slide-up desde abajo. Permite registrar ejercicios
+     y series antes de guardar.
+     BACKEND: POST /sessions al guardar
+════════════════════════════════════════════════════ -->
+<div class="overlay-global oculto" id="overlay-global"></div>
+
+<div class="drawer-nuevo oculto" id="drawer-nuevo" role="dialog" aria-modal="true" aria-label="Registrar nuevo entreno">
+  <div class="drawer-handle" aria-hidden="true"></div>
+
+  <div class="drawer-top">
+    <button class="drawer-btn-cancelar" id="drawer-cancelar" aria-label="Cancelar">
+      Cancelar
+    </button>
+    <h2 class="drawer-titulo">Nuevo Entreno</h2>
+    <!-- BACKEND: POST /sessions con los ejercicios del drawer -->
+    <button class="drawer-btn-guardar" id="drawer-guardar" aria-label="Guardar entreno">
+      Guardar
+    </button>
+  </div>
+
+  <div class="drawer-fecha-row">
+    <i data-lucide="calendar-days"></i>
+    <span id="drawer-fecha-texto">Hoy</span>
+  </div>
+
+  <!-- Ejercicios añadidos al entreno actual -->
+  <ul class="drawer-lista-ejercicios" id="drawer-lista-ejercicios" aria-label="Ejercicios del entreno">
+    <li class="drawer-empty-hint" id="drawer-empty-hint">
+      <i data-lucide="dumbbell"></i>
+      <span>Añade ejercicios para comenzar</span>
+    </li>
+    <!-- JS inserta aquí los .drawer-ejercicio-item -->
+  </ul>
+
+  <!-- Botón añadir ejercicio → abre sheet -->
+  <button class="drawer-btn-anadir" id="drawer-btn-anadir" aria-label="Añadir ejercicio">
+    <i data-lucide="plus-circle"></i>
+    Añadir ejercicio
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SHEET — SELECTOR DE EJERCICIOS
+     Bottom sheet con grupos musculares expandibles.
+     Es la misma lógica que ejercicios.html pero en modal.
+     BACKEND: GET /exercise-categories?include_exercises=true
+════════════════════════════════════════════════════ -->
+<div class="sheet-ejercicios oculto" id="sheet-ejercicios" role="dialog" aria-modal="true" aria-label="Seleccionar ejercicio">
+  <div class="sheet-drag" aria-hidden="true"></div>
+
+  <div class="sheet-top">
+    <h3 class="sheet-titulo-txt">All Exercises</h3>
+    <button class="sheet-cerrar-btn" id="sheet-cerrar" aria-label="Cerrar">
+      <i data-lucide="x"></i>
+    </button>
+  </div>
+
+  <div class="sheet-search-wrap">
+    <i data-lucide="search" class="sheet-search-icon" aria-hidden="true"></i>
+    <input type="search" class="sheet-search-input" id="sheet-search" placeholder="Buscar ejercicio..." aria-label="Buscar ejercicio" autocomplete="off"/>
+  </div>
+
+  <!-- BACKEND: GET /exercise-categories → lista de grupos con color y ejercicios -->
+  <ul class="sheet-grupos" id="sheet-grupos" role="list" aria-label="Grupos musculares">
+
+    <!-- Cada grupo se puede expandir para ver sus ejercicios -->
+    <!-- BACKEND: data-grupo-id="{{grupo.id}}" data-color="{{grupo.color}}" -->
+    <li class="sheet-grupo-item" data-grupo-id="g-espalda" data-color="#7EB8A4">
+      <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-espalda">
+        <span class="sg-dot" style="background:#7EB8A4"></span>
+        <span class="sg-nombre">Espalda</span>
+        <i data-lucide="chevron-right" class="sg-chevron"></i>
+      </button>
+      <ul class="sg-ejercicios oculto" id="sg-espalda" role="list">
+        <!-- BACKEND: Iterar {{grupo.ejercicios}} -->
+        <li class="sg-ej-item" data-ej-id="ej-001" data-ej-musculo="Espalda" data-ej-color="#7EB8A4">
+          <button class="sg-ej-btn" aria-label="Añadir Jalón Al Pecho Neutro">
+            <span class="sg-ej-nombre">Jalón Al Pecho Neutro</span>
+            <i data-lucide="plus" class="sg-ej-plus"></i>
+          </button>
+        </li>
+        <li class="sg-ej-item" data-ej-id="ej-002" data-ej-musculo="Espalda" data-ej-color="#7EB8A4">
+          <button class="sg-ej-btn" aria-label="Añadir Remo Cerrado En Polea">
+            <span class="sg-ej-nombre">Remo Cerrado En Polea</span>
+            <i data-lucide="plus" class="sg-ej-plus"></i>
+          </button>
+        </li>
+        <li class="sg-ej-item" data-ej-id="ej-003" data-ej-musculo="Espalda" data-ej-color="#7EB8A4">
+          <button class="sg-ej-btn" aria-label="Añadir Jalón Unilateral Con Polea">
+            <span class="sg-ej-nombre">Jalón Unilateral Con Polea</span>
+            <i data-lucide="plus" class="sg-ej-plus"></i>
+          </button>
+        </li>
+      </ul>
+    </li>
+
+    <li class="sheet-grupo-item" data-grupo-id="g-biceps" data-color="#5CB85C">
+      <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-biceps">
+        <span class="sg-dot" style="background:#5CB85C"></span>
+        <span class="sg-nombre">Bíceps</span>
+        <i data-lucide="chevron-right" class="sg-chevron"></i>
+      </button>
+      <ul class="sg-ejercicios oculto" id="sg-biceps" role="list">
+        <li class="sg-ej-item" data-ej-id="ej-004" data-ej-musculo="Bíceps" data-ej-color="#5CB85C">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Curl Bíceps Mancuerna</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+        <li class="sg-ej-item" data-ej-id="ej-005" data-ej-musculo="Bíceps" data-ej-color="#5CB85C">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Curl Bíceps Predicador + Martillo</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+      </ul>
+    </li>
+
+    <li class="sheet-grupo-item" data-grupo-id="g-pecho" data-color="#5CB85C">
+      <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-pecho">
+        <span class="sg-dot" style="background:#5CB85C"></span>
+        <span class="sg-nombre">Pecho</span>
+        <i data-lucide="chevron-right" class="sg-chevron"></i>
+      </button>
+      <ul class="sg-ejercicios oculto" id="sg-pecho" role="list">
+        <li class="sg-ej-item" data-ej-id="ej-006" data-ej-musculo="Pecho" data-ej-color="#5CB85C">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Press Inclinado Mancuerna</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+        <li class="sg-ej-item" data-ej-id="ej-007" data-ej-musculo="Pecho" data-ej-color="#5CB85C">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Apertura De Pecho Maquina</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+        <li class="sg-ej-item" data-ej-id="ej-008" data-ej-musculo="Pecho" data-ej-color="#5CB85C">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Pecho Medio Polea</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+        <li class="sg-ej-item" data-ej-id="ej-009" data-ej-musculo="Pecho" data-ej-color="#5CB85C">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Pecho Bajo Polea</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+      </ul>
+    </li>
+
+    <li class="sheet-grupo-item" data-grupo-id="g-hombro" data-color="#5B9BD5">
+      <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-hombro">
+        <span class="sg-dot" style="background:#5B9BD5"></span>
+        <span class="sg-nombre">Hombro</span>
+        <i data-lucide="chevron-right" class="sg-chevron"></i>
+      </button>
+      <ul class="sg-ejercicios oculto" id="sg-hombro" role="list">
+        <li class="sg-ej-item" data-ej-id="ej-010" data-ej-musculo="Hombro" data-ej-color="#5B9BD5">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Elevaciones Laterales</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+      </ul>
+    </li>
+
+    <li class="sheet-grupo-item" data-grupo-id="g-triceps" data-color="#9B59B6">
+      <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-triceps">
+        <span class="sg-dot" style="background:#9B59B6"></span>
+        <span class="sg-nombre">Tríceps</span>
+        <i data-lucide="chevron-right" class="sg-chevron"></i>
+      </button>
+      <ul class="sg-ejercicios oculto" id="sg-triceps" role="list">
+        <li class="sg-ej-item" data-ej-id="ej-011" data-ej-musculo="Tríceps" data-ej-color="#9B59B6">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Extensión De Tríceps Cuerda</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+      </ul>
+    </li>
+
+    <li class="sheet-grupo-item" data-grupo-id="g-piernas" data-color="#48C9B0">
+      <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-piernas">
+        <span class="sg-dot" style="background:#48C9B0"></span>
+        <span class="sg-nombre">Piernas</span>
+        <i data-lucide="chevron-right" class="sg-chevron"></i>
+      </button>
+      <ul class="sg-ejercicios oculto" id="sg-piernas" role="list">
+        <li class="sg-ej-item" data-ej-id="ej-012" data-ej-musculo="Piernas" data-ej-color="#48C9B0">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Sentadilla Barra</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+        <li class="sg-ej-item" data-ej-id="ej-013" data-ej-musculo="Piernas" data-ej-color="#48C9B0">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Prensa De Piernas</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+      </ul>
+    </li>
+
+    <li class="sheet-grupo-item" data-grupo-id="g-trapecios" data-color="#5CB85C">
+      <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-trapecios">
+        <span class="sg-dot" style="background:#5CB85C"></span>
+        <span class="sg-nombre">Trapecios</span>
+        <i data-lucide="chevron-right" class="sg-chevron"></i>
+      </button>
+      <ul class="sg-ejercicios oculto" id="sg-trapecios" role="list">
+        <li class="sg-ej-item" data-ej-id="ej-014" data-ej-musculo="Trapecios" data-ej-color="#5CB85C">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Encogida En Hombros</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+      </ul>
+    </li>
+
+    <li class="sheet-grupo-item" data-grupo-id="g-antebrazos" data-color="#5B9BD5">
+      <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-antebrazos">
+        <span class="sg-dot" style="background:#5B9BD5"></span>
+        <span class="sg-nombre">Antebrazos</span>
+        <i data-lucide="chevron-right" class="sg-chevron"></i>
+      </button>
+      <ul class="sg-ejercicios oculto" id="sg-antebrazos" role="list">
+        <li class="sg-ej-item" data-ej-id="ej-015" data-ej-musculo="Antebrazos" data-ej-color="#5B9BD5">
+          <button class="sg-ej-btn"><span class="sg-ej-nombre">Curl De Muñeca Barra</span><i data-lucide="plus" class="sg-ej-plus"></i></button>
+        </li>
+      </ul>
+    </li>
+
+    <!-- Sin resultados de búsqueda -->
+    <li class="sheet-sin-res oculto" id="sheet-sin-res">
+      <i data-lucide="search-x"></i>
+      <span>Sin resultados</span>
+    </li>
+
+  </ul>
+</div>
+
+<!-- Toast global -->
+<div class="toast-notificacion" id="toast-notificacion" role="alert" aria-live="polite" aria-atomic="true">
+  <i data-lucide="check-circle" class="toast-icono"></i>
+  <span class="toast-mensaje" id="toast-mensaje">Listo</span>
+</div>
+
+<script src="../assets/js/workout.js"></script>
+</body>
+</html>

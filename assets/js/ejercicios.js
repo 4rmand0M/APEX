@@ -123,18 +123,6 @@ async function obtenerDatosEjercicio(ejercicioId) {
    1. ARRANQUE
 ══════════════════════════════════════════════════════════ */
 
-function inicializarPantallaCarga() {
-  const pantalla = document.getElementById('pantalla-carga');
-  if (!pantalla) return;
-  setTimeout(() => {
-    pantalla.classList.add('saliendo');
-    pantalla.addEventListener('animationend', () => {
-      pantalla.remove();
-      inicializarApp();
-    }, { once: true });
-  }, 3200);
-}
-
 function inicializarCursor() {
   const punto = document.getElementById('cursor-punto');
   if (!punto) return;
@@ -737,7 +725,6 @@ function inicializarOtrosEventos() {
 ══════════════════════════════════════════════════════════ */
 
 function inicializarApp() {
-  inicializarIconos();
   inicializarChipsMusculo();
   inicializarBuscador();
   inicializarSeleccionEjercicio();
@@ -761,5 +748,5 @@ document.addEventListener('DOMContentLoaded', () => {
   inicializarTema();
   inicializarCursor();
   inicializarIconos();
-  inicializarPantallaCarga();
+  inicializarApp();
 });

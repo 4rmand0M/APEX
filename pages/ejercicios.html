@@ -25,25 +25,6 @@
 
   <div id="cursor-punto" aria-hidden="true"></div>
 
-  <!-- ══ PANTALLA DE CARGA ══ -->
-  <div id="pantalla-carga" role="status" aria-label="Cargando">
-    <div class="logo-carga">
-      <svg width="42" height="42" viewBox="0 0 42 42" fill="none">
-        <rect class="svg-trazar" x="3" y="18" width="5" height="6" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
-        <rect class="svg-trazar" x="34" y="18" width="5" height="6" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
-        <rect class="svg-trazar" x="8" y="15" width="4" height="12" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
-        <rect class="svg-trazar" x="30" y="15" width="4" height="12" rx="1.5" stroke="#C8F400" stroke-width="1.8" />
-        <line class="svg-trazar" x1="12" y1="21" x2="30" y2="21" stroke="#C8F400" stroke-width="1.8"
-          stroke-linecap="round" />
-      </svg>
-      <span class="carga-nombre">APEX</span>
-      <span class="carga-slogan">Performance Tracking</span>
-    </div>
-    <div class="barra-carga-fondo">
-      <div class="barra-carga-relleno"></div>
-    </div>
-  </div>
-
   <!-- ══ APP SHELL ══ -->
   <div class="contenedor-app" id="app">
 
@@ -59,9 +40,11 @@
         </svg>
         <span class="logo-texto">APEX</span>
       </a>
+
+      <!-- PENDIENTE CAMBIAR EL NAV -->
       <nav class="nav-principal">
         <ul class="lista-nav" role="list">
-          <li><a href="feed.html" class="enlace-nav" data-pagina="feed"><i data-lucide="home"></i><span>Feed</span></a>
+          <li><a href="workout.html" class="enlace-nav" data-pagina="workout"><i data-lucide="home"></i><span>Workout</span></a>
           </li>
           <li><a href="rutina.html" class="enlace-nav" data-pagina="rutinas"><i
                 data-lucide="clipboard-list"></i><span>Rutinas</span></a></li>
@@ -72,6 +55,7 @@
           <li><a href="#" class="enlace-nav" data-pagina="perfil"><i data-lucide="user"></i><span>Perfil</span></a></li>
         </ul>
       </nav>
+      
       <div class="nav-inferior">
         <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema">
           <i data-lucide="sun" class="icono-tema icono-claro"></i>
@@ -700,7 +684,7 @@
 
     <!-- Bottom nav móvil -->
     <nav class="nav-movil" aria-label="Navegación móvil">
-      <a href="feed.html" class="enlace-nav-movil" aria-label="Feed"><i data-lucide="home"></i><span>Feed</span></a>
+      <a href="workout.html" class="enlace-nav-movil" aria-label="Workout"><i data-lucide="home"></i><span>Workout</span></a>
       <a href="rutina.html" class="enlace-nav-movil" aria-label="Rutinas"><i
           data-lucide="clipboard-list"></i><span>Rutinas</span></a>
       <a href="#" class="enlace-nav-movil enlace-nav-movil-central" aria-label="Nuevo"><i data-lucide="plus"></i></a>

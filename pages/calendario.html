@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APEX FITNESS — Calendario</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/calendario.css" />
+</head>
+<body>
+
+<div id="cursor-punto" aria-hidden="true"></div>
+
+<div class="contenedor-app" id="app">
+
+  <!-- SIDEBAR DESKTOP -->
+  <aside class="barra-lateral" role="navigation" aria-label="Navegación principal">
+    <a href="#" class="logo-barra" aria-label="APEX FITNESS">
+      <svg width="26" height="26" viewBox="0 0 42 42" fill="none">
+        <rect x="3"  y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="34" y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="8"  y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="30" y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-texto">APEX</span>
+    </a>
+    <nav class="nav-principal">
+      <ul class="lista-nav" role="list">
+        <li><a href="workout.html"    class="enlace-nav"><i data-lucide="dumbbell"></i><span>Workout</span></a></li>
+        <li><a href="calendario.html" class="enlace-nav activo" aria-current="page"><i data-lucide="calendar"></i><span>Calendario</span></a></li>
+        <li><a href="ejercicios.html" class="enlace-nav"><i data-lucide="layers"></i><span>Ejercicios</span></a></li>
+        <li><a href="#"               class="enlace-nav"><i data-lucide="user"></i><span>Perfil</span></a></li>
+      </ul>
+    </nav>
+    <div class="nav-inferior">
+      <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema">
+        <i data-lucide="sun"  class="icono-tema icono-claro"></i>
+        <i data-lucide="moon" class="icono-tema icono-oscuro"></i>
+      </button>
+      <hr class="separador-nav"/>
+      <a href="#" class="usuario-barra">
+        <div class="avatar-barra">J</div>
+        <div class="info-usuario-barra">
+          <span class="nombre-usuario-barra">Jeremy Infante</span>
+          <span class="handle-usuario-barra">@jeremyinfante</span>
+        </div>
+        <i data-lucide="log-out" class="icono-logout"></i>
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO -->
+  <div class="area-contenido">
+    <main class="contenido-calendario" id="contenido-calendario" role="main">
+
+      <!-- CABECERA del calendario -->
+      <header class="cal-cabecera">
+        <div class="cal-cabecera-izq">
+          <!-- Hamburguesa que abre el menú de vista y filtros -->
+          <button class="cal-hamburguesa" id="cal-hamburguesa" aria-label="Opciones de vista y filtros" aria-expanded="false" aria-controls="cal-menu-lateral">
+            <i data-lucide="menu"></i>
+          </button>
+          <h1 class="cal-titulo">Calendario</h1>
+        </div>
+        <div class="cal-cabecera-der">
+          <!-- Navegación de mes/semana según vista activa -->
+          <button class="cal-nav-btn" id="cal-prev" aria-label="Periodo anterior">
+            <i data-lucide="chevron-left"></i>
+          </button>
+          <span class="cal-periodo-label" id="cal-periodo-label">Marzo 2026</span>
+          <button class="cal-nav-btn" id="cal-next" aria-label="Periodo siguiente">
+            <i data-lucide="chevron-right"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- CUERPO: área de visualización -->
+      <div class="cal-body" id="cal-body">
+
+        <!-- ════════════════════════════
+             VISTA MENSUAL (default)
+        ════════════════════════════ -->
+        <section class="vista-mensual" id="vista-mensual" role="grid" aria-label="Vista mensual">
+
+          <!-- Encabezados días de la semana -->
+          <div class="cal-semana-header" role="row">
+            <span role="columnheader">DOM</span>
+            <span role="columnheader">LUN</span>
+            <span role="columnheader">MAR</span>
+            <span role="columnheader">MIÉ</span>
+            <span role="columnheader">JUE</span>
+            <span role="columnheader">VIE</span>
+            <span role="columnheader">SÁB</span>
+          </div>
+
+          <!-- Grid de días — generado por JS -->
+          <!-- BACKEND: GET /sessions?user_id={id}&month={mes}&year={año} para los puntos -->
+          <div class="cal-dias-grid" id="cal-dias-grid" role="rowgroup">
+            <!-- JS rellena este contenedor -->
+          </div>
+
+          <!-- Barra inferior: contador de entrenos del mes -->
+          <div class="cal-barra-mes" id="cal-barra-mes">
+            <button class="cal-mes-nav" id="cal-barra-prev" aria-label="Mes anterior">
+              <i data-lucide="chevron-left"></i>
+            </button>
+            <span class="cal-mes-contador" id="cal-mes-contador">3 WORKOUTS</span>
+            <button class="cal-mes-nav" id="cal-barra-next" aria-label="Mes siguiente">
+              <i data-lucide="chevron-right"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- ════════════════════════════
+             VISTA LISTA
+             BACKEND: GET /sessions?user_id={id}&limit=30
+        ════════════════════════════ -->
+        <section class="vista-lista oculto" id="vista-lista" aria-label="Vista de lista">
+          <ul class="cal-lista-entrenos" id="cal-lista-entrenos" role="list">
+
+            <!-- Grupo de fecha -->
+            <!-- BACKEND: Agrupar sesiones por fecha -->
+            <li class="cal-lista-grupo">
+              <div class="cal-lista-fecha-header">
+                <h2 class="cal-lista-fecha-titulo">viernes 20th marzo 2026</h2>
+              </div>
+              <ul class="cal-lista-sesiones" role="list">
+                <!-- Ejercicio de la sesión -->
+                <li class="cal-lista-ejercicio">
+                  <span class="cal-lista-dot" style="--c:#7EB8A4"></span>
+                  <div class="cal-lista-ej-detalle">
+                    <span class="cal-lista-ej-nombre">Jalón Al Pecho Neutro</span>
+                    <!-- BACKEND: Iterar series -->
+                    <ul class="cal-lista-ej-series">
+                      <li>120.0 lbs × 10 reps</li>
+                      <li>120.0 lbs × 7 reps</li>
+                      <li>105.0 lbs × 10 reps</li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="cal-lista-ejercicio">
+                  <span class="cal-lista-dot" style="--c:#7EB8A4"></span>
+                  <div class="cal-lista-ej-detalle">
+                    <span class="cal-lista-ej-nombre">Remo Cerrado En Polea</span>
+                    <ul class="cal-lista-ej-series">
+                      <li>111.0 lbs × 15 reps</li>
+                      <li>133.0 lbs × 10 reps</li>
+                      <li>133.0 lbs × 10 reps</li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="cal-lista-ejercicio">
+                  <span class="cal-lista-dot" style="--c:#5CB85C"></span>
+                  <div class="cal-lista-ej-detalle">
+                    <span class="cal-lista-ej-nombre">Curl Bíceps Mancuerna</span>
+                    <ul class="cal-lista-ej-series">
+                      <li>22.0 lbs × 12 reps</li>
+                      <li>22.0 lbs × 10 reps</li>
+                      <li>22.0 lbs × 10 reps</li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+              <!-- Chips de músculo al pie del grupo -->
+              <div class="cal-lista-chips">
+                <span class="cal-chip" style="--c:#7EB8A4">ESPALDA</span>
+                <span class="cal-chip" style="--c:#5CB85C">BÍCEPS</span>
+                <span class="cal-chip" style="--c:#5CB85C">TRAPECIOS</span>
+                <span class="cal-chip" style="--c:#5B9BD5">ANTEBRAZOS</span>
+              </div>
+            </li>
+
+            <li class="cal-lista-grupo">
+              <div class="cal-lista-fecha-header">
+                <h2 class="cal-lista-fecha-titulo">jueves 19th marzo 2026</h2>
+              </div>
+              <ul class="cal-lista-sesiones" role="list">
+                <li class="cal-lista-ejercicio">
+                  <span class="cal-lista-dot" style="--c:#5CB85C"></span>
+                  <div class="cal-lista-ej-detalle">
+                    <span class="cal-lista-ej-nombre">Press Inclinado Mancuerna</span>
+                    <ul class="cal-lista-ej-series">
+                      <li>45.0 lbs × 9 reps</li>
+                      <li>40.0 lbs × 9 reps</li>
+                      <li>40.0 lbs × 10 reps</li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="cal-lista-ejercicio">
+                  <span class="cal-lista-dot" style="--c:#5CB85C"></span>
+                  <div class="cal-lista-ej-detalle">
+                    <span class="cal-lista-ej-nombre">Apertura De Pecho Maquina</span>
+                    <ul class="cal-lista-ej-series">
+                      <li>90.0 lbs × 10 reps</li>
+                      <li>90.0 lbs × 10 reps</li>
+                      <li>110.0 lbs × 10 reps</li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="cal-lista-ejercicio">
+                  <span class="cal-lista-dot" style="--c:#5B9BD5"></span>
+                  <div class="cal-lista-ej-detalle">
+                    <span class="cal-lista-ej-nombre">Elevaciones Laterales</span>
+                    <ul class="cal-lista-ej-series">
+                      <li>11.0 lbs × 20 reps</li>
+                      <li>11.0 lbs × 20 reps</li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+              <div class="cal-lista-chips">
+                <span class="cal-chip" style="--c:#5CB85C">PECHO</span>
+                <span class="cal-chip" style="--c:#5B9BD5">HOMBRO</span>
+                <span class="cal-chip" style="--c:#9B59B6">TRÍCEPS</span>
+              </div>
+            </li>
+
+          </ul>
+        </section>
+
+        <!-- ════════════════════════════
+             VISTA SEMANA
+             BACKEND: GET /sessions?user_id={id}&week_start={fecha}
+        ════════════════════════════ -->
+        <section class="vista-semana oculto" id="vista-semana" aria-label="Vista semanal">
+          <!-- Fila de días de la semana -->
+          <div class="sem-dias-fila" id="sem-dias-fila" role="list">
+            <!-- JS genera 7 botones de día con puntos de entreno -->
+          </div>
+          <!-- Detalle del día seleccionado -->
+          <div class="sem-detalle" id="sem-detalle" aria-label="Detalle del día seleccionado">
+            <!-- JS rellena este panel -->
+            <div class="sem-detalle-vacio" id="sem-detalle-vacio">
+              <i data-lucide="calendar-x"></i>
+              <span>Sin entreno este día</span>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /cal-body -->
+
+    </main>
+  </div>
+
+  <!-- BOTTOM NAV MÓVIL -->
+  <nav class="nav-movil" aria-label="Navegación móvil">
+    <a href="workout.html"    class="enlace-nav-movil" aria-label="Workout">
+      <i data-lucide="dumbbell"></i><span>Workout</span>
+    </a>
+    <a href="calendario.html" class="enlace-nav-movil activo" aria-current="page" aria-label="Calendario">
+      <i data-lucide="calendar"></i><span>Calendario</span>
+    </a>
+    <a href="workout.html"    class="enlace-nav-movil enlace-nav-movil-central" aria-label="Nuevo entreno">
+      <i data-lucide="plus"></i>
+    </a>
+    <a href="ejercicios.html" class="enlace-nav-movil" aria-label="Ejercicios">
+      <i data-lucide="layers"></i><span>Ejercicios</span>
+    </a>
+    <a href="#" class="enlace-nav-movil" aria-label="Perfil">
+      <i data-lucide="user"></i><span>Perfil</span>
+    </a>
+  </nav>
+
+</div><!-- /contenedor-app -->
+
+<!-- ════════════════════════════════════════════════════
+     MENÚ LATERAL (Hamburguesa) — Vista y filtros
+     Se desliza desde la izquierda
+════════════════════════════════════════════════════ -->
+<div class="cal-overlay oculto" id="cal-overlay"></div>
+<aside class="cal-menu-lateral oculto" id="cal-menu-lateral" role="dialog" aria-modal="true" aria-label="Opciones de vista y filtros">
+
+  <div class="cal-menu-inner">
+
+    <!-- Opciones de vista -->
+    <section class="cal-menu-seccion">
+      <button class="cal-vista-opcion activa" data-vista="mensual" role="radio" aria-checked="true">
+        <i data-lucide="grid-3x3"></i>
+        Month View
+      </button>
+      <button class="cal-vista-opcion" data-vista="lista" role="radio" aria-checked="false">
+        <i data-lucide="list"></i>
+        List View
+      </button>
+      <button class="cal-vista-opcion" data-vista="semana" role="radio" aria-checked="false">
+        <i data-lucide="calendar-days"></i>
+        Week View
+      </button>
+    </section>
+
+    <hr class="cal-menu-sep"/>
+
+    <!-- Filtro por categoría muscular -->
+    <!-- BACKEND: GET /exercise-categories para la lista de filtros -->
+    <section class="cal-menu-seccion">
+      <h3 class="cal-menu-seccion-titulo">CATEGORY FILTER</h3>
+      <ul class="cal-filtros-lista" id="cal-filtros-lista" role="list">
+        <!-- BACKEND: Iterar grupos musculares con su color desde la BD -->
+        <li class="cal-filtro-item" role="listitem">
+          <label class="cal-filtro-label">
+            <span class="cal-filtro-dot" style="--c:#5B9BD5"></span>
+            <span class="cal-filtro-nombre">Antebrazos</span>
+          </label>
+          <input type="checkbox" class="cal-filtro-check" data-musculo="antebrazos" aria-label="Filtrar Antebrazos"/>
+        </li>
+        <li class="cal-filtro-item" role="listitem">
+          <label class="cal-filtro-label">
+            <span class="cal-filtro-dot" style="--c:#5CB85C"></span>
+            <span class="cal-filtro-nombre">Bíceps</span>
+          </label>
+          <input type="checkbox" class="cal-filtro-check" data-musculo="biceps" aria-label="Filtrar Bíceps"/>
+        </li>
+        <li class="cal-filtro-item" role="listitem">
+          <label class="cal-filtro-label">
+            <span class="cal-filtro-dot" style="--c:#7EB8A4"></span>
+            <span class="cal-filtro-nombre">Espalda</span>
+          </label>
+          <input type="checkbox" class="cal-filtro-check" data-musculo="espalda" aria-label="Filtrar Espalda"/>
+        </li>
+        <li class="cal-filtro-item" role="listitem">
+          <label class="cal-filtro-label">
+            <span class="cal-filtro-dot" style="--c:#5B9BD5"></span>
+            <span class="cal-filtro-nombre">Hombro</span>
+          </label>
+          <input type="checkbox" class="cal-filtro-check" data-musculo="hombro" aria-label="Filtrar Hombro"/>
+        </li>
+        <li class="cal-filtro-item" role="listitem">
+          <label class="cal-filtro-label">
+            <span class="cal-filtro-dot" style="--c:#5CB85C"></span>
+            <span class="cal-filtro-nombre">Pecho</span>
+          </label>
+          <input type="checkbox" class="cal-filtro-check" data-musculo="pecho" aria-label="Filtrar Pecho"/>
+        </li>
+        <li class="cal-filtro-item" role="listitem">
+          <label class="cal-filtro-label">
+            <span class="cal-filtro-dot" style="--c:#48C9B0"></span>
+            <span class="cal-filtro-nombre">Piernas</span>
+          </label>
+          <input type="checkbox" class="cal-filtro-check" data-musculo="piernas" aria-label="Filtrar Piernas"/>
+        </li>
+        <li class="cal-filtro-item" role="listitem">
+          <label class="cal-filtro-label">
+            <span class="cal-filtro-dot" style="--c:#5CB85C"></span>
+            <span class="cal-filtro-nombre">Trapecios</span>
+          </label>
+          <input type="checkbox" class="cal-filtro-check" data-musculo="trapecios" aria-label="Filtrar Trapecios"/>
+        </li>
+        <li class="cal-filtro-item" role="listitem">
+          <label class="cal-filtro-label">
+            <span class="cal-filtro-dot" style="--c:#9B59B6"></span>
+            <span class="cal-filtro-nombre">Tríceps</span>
+          </label>
+          <input type="checkbox" class="cal-filtro-check" data-musculo="triceps" aria-label="Filtrar Tríceps"/>
+        </li>
+      </ul>
+    </section>
+
+    <hr class="cal-menu-sep"/>
+
+    <!-- Filtro por ejercicio específico -->
+    <!-- BACKEND: GET /exercises?user_id={id} para la lista -->
+    <section class="cal-menu-seccion">
+      <div class="cal-menu-ej-header">
+        <h3 class="cal-menu-seccion-titulo">EXERCISE FILTER</h3>
+        <button class="cal-menu-ej-add" id="cal-menu-ej-add" aria-label="Añadir filtro de ejercicio">
+          <i data-lucide="plus"></i>
+        </button>
+      </div>
+      <!-- BACKEND: Lista de ejercicios seleccionados como filtro -->
+      <div class="cal-ej-filtros" id="cal-ej-filtros">
+        <!-- JS inserta chips de ejercicio aquí -->
+      </div>
+    </section>
+
+  </div>
+</aside>
+
+<!-- Toast -->
+<div class="toast-notificacion" id="toast-notificacion" role="alert" aria-live="polite" aria-atomic="true">
+  <i data-lucide="check-circle" class="toast-icono"></i>
+  <span class="toast-mensaje" id="toast-mensaje">Listo</span>
+</div>
+
+<script src="../assets/js/calendario.js"></script>
+</body>
+</html>
