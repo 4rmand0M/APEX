@@ -1191,6 +1191,11 @@ canvas {
   transition: background 0.14s ease;
 }
 
+.item-biblioteca:focus-within, 
+.item-biblioteca:hover {
+  z-index: 10;
+}
+
 .item-biblioteca:last-child {
   border-bottom: none;
 }

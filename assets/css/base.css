@@ -34,14 +34,17 @@ body {
 
 #cursor-punto {
   position: fixed;
+  top: 0;
+  left: 0;
   width: 6px;
   height: 6px;
   background: var(--acento);
   border-radius: 50%;
   pointer-events: none;
   z-index: 99999;
-  transform: translate(-50%, -50%);
-  will-change: left, top;
+  margin-left: -3px;
+  margin-top: -3px;
+  will-change: transform;
   transition: width 0.12s, height 0.12s;
 }
 
@@ -195,4 +198,100 @@ body.sobre-interactivo #cursor-punto {
   .enlace {
     cursor: auto;
   }
+}
+
+/* ============================================================
+   GLOBAL DROPDOWN COMPONENT (FitNotes-style)
+============================================================ */
+
+.dropdown-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-opciones {
+  background: transparent;
+  border: none;
+  color: var(--texto-secundario);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-opciones:hover {
+  background: var(--superficie-2);
+  color: var(--texto);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  min-width: 220px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  animation: dropFadeIn 0.2s ease forwards;
+  transform-origin: top right;
+}
+
+.dropdown-menu.oculto {
+  display: none !important;
+}
+
+@keyframes dropFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  color: var(--texto);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dropdown-item i {
+  width: 18px;
+  height: 18px;
+  color: var(--texto-secundario);
+}
+
+.dropdown-item:hover {
+  background: var(--superficie-2);
+}
+
+.dropdown-item:hover i {
+  color: var(--acento);
+}
+
+.dropdown-separator {
+  height: 1px;
+  background: var(--borde);
+  margin: 6px 0;
 }

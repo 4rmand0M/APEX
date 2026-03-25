@@ -239,62 +239,112 @@ html {
 
 /* ── CABECERA FIJA ── */
 .cabecera-workout {
-  flex-shrink: 0;
-  background: var(--superficie);
-  border-bottom: 1px solid var(--borde);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
+  background: var(--fondo);
+  border-bottom: 1px solid var(--superficie-2);
 }
 
-.cabecera-workout-inner {
+.top-app-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  height: 64px;
+}
+
+@media (min-width: 821px) {
+  .top-app-bar .mobile-only {
+    display: none;
+  }
+}
+
+.brand-app-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 14px 20px;
-  position: relative;
+  gap: 8px;
+  font-family: 'Bebas Neue', display;
+  font-size: 24px;
+  letter-spacing: 1px;
+  color: var(--texto);
 }
 
 .fecha-centro {
-  text-align: center;
   flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
-.fecha-label {
+.btn-fecha-selector {
+  background: transparent;
+  border: none;
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   font-weight: 700;
   color: var(--texto);
   letter-spacing: 1.5px;
   text-transform: uppercase;
-}
-
-.btn-fecha-nav {
-  background: none;
-  border: none;
-  color: var(--acento);
-  cursor: none;
   display: flex;
   align-items: center;
-  padding: 6px;
+  gap: 6px;
+  cursor: pointer;
+  padding: 8px 16px;
   border-radius: 8px;
-  transition: background .14s, transform .14s;
+  transition: background 0.14s ease;
 }
 
-.btn-fecha-nav i {
-  width: 22px;
-  height: 22px;
-  stroke-width: 2.5;
-}
-
-.btn-fecha-nav:hover {
+.btn-fecha-selector:hover {
   background: var(--superficie-2);
-  transform: scale(1.1);
 }
 
-[data-tema="claro"] .btn-fecha-nav {
+.btn-fecha-selector i {
+  width: 16px;
+  height: 16px;
+  color: var(--acento);
+}
+
+/* FLOATING SCROLL BUTTONS */
+.floating-scroll-btns {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 99;
+}
+
+@media (min-width: 821px) {
+  .floating-scroll-btns {
+    bottom: 40px;
+    right: 40px;
+  }
+}
+
+.fab-scroll {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(30, 30, 30, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--borde);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
   color: var(--texto);
+}
+
+.fab-scroll:hover {
+  background: var(--superficie-2);
+  transform: scale(1.05);
+}
+
+.fab-scroll i {
+  width: 24px;
+  height: 24px;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -305,20 +355,26 @@ html {
 .workout-feed {
   flex: 1;
   overflow-y: auto;
-  scroll-snap-type: y mandatory;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
-  padding: 0;
+  padding: 0; /* Sin padding global para permitir snapping limpio a los bordes */
+  
+  /* Reel-style snap */
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
 }
 
 .entreno-card {
-  scroll-snap-align: start;
-  min-height: calc(100dvh - 64px - 56px);
-  /* altura visible */
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid var(--borde);
   animation: cardEntrada .3s ease both;
+  margin: 0; /* Removemos margen para que las cartas se unan */
+  padding: 120px 16px 80px 16px; /* Offset para cabecera fija y barra inferior */
+  min-height: 100%; /* Cada tarjeta ocupa la altura visible entera del feed */
+  
+  /* Snapping config */
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 @keyframes cardEntrada {
@@ -339,11 +395,12 @@ html {
   flex: 1;
   padding: 0;
   background: var(--superficie);
-  margin: 12px;
-  border-radius: 16px;
+  margin: 0;
+  border-radius: 18px;
   border: 1px solid var(--borde);
   overflow: hidden;
-  transition: border-color .2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: border-color .2s, box-shadow .2s;
 }
 
 .entreno-card-inner:hover {
@@ -439,10 +496,14 @@ html {
   padding: 0 18px;
   flex: 1;
   overflow-y: auto;
+  scrollbar-width: none;
+}
+.entreno-ejercicios::-webkit-scrollbar {
+  display: none;
 }
 
 .ejercicio-bloque {
-  padding: 14px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--borde);
 }
 
@@ -484,7 +545,13 @@ html {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 3px 0;
+  padding: 5px 8px;
+  border-radius: 6px;
+  transition: background .14s;
+}
+
+.serie-fila:hover {
+  background: var(--superficie-2);
 }
 
 .serie-fila.serie-pr .icono-trofeo {
@@ -515,18 +582,21 @@ html {
 .entreno-card-footer {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 12px 18px;
+  gap: 8px;
+  padding: 14px 18px;
   border-top: 1px solid var(--borde);
   background: var(--superficie-2);
 }
 
 .etiqueta-musculo {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: .8px;
+  letter-spacing: .5px;
   text-transform: uppercase;
   color: var(--c, #888);
+  background: color-mix(in srgb, var(--c) 15%, transparent);
+  padding: 4px 10px;
+  border-radius: 8px;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -897,6 +967,7 @@ html {
   color: var(--texto);
   outline: none;
   -moz-appearance: textfield;
+  appearance: textfield;
   transition: border-color .14s;
 }
 
@@ -1505,131 +1576,5 @@ html {
   .drawer-btn-add-serie,
   .drawer-ej-eliminar {
     cursor: auto;
-  }
-}
-
-/* ============================================================
-   APEX FITNESS — Workout (workout.css) — CORRECCIONES RECOMENDADAS
-============================================================ */
-
-/* base logic for .entreno-ejercicios: No scrollbar */
-.entreno-ejercicios::-webkit-scrollbar {
-  display: none;
-}
-.entreno-ejercicios {
-  scrollbar-width: none;
-}
-
-/* ════════════════════════════════════════════════════════════
-   DESKTOP / WIDESCREEN ENHANCEMENTS (≥1100px)
-   Correcciones para PC y selectores redundantes fusionados.
-════════════════════════════════════════════════════════════ */
-@media (min-width: 1100px) {
-  .contenedor-app {
-    flex-direction: row;
-  }
-
-  .barra-lateral {
-    display: flex;
-    flex-direction: column;
-    width: 240px;
-    min-width: 240px;
-    padding: 24px 16px;
-    border-right: 1px solid var(--borde);
-    background: var(--superficie);
-    position: sticky;
-    top: 0;
-    height: 100dvh;
-    z-index: 50;
-  }
-
-  .area-contenido {
-    margin-left: 0;
-    /* CORRECCIÓN VERDE 1/2: Eliminar padding lateral para PC */
-    padding: 24px 0 24px;
-    max-width: 100%;
-    width: 100%;
-  }
-
-  .contenido-workout {
-    height: auto;
-    overflow: visible;
-  }
-
-  /* CORRECCIÓN AMARILLA: Restaurar diseño flex para centrar fecha */
-  .cabecera-workout-inner {
-    justify-content: center;
-    position: relative;
-    padding: 14px 24px;
-    gap: 24px;
-  }
-
-  .fecha-centro {
-    text-align: center;
-    flex: 1; /* Volver a flex:1 */
-    width: auto; /* Anular ancho fijo min(350px, 70%) */
-    max-width: none; /* Anular ancho máximo */
-  }
-
-  .btn-fecha-nav {
-    position: static; /* Volver a estático */
-    top: auto;
-    transform: none;
-  }
-
-  /* No se necesitan estilos para #btn-fecha-prev, #btn-fecha-next con static */
-
-  .workout-feed {
-    width: 100%;
-    /* CORRECCIÓN VERDE 2/2: Eliminar padding del feed */
-    padding: 0;
-    scroll-snap-type: none;
-    overflow-y: auto;
-    min-height: calc(100vh - 90px);
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .workout-feed::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-  }
-
-  .entreno-card {
-    min-height: auto;
-    margin: 10px;
-    width: 100%;
-    box-shadow: 0 8px 28px rgba(0, 0, 0, .18);
-    border: none;
-  }
-
-  /* CORRECCIÓN ROJA + ANCHO VERDE: Eliminar borde interno, estirar ancho y fusionar */
-  .entreno-card-inner {
-    margin: 0;
-    width: 98%; /* Forzar ancho completo */
-    overflow: hidden;
-    border: none; /* Eliminar borde interno para PC */
-  }
-
-  .entreno-ejercicios {
-    padding-right: 2px;
-  }
-
-  .bottom-nav {
-    display: none;
-  }
-
-  .nav-movil {
-    display: none;
-  }
-
-  .enlace-nav {
-    font-size: 15px;
-    padding: 12px 14px;
-  }
-
-  .cabecera-workout {
-    border-bottom: 1px solid var(--borde);
-    background: var(--superficie);
   }
 }

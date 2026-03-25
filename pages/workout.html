@@ -61,20 +61,58 @@
   <div class="area-contenido">
     <main class="contenido-workout" id="contenido-workout" role="main">
 
-      <!-- CABECERA FIJA con navegación de fecha -->
+      <!-- CABECERA FIJA -->
       <header class="cabecera-workout" id="cabecera-workout">
-        <div class="cabecera-workout-inner">
-          <button class="btn-fecha-nav" id="btn-fecha-prev" aria-label="Día anterior">
-            <i data-lucide="chevron-left"></i>
-          </button>
-          <div class="fecha-centro">
-            <span class="fecha-label" id="label-fecha">HOY</span>
+        
+        <!-- BARRA SUPERIOR (LOGO, FECHA Y OPCIONES) -->
+        <div class="top-app-bar">
+          <div class="brand-app-bar mobile-only">
+            <svg width="22" height="22" viewBox="0 0 42 42" fill="none">
+              <rect x="3" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/>
+              <rect x="34" y="18" width="5" height="6" rx="1.5" stroke="currentColor" stroke-width="2"/>
+              <rect x="8" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="2"/>
+              <rect x="30" y="15" width="4" height="12" rx="1.5" stroke="currentColor" stroke-width="2"/>
+              <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>APEX</span>
           </div>
-          <button class="btn-fecha-nav" id="btn-fecha-next" aria-label="Día siguiente">
-            <i data-lucide="chevron-right"></i>
-          </button>
+
+          <!-- BACKEND: DatePicker trigger -->
+          <!-- Al hacer clic, abre un DatePicker UI e interacciona visualmente saltando de dia -->
+          <div class="fecha-centro">
+            <button class="btn-fecha-selector" aria-label="Seleccionar fecha" id="btn-seleccionar-fecha">
+              <span class="fecha-label" id="label-fecha">HOY</span>
+              <i data-lucide="calendar"></i>
+            </button>
+          </div>
+
+          <div class="dropdown-wrap">
+            <button class="btn-opciones" id="btn-opciones-workout" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">
+              <i data-lucide="more-vertical"></i>
+            </button>
+            <div class="dropdown-menu oculto" id="dropdown-menu-workout" role="menu">
+              <button class="dropdown-item" role="menuitem"><i data-lucide="settings"></i> Ajustes</button>
+              <button class="dropdown-item" role="menuitem"><i data-lucide="copy"></i> Copiar Entreno</button>
+              <button class="dropdown-item" role="menuitem"><i data-lucide="message-square"></i> Comentar Entreno</button>
+              <button class="dropdown-item" role="menuitem"><i data-lucide="clock"></i> Tiempo del Entreno</button>
+              <button class="dropdown-item" role="menuitem"><i data-lucide="share-2"></i> Compartir Entreno</button>
+              <div class="dropdown-separator" role="separator"></div>
+              <button class="dropdown-item" role="menuitem"><i data-lucide="activity"></i> Seguidor Corporal</button>
+              <button class="dropdown-item" role="menuitem"><i data-lucide="bar-chart-2"></i> Análisis</button>
+            </div>
+          </div>
         </div>
       </header>
+
+      <!-- BOTONES FLOTANTES DE NAVEGACION (SCROLL) -->
+      <div class="floating-scroll-btns">
+        <button class="fab-scroll" id="btn-scroll-up" aria-label="Scroll Arriba">
+          <i data-lucide="chevron-up"></i>
+        </button>
+        <button class="fab-scroll" id="btn-scroll-down" aria-label="Scroll Abajo">
+          <i data-lucide="chevron-down"></i>
+        </button>
+      </div>
 
       <!-- ════════════════════════════════════════
            SCROLL FEED — cards apiladas verticalmente
@@ -311,20 +349,19 @@
     </main>
   </div><!-- /area-contenido -->
 
-  <!-- BOTTOM NAV MÓVIL -->
   <nav class="nav-movil" aria-label="Navegación móvil">
     <a href="workout.html"    class="enlace-nav-movil activo" aria-current="page" aria-label="Workout">
-      <i data-lucide="dumbbell"></i><span>Workout</span>
+      <i data-lucide="home"></i><span>Workout</span>
     </a>
     <a href="calendario.html" class="enlace-nav-movil" aria-label="Calendario">
-      <i data-lucide="calendar"></i><span>Calendario</span>
+      <i data-lucide="clipboard-list"></i><span>Calendario</span>
     </a>
     <!-- Botón central: abre drawer nuevo entreno -->
     <button class="enlace-nav-movil enlace-nav-movil-central" id="btn-nuevo-workout-nav" aria-label="Nuevo entreno">
       <i data-lucide="plus"></i>
     </button>
     <a href="ejercicios.html" class="enlace-nav-movil" aria-label="Ejercicios">
-      <i data-lucide="layers"></i><span>Ejercicios</span>
+      <i data-lucide="dumbbell"></i><span>Ejercicios</span>
     </a>
     <a href="#" class="enlace-nav-movil" aria-label="Perfil">
       <i data-lucide="user"></i><span>Perfil</span>

@@ -271,6 +271,9 @@ function actualizarContadorResultados(num) {
 
 function inicializarSeleccionEjercicio() {
   document.getElementById('lista-biblioteca')?.addEventListener('click', async e => {
+    // Si se hizo clic en el menú o sus opciones, no activar la tarjeta
+    if (e.target.closest('.dropdown-wrap')) return;
+
     const boton = e.target.closest('.boton-item');
     if (!boton) return;
 
@@ -749,4 +752,31 @@ document.addEventListener('DOMContentLoaded', () => {
   inicializarCursor();
   inicializarIconos();
   inicializarApp();
+});
+
+/* ══════════════════════════════════════════════════════════
+   GLOBAL DROPDOWN LOGIC
+══════════════════════════════════════════════════════════ */
+document.addEventListener('click', (e) => {
+  const isDropdownBtn = e.target.closest('.btn-opciones');
+  const isDropdownMenu = e.target.closest('.dropdown-menu');
+  
+  if (isDropdownBtn) {
+    const parentWrap = isDropdownBtn.closest('.dropdown-wrap');
+    if (parentWrap) {
+      const dropdown = parentWrap.querySelector('.dropdown-menu');
+      if (dropdown) {
+        document.querySelectorAll('.dropdown-menu').forEach(m => {
+          if (m !== dropdown) m.classList.add('oculto');
+        });
+        dropdown.classList.toggle('oculto');
+      }
+    }
+  } else if (!isDropdownMenu) {
+    document.querySelectorAll('.dropdown-menu').forEach(m => {
+      if (m.closest('.dropdown-wrap')) {
+        m.classList.add('oculto');
+      }
+    });
+  }
 });

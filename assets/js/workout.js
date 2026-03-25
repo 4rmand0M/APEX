@@ -45,8 +45,7 @@ function inicializarCursor() {
   document.addEventListener('mousemove', e => {
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(() => {
-      punto.style.left = `${e.clientX}px`;
-      punto.style.top  = `${e.clientY}px`;
+      punto.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
     });
   });
   const sel = 'button, a, input';
@@ -488,4 +487,57 @@ document.addEventListener('DOMContentLoaded', () => {
   inicializarCursor();
   inicializarIconos();
   inicializarApp();
+});
+
+/* ══════════════════════════════════════════════════════════
+   GLOBAL DROPDOWN LOGIC
+══════════════════════════════════════════════════════════ */
+document.addEventListener('click', (e) => {
+  const isDropdownBtn = e.target.closest('.btn-opciones');
+  const isDropdownMenu = e.target.closest('.dropdown-menu');
+  
+  // Toggle the specific dropdown menu
+  if (isDropdownBtn) {
+    const parentWrap = isDropdownBtn.closest('.dropdown-wrap');
+    if (parentWrap) {
+      const dropdown = parentWrap.querySelector('.dropdown-menu');
+      if (dropdown) {
+        // Close others first
+        document.querySelectorAll('.dropdown-menu').forEach(m => {
+          if (m !== dropdown) m.classList.add('oculto');
+        });
+        dropdown.classList.toggle('oculto');
+      }
+    }
+  } else if (!isDropdownMenu) {
+    // Click outside -> close all dropdowns
+    document.querySelectorAll('.dropdown-menu').forEach(m => {
+      // no cerrar el drawer o el sheet que no tengan dropdown-wrap, 
+      // asumiendo que esos tienen sus propios comportamientos o clases diferentes.
+      if (m.closest('.dropdown-wrap')) {
+        m.classList.add('oculto');
+      }
+    });
+  }
+});
+
+/* ══════════════════════════════════════════════════════════
+   UP / DOWN SCROLL BUTTON LOGIC (REELS STYLE)
+══════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const btnUp = document.getElementById('btn-scroll-up');
+  const btnDown = document.getElementById('btn-scroll-down');
+  const feed = document.querySelector('.workout-feed');
+
+  if (btnUp && btnDown && feed) {
+    btnUp.addEventListener('click', () => {
+      // Al presionar el botón de arriba, saltar directamente un viewport height hacia arriba
+      feed.scrollBy({ top: -window.innerHeight, left: 0, behavior: 'smooth' });
+    });
+
+    btnDown.addEventListener('click', () => {
+      // Al presionar el botón de abajo, saltar directamente un viewport height hacia abajo
+      feed.scrollBy({ top: window.innerHeight, left: 0, behavior: 'smooth' });
+    });
+  }
 });
