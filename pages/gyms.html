@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex - Gimnasios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { --bg: #0a0a0a; --fg: #ffffff; --card: #141414; --border: #262626; --primary: #ef4444; }
+        body { background: var(--bg); color: var(--fg); font-family: sans-serif; margin: 0; }
+        .container { padding: 100px 52px; max-width: 1200px; margin: 0 auto; }
+        .badge { border: 1px solid var(--border); color: var(--primary); padding: 4px 12px; border-radius: 99px; font-size: 12px; letter-spacing: 2px; }
+        .title { font-family: 'Bebas Neue'; font-size: 72px; margin: 20px 0 40px; line-height: 0.9; }
+        .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .map-box { background: #1a1a1a; border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; }
+        .gym-item { background: var(--card); border: 1px solid var(--border); border-radius: 8px; display: flex; margin-bottom: 15px; cursor: pointer; transition: 0.3s; overflow: hidden; }
+        .gym-item:hover { border-color: var(--primary); }
+        .gym-item img { width: 140px; height: 100px; object-fit: cover; }
+        .gym-info { padding: 15px; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--card); border: 1px solid var(--border); padding: 30px; width: 500px; border-radius: 12px; position: relative; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="badge">UBICACIONES</span>
+        <h1 class="title">NUESTROS GIMNASIOS</h1>
+        <div class="layout">
+            <div class="map-box">
+                <i data-lucide="map-pin" style="width: 48px; height: 48px; color: var(--primary)"></i>
+                <p style="font-family: 'Bebas Neue'; font-size: 24px;">MAPA INTERACTIVO</p>
+            </div>
+            <div id="list"></div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button onclick="closeModal()" style="position: absolute; top:15px; right:15px; background:none; border:1px solid #262626; color:white; border-radius:50%; cursor:pointer;"><i data-lucide="x"></i></button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const gyms = [{ id: 1, name: "APEX CENTRAL", address: "Av. Principal 123", image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400", description: "Nuestra sede principal.", services: ["Parking", "Duchas"] }];
+        
+        function render() {
+            document.getElementById('list').innerHTML = gyms.map(g => `
+                <div class="gym-item" onclick="openModal(${g.id})">
+                    <img src="${g.image}">
+                    <div class="gym-info">
+                        <h3 style="font-family: 'Bebas Neue'; margin: 0">${g.name}</h3>
+                        <p style="font-size: 12px; color: #a3a3a3">${g.address}</p>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function openModal(id) {
+            const g = gyms.find(x => x.id === id);
+            document.getElementById('modal-body').innerHTML = `
+                <h2 style="font-family:'Bebas Neue'; font-size: 32px; margin: 0">${g.name}</h2>
+                <p style="font-size: 14px; color: #a3a3a3">${g.description}</p>
+                <div style="margin-top: 15px">
+                    <p style="font-size: 10px; color: var(--primary); letter-spacing: 2px">SERVICIOS</p>
+                    ${g.services.map(s => `<span class="badge" style="font-size: 9px; margin-right: 5px">${s}</span>`).join('')}
+                </div>
+            `;
+            document.getElementById('modal').classList.add('active');
+            lucide.createIcons();
+        }
+
+        function closeModal() { document.getElementById('modal').classList.remove('active'); }
+        render();
+    </script>
+</body>
+</html>

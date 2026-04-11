@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex - Entrenadores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #0a0a0a; --fg: #ffffff; --card: #141414;
+            --border: #262626; --primary: #ef4444; --muted: #a3a3a3;
+        }
+        body { background: var(--bg); color: var(--fg); font-family: sans-serif; margin: 0; }
+        .container { padding: 100px 52px; max-width: 1200px; margin: 0 auto; }
+        .badge { border: 1px solid var(--border); color: var(--primary); padding: 4px 12px; border-radius: 99px; font-size: 12px; letter-spacing: 2px; }
+        .title { font-family: 'Bebas Neue'; font-size: 72px; margin: 20px 0 40px; line-height: 0.9; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .card img { width: 100%; height: 250px; object-fit: cover; }
+        .card-body { padding: 20px; }
+        .bebas { font-family: 'Bebas Neue'; letter-spacing: 1px; margin: 0; }
+        
+        /* Modal */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--card); border: 1px solid var(--border); width: 100%; max-width: 600px; border-radius: 12px; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; }
+        .close { position: absolute; top: 20px; right: 20px; background: none; border: 1px solid var(--border); color: white; border-radius: 50%; cursor: pointer; padding: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="badge">NUESTRO EQUIPO</span>
+        <h1 class="title">ENTRENADORES</h1>
+        <div id="grid" class="grid"></div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="close" onclick="closeModal()"><i data-lucide="x"></i></button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const trainers = [
+            { id: 1, name: "CARLOS RUIZ", specialty: "Fuerza e Hipertrofia", experience: "5 AÑOS", image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=500", bio: "Especialista en biomecánica aplicada al entrenamiento de fuerza.", specialties: ["Powerlifting", "Nutrición"], reviews: [{name: "Juan", text: "El mejor coach", rating: 5}] }
+        ];
+
+        function render() {
+            const container = document.getElementById('grid');
+            container.innerHTML = trainers.map(t => `
+                <div class="card" onclick="openModal(${t.id})">
+                    <img src="${t.image}">
+                    <div class="card-body">
+                        <h3 class="bebas">${t.name}</h3>
+                        <p style="color: var(--muted); font-size: 13px">${t.specialty}</p>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function openModal(id) {
+            const t = trainers.find(x => x.id === id);
+            document.getElementById('modal-body').innerHTML = `
+                <h2 class="bebas" style="font-size: 32px">${t.name}</h2>
+                <p style="color: var(--primary)">${t.specialty}</p>
+                <p style="font-size: 14px; color: var(--muted)">${t.bio}</p>
+                <div style="margin-top: 20px">
+                    <p class="bebas" style="font-size: 12px; color: var(--muted)">ESPECIALIDADES</p>
+                    ${t.specialties.map(s => `<span class="badge" style="font-size: 10px; margin-right: 5px">${s}</span>`).join('')}
+                </div>
+            `;
+            document.getElementById('modal').classList.add('active');
+            lucide.createIcons();
+        }
+
+        function closeModal() { document.getElementById('modal').classList.remove('active'); }
+        render();
+    </script>
+</body>
+</html>
