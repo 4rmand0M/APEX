@@ -14,4 +14,3 @@ package-lock.json
 # Otros
 .DS_Store
 Dockerfile
-docker-entrypoint.sh
