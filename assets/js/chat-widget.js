@@ -495,7 +495,7 @@
      Modelo: llama3-8b-8192 (plan gratuito disponible)
      Obtén tu key gratis en: console.groq.com
   ══════════════════════════════════════════════ */
-  const GROQ_MODEL = 'llama3-8b-8192';
+  const GROQ_MODEL = 'llama-3.1-8b-instant';
   let proveedorActivo = 'Gemini';
 
   async function _llamarGroq(prompt) {
