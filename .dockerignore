@@ -1,0 +1,17 @@
+# Claves secretas locales
+.env
+.env.*
+.env.example
+
+# Carpetas de git
+.git/
+.gitignore
+
+# Dependencias (si las hubiera)
+node_modules/
+package-lock.json
+
+# Otros
+.DS_Store
+Dockerfile
+docker-entrypoint.sh
