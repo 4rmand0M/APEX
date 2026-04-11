@@ -3,6 +3,10 @@
 .env.local
 .env.*.local
 assets/js/config.js
+Dockerfile
+.dockerignore
+docker-entrypoint.sh
+assets/js/config.template.js
 
 # ─── Dependencias ───
 node_modules/
