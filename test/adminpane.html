@@ -652,11 +652,13 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/config.js"></script>
 
   <script>
     /* ── Supabase ── */
-    const SUPABASE_URL  = 'https://lvxsnyycqubnnwaxlgzx.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2eHNueXljcXVibm53YXhsZ3p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NzU1NjAsImV4cCI6MjA4ODA1MTU2MH0.p67j4YxMVXjlVTuqfpVKsuqaL9sWB6D6zlHRZ3WBFYk';
+    const _cfg = window.__APEX_CONFIG || {};
+    const SUPABASE_URL  = _cfg.SUPABASE_URL;
+    const SUPABASE_ANON = _cfg.SUPABASE_ANON;
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 

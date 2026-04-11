@@ -17,14 +17,16 @@
      CONFIGURACIÓN — ajusta estas rutas si es necesario
   ══════════════════════════════════════════════ */
   const KNOWLEDGE_URL = '/assets/data/knowledge.json'; // ruta absoluta para que funcione desde cualquier página
-  const GEMINI_MODEL  = 'gemini-2.5-flash';
-  const SYS_PROMPT    = 'Eres el asistente virtual de APEX Fitness. Ayudas con preguntas sobre entrenamiento, rutinas, nutrición y el uso de la plataforma. Responde siempre en español, de forma concisa y motivadora.';
+  const GEMINI_MODEL = 'gemini-2.5-flash';
+  const SYS_PROMPT = 'Eres el asistente virtual de APEX Fitness. Ayudas con preguntas sobre entrenamiento, rutinas, nutrición y el uso de la plataforma. Responde siempre en español, de forma concisa y motivadora.';
 
   /* ══════════════════════════════════════════════
      ESTADO INTERNO DEL WIDGET
   ══════════════════════════════════════════════ */
-  let knowledge  = [];
-  let geminiKey  = localStorage.getItem('apex_gkey') || 'AIzaSyCuD0-uYE4HHJnI_UgnjoY77vc8IooM-ok';
+  let knowledge = [];
+  const _cfg = window.__APEX_CONFIG || {};
+  let groqKey = localStorage.getItem('apex_groq_key') || _cfg.GROQ_API_KEY || '';
+  let geminiKey = localStorage.getItem('apex_gkey') || _cfg.GEMINI_API_KEY || '';
   let estaAbierto = false;
 
   /* ══════════════════════════════════════════════
@@ -376,7 +378,7 @@
     document.addEventListener('click', (e) => {
       const widget = document.getElementById('apex-chat-widget');
       const btn = document.getElementById('apex-chat-btn');
-      
+
       // Si el chat está abierto Y el clic NO fue dentro del widget Y NO fue en el botón...
       if (estaAbierto && !widget.contains(e.target) && !btn.contains(e.target)) {
         apexChatToggle();
@@ -411,17 +413,17 @@
   function apexChatToggle() {
     estaAbierto = !estaAbierto;
     const widget = document.getElementById('apex-chat-widget');
-    const btn    = document.getElementById('apex-chat-btn');
-    const iconChat  = document.getElementById('apex-icon-chat');
+    const btn = document.getElementById('apex-chat-btn');
+    const iconChat = document.getElementById('apex-icon-chat');
     const iconClose = document.getElementById('apex-icon-close');
-    const carga  = document.getElementById('wchat-pantalla-carga');
+    const carga = document.getElementById('wchat-pantalla-carga');
 
     if (estaAbierto) {
       widget.classList.add('visible');
       btn.classList.add('abierto');
-      iconChat.style.display  = 'none';
+      iconChat.style.display = 'none';
       iconClose.style.display = 'block';
-      
+
       // Mostrar pantalla de carga brevemente
       carga.classList.remove('oculto');
       setTimeout(() => {
@@ -432,7 +434,7 @@
     } else {
       widget.classList.remove('visible');
       btn.classList.remove('abierto');
-      iconChat.style.display  = 'block';
+      iconChat.style.display = 'block';
       iconClose.style.display = 'none';
     }
   }
@@ -440,32 +442,16 @@
   // Exponer globalmente para que el HTML inline lo llame
   window.apexChatToggle = apexChatToggle;
 
-
-
   /* ══════════════════════════════════════════════
-     BUSCAR CONTEXTO EN EL JSON LOCAL
+     BUSCAR CONTEXTO EN KNOWLEDGE.JSON
   ══════════════════════════════════════════════ */
   function buscarContexto(pregunta) {
     if (!knowledge.length) return [];
-
-    const stopwords = new Set(['qué','que','cómo','como','cuál','cual','es','son',
-      'está','hay','tiene','el','la','los','las','un','una','de','del','en','con',
-      'por','para','y','o','a','su','me','te','se','puedo','dónde','cuando','quién',
-      'dame','dime','explica','sabes','cuánto','cuántos','cuantos','necesito','quiero']);
-
-    const palabras = pregunta.toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .replace(/[¿?¡!.,;:]/g, '')
-      .split(/\s+/)
-      .filter(p => p.length >= 3 && !stopwords.has(p));
-
-    if (!palabras.length) return [];
-
+    const palabras = pregunta.toLowerCase().split(/\s+/).filter(p => p.length > 2);
     return knowledge
       .map(item => {
-        const base = (item.topic + ' ' + item.content)
-          .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        const pts = palabras.reduce((n, p) => n + (base.includes(p) ? 1 : 0), 0);
+        const base = (item.keywords || []).join(' ').toLowerCase();
+        const pts = palabras.reduce((sum, p) => sum + (base.includes(p) ? 1 : 0), 0);
         return { content: item.content, pts };
       })
       .filter(x => x.pts > 0)
@@ -479,18 +465,16 @@
   ══════════════════════════════════════════════ */
   function construirPrompt(pregunta, contexto) {
     const ctx = contexto.length
-      ? `\n\n--- INFORMACIÓN DE APEX FITNESS ---\n${contexto.map((c, i) => `[${i+1}] ${c}`).join('\n\n')}\n--- FIN ---\n\n`
+      ? `\n\n--- INFORMACIÓN DE APEX FITNESS ---\n${contexto.map((c, i) => `[${i + 1}] ${c}`).join('\n\n')}\n--- FIN ---\n\n`
       : '\n\n';
     return `${SYS_PROMPT}${ctx}Usuario: ${pregunta}\nAsistente:`;
   }
 
   /* ══════════════════════════════════════════════
-     LLAMAR A GEMINI API
-     Gratis · sin servidor · funciona en Netlify
+     LLAMAR A GEMINI API  (proveedor primario)
   ══════════════════════════════════════════════ */
-  async function llamarGemini(prompt) {
+  async function _llamarGemini(prompt) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${geminiKey}`;
-
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -499,30 +483,86 @@
         generationConfig: { temperature: 0.7, maxOutputTokens: 512, topP: 0.9 }
       })
     });
+    if (!res.ok) throw new Error(`Gemini ${res.status}`);
+    const data = await res.json();
+    const texto = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!texto) throw new Error('Gemini sin respuesta');
+    return texto.trim();
+  }
 
-    if (!res.ok) {
-      if (res.status === 400) throw new Error('API key inválida. Toca ⚙ para corregirla.');
-      if (res.status === 403) throw new Error('Sin permisos. Verifica tu key en Google AI Studio.');
-      if (res.status === 429) throw new Error('Límite alcanzado. Espera un momento.');
-      throw new Error(`Error ${res.status}. Intenta de nuevo.`);
+  /* ══════════════════════════════════════════════
+     LLAMAR A GROQ API  (fallback)
+     Modelo: llama3-8b-8192 (plan gratuito disponible)
+     Obtén tu key gratis en: console.groq.com
+  ══════════════════════════════════════════════ */
+  const GROQ_MODEL = 'llama3-8b-8192';
+  let proveedorActivo = 'Gemini';
+
+  async function _llamarGroq(prompt) {
+    if (!groqKey) throw new Error('No hay API key de Groq configurada.');
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${groqKey}`
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          { role: 'system', content: SYS_PROMPT },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 512
+      })
+    });
+    if (!res.ok) throw new Error(`Groq ${res.status}`);
+    const data = await res.json();
+    const texto = data?.choices?.[0]?.message?.content;
+    if (!texto) throw new Error('Groq sin respuesta');
+    return texto.trim();
+  }
+
+  /* ══════════════════════════════════════════════
+     PIPELINE CON FALLBACK AUTOMÁTICO Gemini → Groq
+  ══════════════════════════════════════════════ */
+  async function llamarIA(prompt) {
+    // ── Intento 1: Gemini ──
+    try {
+      const r = await _llamarGemini(prompt);
+      if (proveedorActivo !== 'Gemini') {
+        proveedorActivo = 'Gemini';
+        setEstado(true, `Listo · Gemini`);
+      }
+      return r;
+    } catch (errGemini) {
+      console.warn('[APEX Chat] Gemini falló, cambiando a Groq…', errGemini.message);
     }
 
-    const data  = await res.json();
-    const texto = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!texto) throw new Error('Sin respuesta. Intenta de nuevo.');
-    return texto.trim();
+    // ── Intento 2: Groq (fallback) ──
+    try {
+      const r = await _llamarGroq(prompt);
+      if (proveedorActivo !== 'Groq') {
+        proveedorActivo = 'Groq';
+        setEstado(true, `Listo · Groq (fallback)`);
+      }
+      return r;
+    } catch (errGroq) {
+      console.error('[APEX Chat] Groq también falló.', errGroq.message);
+      throw new Error('Ambas APIs no disponibles. Intenta de nuevo más tarde.');
+    }
   }
 
   /* ══════════════════════════════════════════════
      ENVIAR MENSAJE — PIPELINE PRINCIPAL
   ══════════════════════════════════════════════ */
   async function apexChatEnviar() {
-    const campo   = document.getElementById('wchat-campo');
+    const campo = document.getElementById('wchat-campo');
     const pregunta = campo.value.trim();
     if (!pregunta) return;
 
-    if (!geminiKey) {
-      addMsgError('Error: No hay configurada una API key de Gemini.');
+    if (!geminiKey && !groqKey) {
+      addMsgError('Error: No hay configurada ninguna API key.');
       return;
     }
 
@@ -541,9 +581,9 @@
     const idPens = addPensando();
 
     try {
-      const contexto  = buscarContexto(pregunta);   // busca en knowledge.json
-      const prompt    = construirPrompt(pregunta, contexto);
-      const respuesta = await llamarGemini(prompt);
+      const contexto = buscarContexto(pregunta);   // busca en knowledge.json
+      const prompt = construirPrompt(pregunta, contexto);
+      const respuesta = await llamarIA(prompt);     // ← fallback Gemini → Groq
       quitarPensando(idPens);
       addMsg(respuesta, 'bot');
     } catch (e) {
@@ -561,8 +601,8 @@
   ══════════════════════════════════════════════ */
   function addMsg(texto, tipo) {
     const area = document.getElementById('wchat-mensajes');
-    const hora  = new Date().toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
-    const div   = document.createElement('div');
+    const hora = new Date().toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+    const div = document.createElement('div');
     div.className = `wburbuja ${tipo}`;
     div.innerHTML = `
       <div class="wavatar">${tipo === 'usuario' ? 'TÚ' : 'AI'}</div>
@@ -576,7 +616,7 @@
 
   function addMsgError(texto) {
     const area = document.getElementById('wchat-mensajes');
-    const div  = document.createElement('div');
+    const div = document.createElement('div');
     div.className = 'wmsg-error';
     div.innerHTML = `⚠ ${texto}`;
     area.appendChild(div);
@@ -585,8 +625,8 @@
 
   function addPensando() {
     const area = document.getElementById('wchat-mensajes');
-    const id   = 'wp' + Date.now();
-    const div  = document.createElement('div');
+    const id = 'wp' + Date.now();
+    const div = document.createElement('div');
     div.id = id; div.className = 'wburbuja bot wpensando';
     div.innerHTML = `<div class="wavatar">AI</div><div class="wburbuja-body"><div class="wburbuja-texto"><div class="wdot"></div><div class="wdot"></div><div class="wdot"></div></div></div>`;
     area.appendChild(div);
