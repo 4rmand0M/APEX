@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es" data-tema="oscuro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APEX FITNESS — Perfil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/workout.css" />
+  <link rel="stylesheet" href="../assets/css/perfil.css" />
+</head>
+<body>
+
+<div id="cursor-punto" aria-hidden="true"></div>
+
+<div class="contenedor-app" id="app">
+
+  <!-- SIDEBAR DESKTOP -->
+  <aside class="barra-lateral" role="navigation" aria-label="Navegación principal">
+    <a href="#" class="logo-barra" aria-label="APEX FITNESS">
+      <svg width="26" height="26" viewBox="0 0 42 42" fill="none">
+        <rect x="3"  y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="34" y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="8"  y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="30" y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-texto">APEX</span>
+    </a>
+    <nav class="nav-principal">
+      <ul class="lista-nav" role="list">
+        <li><a href="workout.html"    class="enlace-nav"><i data-lucide="dumbbell"></i><span>Workout</span></a></li>
+        <li><a href="calendario.html" class="enlace-nav"><i data-lucide="calendar"></i><span>Calendario</span></a></li>
+        <li><a href="ejercicios.html" class="enlace-nav"><i data-lucide="layers"></i><span>Ejercicios</span></a></li>
+        <li><a href="perfil.html"     class="enlace-nav activo" aria-current="page"><i data-lucide="user"></i><span>Perfil</span></a></li>
+        <li><a href="entrenadores.html" class="enlace-nav"><i data-lucide="users"></i><span>Entrenadores</span></a></li>
+        <li><a href="gyms.html" class="enlace-nav"><i data-lucide="map-pin"></i><span>Gimnasios</span></a></li>
+        <li><a href="comunity.html" class="enlace-nav"><i data-lucide="globe"></i><span>Comunidad</span></a></li>
+      </ul>
+    </nav>
+    <div class="nav-inferior">
+      <div class="botones-legales">
+        <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema">
+          <i data-lucide="sun"  class="icono-tema icono-claro"></i>
+          <i data-lucide="moon" class="icono-tema icono-oscuro"></i>
+        </button>
+        <a href="privacidad.html" class="boton-legal" aria-label="Privacidad" title="Privacidad">
+          <i data-lucide="shield" class="icono-legal"></i>
+        </a>
+        <a href="terminos.html" class="boton-legal" aria-label="Términos y Condiciones" title="Términos">
+          <i data-lucide="file-text" class="icono-legal"></i>
+        </a>
+      </div>
+      <hr class="separador-nav"/>
+      <a href="#" class="usuario-barra">
+        <div class="avatar-barra">J</div>
+        <div class="info-usuario-barra">
+          <span class="nombre-usuario-barra">Jeremy Infante</span>
+          <span class="handle-usuario-barra">@jeremyinfante</span>
+        </div>
+        <i data-lucide="log-out" class="icono-logout"></i>
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO -->
+  <div class="area-contenido">
+    <main class="contenido-perfil" role="main">
+
+      <!-- ═══ HERO ═══ -->
+      <section class="perfil-hero">
+        <div class="perfil-avatar">JI</div>
+        <div class="perfil-info-col">
+          <h1 class="perfil-nombre">JEREMY INFANTE</h1>
+          <span class="perfil-handle">@jeremyinfante</span>
+          <p class="perfil-bio">Atleta dedicado a la mejora continua. Enfocado en fuerza e hipertrofia. 💪</p>
+        </div>
+
+        <div class="perfil-stats">
+          <div class="perfil-stat">
+            <span class="perfil-stat-valor">156</span>
+            <span class="perfil-stat-label">Entrenos</span>
+          </div>
+          <div class="perfil-stat">
+            <span class="perfil-stat-valor">23</span>
+            <span class="perfil-stat-label">PRs</span>
+          </div>
+          <div class="perfil-stat">
+            <span class="perfil-stat-valor">18</span>
+            <span class="perfil-stat-label">Racha</span>
+          </div>
+          <div class="perfil-stat">
+            <span class="perfil-stat-valor">4</span>
+            <span class="perfil-stat-label">Meses</span>
+          </div>
+        </div>
+
+        <div class="perfil-acciones">
+          <button class="btn-perfil btn-perfil-primario">
+            <i data-lucide="edit-3"></i>
+            Editar Perfil
+          </button>
+          <button class="btn-perfil btn-perfil-secundario">
+            <i data-lucide="share-2"></i>
+            Compartir
+          </button>
+        </div>
+      </section>
+
+      <!-- ═══ INFORMACIÓN PERSONAL ═══ -->
+      <section class="perfil-seccion">
+        <div class="perfil-seccion-header">
+          <i data-lucide="user"></i>
+          <h2 class="perfil-seccion-titulo">Información Personal</h2>
+        </div>
+        <div class="perfil-seccion-body">
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Nombre completo</span>
+            <span class="perfil-fila-valor">Jeremy Infante</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Email</span>
+            <span class="perfil-fila-valor">jeremy@apex.fit</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Teléfono</span>
+            <span class="perfil-fila-valor">+1 (809) 555-0123</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Fecha de nacimiento</span>
+            <span class="perfil-fila-valor">15 Mar 2003</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Ubicación</span>
+            <span class="perfil-fila-valor">Santo Domingo, RD</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ MEDIDAS CORPORALES ═══ -->
+      <section class="perfil-seccion">
+        <div class="perfil-seccion-header">
+          <i data-lucide="ruler"></i>
+          <h2 class="perfil-seccion-titulo">Medidas Corporales</h2>
+        </div>
+        <div class="perfil-seccion-body">
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Peso</span>
+            <span class="perfil-fila-valor">175 lbs</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Altura</span>
+            <span class="perfil-fila-valor">5' 11"</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">IMC</span>
+            <span class="perfil-fila-valor">24.4</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">% Grasa corporal</span>
+            <span class="perfil-fila-valor">14.2%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ PREFERENCIAS DE ENTRENAMIENTO ═══ -->
+      <section class="perfil-seccion">
+        <div class="perfil-seccion-header">
+          <i data-lucide="target"></i>
+          <h2 class="perfil-seccion-titulo">Preferencias de Entrenamiento</h2>
+        </div>
+        <div class="perfil-seccion-body">
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Objetivo principal</span>
+            <span class="perfil-fila-valor">Hipertrofia</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Nivel</span>
+            <span class="perfil-fila-valor">Intermedio</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Gimnasio</span>
+            <span class="perfil-fila-valor">Apex Central</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Días por semana</span>
+            <span class="perfil-fila-valor">5 días</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Unidades</span>
+            <span class="perfil-fila-valor">Libras (lbs)</span>
+          </div>
+        </div>
+        <div class="perfil-tags">
+          <span class="perfil-tag">Fuerza</span>
+          <span class="perfil-tag">Hipertrofia</span>
+          <span class="perfil-tag">Funcional</span>
+          <span class="perfil-tag">Movilidad</span>
+        </div>
+      </section>
+
+      <!-- ═══ LOGROS ═══ -->
+      <section class="perfil-seccion">
+        <div class="perfil-seccion-header">
+          <i data-lucide="trophy"></i>
+          <h2 class="perfil-seccion-titulo">Logros</h2>
+        </div>
+        <div class="perfil-logros-grid">
+          <div class="perfil-logro">
+            <div class="perfil-logro-icono"><i data-lucide="flame"></i></div>
+            <span class="perfil-logro-nombre">Racha 7 días</span>
+          </div>
+          <div class="perfil-logro">
+            <div class="perfil-logro-icono"><i data-lucide="zap"></i></div>
+            <span class="perfil-logro-nombre">100 Entrenos</span>
+          </div>
+          <div class="perfil-logro">
+            <div class="perfil-logro-icono"><i data-lucide="trophy"></i></div>
+            <span class="perfil-logro-nombre">10 PRs</span>
+          </div>
+          <div class="perfil-logro">
+            <div class="perfil-logro-icono"><i data-lucide="star"></i></div>
+            <span class="perfil-logro-nombre">Elite</span>
+          </div>
+          <div class="perfil-logro">
+            <div class="perfil-logro-icono"><i data-lucide="dumbbell"></i></div>
+            <span class="perfil-logro-nombre">1000 kg Vol</span>
+          </div>
+          <div class="perfil-logro">
+            <div class="perfil-logro-icono"><i data-lucide="heart"></i></div>
+            <span class="perfil-logro-nombre">Consistente</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ CUENTA ═══ -->
+      <section class="perfil-seccion">
+        <div class="perfil-seccion-header">
+          <i data-lucide="settings"></i>
+          <h2 class="perfil-seccion-titulo">Cuenta</h2>
+        </div>
+        <div class="perfil-seccion-body">
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Cambiar contraseña</span>
+            <span class="perfil-fila-valor" style="color: var(--acento);">Cambiar →</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Notificaciones</span>
+            <span class="perfil-fila-valor">Activadas</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Idioma</span>
+            <span class="perfil-fila-valor">Español</span>
+          </div>
+          <div class="perfil-fila">
+            <span class="perfil-fila-label">Miembro desde</span>
+            <span class="perfil-fila-valor">Dic 2025</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ CERRAR SESIÓN ═══ -->
+      <section class="perfil-seccion perfil-seccion-danger">
+        <button class="btn-perfil-danger">
+          <i data-lucide="log-out"></i>
+          Cerrar Sesión
+        </button>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- NAV MÓVIL -->
+  <nav class="nav-movil" aria-label="Navegación móvil">
+    <a href="workout.html" class="enlace-nav-movil" aria-label="Workout">
+      <i data-lucide="home"></i><span>Workout</span>
+    </a>
+    <a href="calendario.html" class="enlace-nav-movil" aria-label="Calendario">
+      <i data-lucide="clipboard-list"></i><span>Calendario</span>
+    </a>
+    <a href="workout.html" class="enlace-nav-movil enlace-nav-movil-central" aria-label="Nuevo entreno">
+      <i data-lucide="plus"></i>
+    </a>
+    <a href="ejercicios.html" class="enlace-nav-movil" aria-label="Ejercicios">
+      <i data-lucide="dumbbell"></i><span>Ejercicios</span>
+    </a>
+    <a href="perfil.html" class="enlace-nav-movil activo" aria-current="page" aria-label="Perfil">
+      <i data-lucide="user"></i><span>Perfil</span>
+    </a>
+  </nav>
+
+</div>
+
+<script src="../assets/js/perfil.js"></script>
+</body>
+</html>

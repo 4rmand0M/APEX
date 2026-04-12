@@ -1,84 +1,481 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-tema="oscuro">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex - Entrenadores</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        :root {
-            --bg: #0a0a0a; --fg: #ffffff; --card: #141414;
-            --border: #262626; --primary: #ef4444; --muted: #a3a3a3;
-        }
-        body { background: var(--bg); color: var(--fg); font-family: sans-serif; margin: 0; }
-        .container { padding: 100px 52px; max-width: 1200px; margin: 0 auto; }
-        .badge { border: 1px solid var(--border); color: var(--primary); padding: 4px 12px; border-radius: 99px; font-size: 12px; letter-spacing: 2px; }
-        .title { font-family: 'Bebas Neue'; font-size: 72px; margin: 20px 0 40px; line-height: 0.9; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.3s; }
-        .card:hover { border-color: var(--primary); transform: translateY(-5px); }
-        .card img { width: 100%; height: 250px; object-fit: cover; }
-        .card-body { padding: 20px; }
-        .bebas { font-family: 'Bebas Neue'; letter-spacing: 1px; margin: 0; }
-        
-        /* Modal */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal.active { display: flex; }
-        .modal-content { background: var(--card); border: 1px solid var(--border); width: 100%; max-width: 600px; border-radius: 12px; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; }
-        .close { position: absolute; top: 20px; right: 20px; background: none; border: 1px solid var(--border); color: white; border-radius: 50%; cursor: pointer; padding: 5px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APEX FITNESS — Entrenadores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/workout.css" />
+  <style>
+    .contenido-entrenadores {
+      padding: 32px 24px 100px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .cabecera-entrenadores {
+      margin-bottom: 36px;
+    }
+
+    .badge-seccion {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--acento);
+      margin-bottom: 12px;
+    }
+
+    .badge-seccion::before {
+      content: '';
+      width: 18px;
+      height: 1px;
+      background: var(--acento);
+      flex-shrink: 0;
+    }
+
+    [data-tema="claro"] .badge-seccion {
+      color: var(--texto-sub);
+    }
+
+    [data-tema="claro"] .badge-seccion::before {
+      background: var(--texto-sub);
+    }
+
+    .titulo-entrenadores {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 52px;
+      letter-spacing: 6px;
+      color: var(--texto);
+      line-height: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .subtitulo-entrenadores {
+      font-size: 14px;
+      color: var(--texto-atenuado);
+      font-weight: 300;
+    }
+
+    .grid-entrenadores {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .tarjeta-entrenador {
+      background: var(--superficie);
+      border: 1px solid var(--borde);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: none;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .tarjeta-entrenador:hover {
+      border-color: var(--borde-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .tarjeta-entrenador img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+    }
+
+    .entrenador-body {
+      padding: 20px;
+    }
+
+    .entrenador-nombre {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 24px;
+      letter-spacing: 2px;
+      color: var(--texto);
+      margin-bottom: 6px;
+      line-height: 1;
+    }
+
+    .entrenador-especialidad {
+      font-size: 13px;
+      color: var(--texto-atenuado);
+      margin-bottom: 8px;
+    }
+
+    .entrenador-experiencia {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--acento);
+      background: rgba(var(--acento-rgb), 0.1);
+      padding: 4px 10px;
+      border-radius: 99px;
+    }
+
+    [data-tema="claro"] .entrenador-experiencia {
+      color: var(--texto-sub);
+      background: rgba(0,0,0,0.06);
+    }
+
+    .entrenador-experiencia i {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.activo {
+      display: flex;
+    }
+
+    .modal-contenido {
+      background: var(--superficie);
+      border: 1px solid var(--borde);
+      width: 100%;
+      max-width: 640px;
+      border-radius: 16px;
+      padding: 32px;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalEntrada 0.3s cubic-bezier(0.34, 1.45, 0.64, 1);
+    }
+
+    @keyframes modalEntrada {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-cerrar {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--superficie-2);
+      border: 1px solid var(--borde);
+      color: var(--texto-atenuado);
+      border-radius: 50%;
+      cursor: none;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    .modal-cerrar:hover {
+      background: var(--borde);
+      color: var(--texto);
+      border-color: var(--borde-hover);
+    }
+
+    .modal-cerrar i {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+    }
+
+    .modal-titulo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 36px;
+      letter-spacing: 2px;
+      color: var(--texto);
+      margin-bottom: 8px;
+    }
+
+    .modal-especialidad {
+      font-size: 14px;
+      color: var(--acento);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    [data-tema="claro"] .modal-especialidad {
+      color: var(--texto-sub);
+    }
+
+    .modal-bio {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--texto-atenuado);
+      margin-bottom: 24px;
+    }
+
+    .modal-seccion-titulo {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--texto-atenuado);
+      margin-bottom: 12px;
+    }
+
+    .modal-especialidades {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge-especialidad {
+      display: inline-flex;
+      align-items: center;
+      background: var(--superficie-2);
+      border: 1px solid var(--borde);
+      color: var(--texto);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 6px 12px;
+      border-radius: 99px;
+    }
+
+    @media (min-width: 820px) {
+      .contenido-entrenadores {
+        padding: 40px 32px 60px;
+      }
+
+      .titulo-entrenadores {
+        font-size: 64px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <span class="badge">NUESTRO EQUIPO</span>
-        <h1 class="title">ENTRENADORES</h1>
-        <div id="grid" class="grid"></div>
-    </div>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <button class="close" onclick="closeModal()"><i data-lucide="x"></i></button>
-            <div id="modal-body"></div>
+<div id="cursor-punto" aria-hidden="true"></div>
+
+<div class="contenedor-app" id="app">
+
+  <!-- SIDEBAR DESKTOP -->
+  <aside class="barra-lateral" role="navigation" aria-label="Navegación principal">
+    <a href="#" class="logo-barra" aria-label="APEX FITNESS">
+      <svg width="26" height="26" viewBox="0 0 42 42" fill="none">
+        <rect x="3"  y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="34" y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="8"  y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="30" y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-texto">APEX</span>
+    </a>
+    <nav class="nav-principal">
+      <ul class="lista-nav" role="list">
+        <li><a href="workout.html"    class="enlace-nav"><i data-lucide="dumbbell"></i><span>Workout</span></a></li>
+        <li><a href="calendario.html" class="enlace-nav"><i data-lucide="calendar"></i><span>Calendario</span></a></li>
+        <li><a href="ejercicios.html" class="enlace-nav"><i data-lucide="layers"></i><span>Ejercicios</span></a></li>
+        <li><a href="perfil.html"     class="enlace-nav"><i data-lucide="user"></i><span>Perfil</span></a></li>
+        <li><a href="entrenadores.html" class="enlace-nav activo" aria-current="page"><i data-lucide="users"></i><span>Entrenadores</span></a></li>
+        <li><a href="gyms.html" class="enlace-nav"><i data-lucide="map-pin"></i><span>Gimnasios</span></a></li>
+        <li><a href="comunity.html" class="enlace-nav"><i data-lucide="globe"></i><span>Comunidad</span></a></li>
+      </ul>
+    </nav>
+    <div class="nav-inferior">
+      <div class="botones-legales">
+        <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema">
+          <i data-lucide="sun"  class="icono-tema icono-claro"></i>
+          <i data-lucide="moon" class="icono-tema icono-oscuro"></i>
+        </button>
+        <a href="privacidad.html" class="boton-legal" aria-label="Privacidad" title="Privacidad">
+          <i data-lucide="shield" class="icono-legal"></i>
+        </a>
+        <a href="terminos.html" class="boton-legal" aria-label="Términos y Condiciones" title="Términos">
+          <i data-lucide="file-text" class="icono-legal"></i>
+        </a>
+      </div>
+      <hr class="separador-nav"/>
+      <a href="#" class="usuario-barra">
+        <div class="avatar-barra">J</div>
+        <div class="info-usuario-barra">
+          <span class="nombre-usuario-barra">Jeremy Infante</span>
+          <span class="handle-usuario-barra">@jeremyinfante</span>
         </div>
+        <i data-lucide="log-out" class="icono-logout"></i>
+      </a>
     </div>
+  </aside>
 
-    <script>
-        const trainers = [
-            { id: 1, name: "CARLOS RUIZ", specialty: "Fuerza e Hipertrofia", experience: "5 AÑOS", image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=500", bio: "Especialista en biomecánica aplicada al entrenamiento de fuerza.", specialties: ["Powerlifting", "Nutrición"], reviews: [{name: "Juan", text: "El mejor coach", rating: 5}] }
-        ];
+  <!-- CONTENIDO -->
+  <div class="area-contenido">
+    <main class="contenido-entrenadores" role="main">
+      
+      <header class="cabecera-entrenadores">
+        <span class="badge-seccion">NUESTRO EQUIPO</span>
+        <h1 class="titulo-entrenadores">ENTRENADORES</h1>
+        <p class="subtitulo-entrenadores">Expertos certificados dedicados a tu evolución física</p>
+      </header>
 
-        function render() {
-            const container = document.getElementById('grid');
-            container.innerHTML = trainers.map(t => `
-                <div class="card" onclick="openModal(${t.id})">
-                    <img src="${t.image}">
-                    <div class="card-body">
-                        <h3 class="bebas">${t.name}</h3>
-                        <p style="color: var(--muted); font-size: 13px">${t.specialty}</p>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
+      <div id="grid-entrenadores" class="grid-entrenadores"></div>
 
-        function openModal(id) {
-            const t = trainers.find(x => x.id === id);
-            document.getElementById('modal-body').innerHTML = `
-                <h2 class="bebas" style="font-size: 32px">${t.name}</h2>
-                <p style="color: var(--primary)">${t.specialty}</p>
-                <p style="font-size: 14px; color: var(--muted)">${t.bio}</p>
-                <div style="margin-top: 20px">
-                    <p class="bebas" style="font-size: 12px; color: var(--muted)">ESPECIALIDADES</p>
-                    ${t.specialties.map(s => `<span class="badge" style="font-size: 10px; margin-right: 5px">${s}</span>`).join('')}
-                </div>
-            `;
-            document.getElementById('modal').classList.add('active');
-            lucide.createIcons();
-        }
+    </main>
+  </div>
 
-        function closeModal() { document.getElementById('modal').classList.remove('active'); }
-        render();
-    </script>
+  <!-- NAV MÓVIL -->
+  <nav class="nav-movil" aria-label="Navegación móvil">
+    <a href="workout.html" class="enlace-nav-movil" aria-label="Workout">
+      <i data-lucide="home"></i><span>Workout</span>
+    </a>
+    <a href="calendario.html" class="enlace-nav-movil" aria-label="Calendario">
+      <i data-lucide="clipboard-list"></i><span>Calendario</span>
+    </a>
+    <button class="enlace-nav-movil enlace-nav-movil-central" aria-label="Nuevo entreno">
+      <i data-lucide="plus"></i>
+    </button>
+    <a href="ejercicios.html" class="enlace-nav-movil" aria-label="Ejercicios">
+      <i data-lucide="dumbbell"></i><span>Ejercicios</span>
+    </a>
+    <a href="#" class="enlace-nav-movil activo" aria-current="page" aria-label="Entrenadores">
+      <i data-lucide="users"></i><span>Coaches</span>
+    </a>
+  </nav>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal-contenido">
+    <button class="modal-cerrar" onclick="cerrarModal()" aria-label="Cerrar">
+      <i data-lucide="x"></i>
+    </button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const trainers = [
+  { 
+    id: 1, 
+    name: "CARLOS RUIZ", 
+    specialty: "Fuerza e Hipertrofia", 
+    experience: "5 AÑOS", 
+    image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=500", 
+    bio: "Especialista en biomecánica aplicada al entrenamiento de fuerza. Certificado en metodología Westside y periodización ondulatoria.", 
+    specialties: ["Powerlifting", "Nutrición Deportiva", "Rehabilitación"] 
+  },
+  { 
+    id: 2, 
+    name: "LAURA MARTE", 
+    specialty: "Fitness Funcional", 
+    experience: "4 AÑOS", 
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500", 
+    bio: "Entrenadora certificada en CrossFit y movilidad funcional. Enfoque en entrenamiento de alto rendimiento y prevención de lesiones.", 
+    specialties: ["CrossFit", "Movilidad", "HIIT"] 
+  },
+  { 
+    id: 3, 
+    name: "MIGUEL SANTOS", 
+    specialty: "Bodybuilding Clásico", 
+    experience: "7 AÑOS", 
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500", 
+    bio: "Competidor nacional de culturismo. Experto en preparación para competencias y desarrollo muscular estético.", 
+    specialties: ["Culturismo", "Preparación Competencia", "Volumen"] 
+  }
+];
+
+function render() {
+  document.getElementById('grid-entrenadores').innerHTML = trainers.map(t => `
+    <article class="tarjeta-entrenador" onclick="abrirModal(${t.id})">
+      <img src="${t.image}" alt="${t.name}">
+      <div class="entrenador-body">
+        <h3 class="entrenador-nombre">${t.name}</h3>
+        <p class="entrenador-especialidad">${t.specialty}</p>
+        <div class="entrenador-experiencia">
+          <i data-lucide="award"></i>
+          <span>${t.experience}</span>
+        </div>
+      </div>
+    </article>
+  `).join('');
+  lucide.createIcons();
+}
+
+function abrirModal(id) {
+  const t = trainers.find(x => x.id === id);
+  document.getElementById('modal-body').innerHTML = `
+    <h2 class="modal-titulo">${t.name}</h2>
+    <p class="modal-especialidad">${t.specialty}</p>
+    <p class="modal-bio">${t.bio}</p>
+    <div style="margin-top: 24px">
+      <p class="modal-seccion-titulo">ESPECIALIDADES</p>
+      <div class="modal-especialidades">
+        ${t.specialties.map(s => `<span class="badge-especialidad">${s}</span>`).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('activo');
+  lucide.createIcons();
+}
+
+function cerrarModal() {
+  document.getElementById('modal').classList.remove('activo');
+}
+
+// Tema
+const tema = localStorage.getItem('apex_tema') || 'oscuro';
+document.documentElement.setAttribute('data-tema', tema);
+
+document.getElementById('boton-tema')?.addEventListener('click', () => {
+  const actual = document.documentElement.getAttribute('data-tema');
+  const nuevo = actual === 'oscuro' ? 'claro' : 'oscuro';
+  document.documentElement.setAttribute('data-tema', nuevo);
+  localStorage.setItem('apex_tema', nuevo);
+});
+
+// Cursor
+(function() {
+  const punto = document.getElementById('cursor-punto');
+  if (!punto) return;
+  if (window.matchMedia('(hover: none), (max-width: 820px)').matches) return;
+  let raf;
+  document.addEventListener('mousemove', e => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      punto.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+    });
+  });
+  const sel = 'button, a, input';
+  document.addEventListener('mouseover', e => { if (e.target.closest(sel)) document.body.classList.add('sobre-interactivo'); });
+  document.addEventListener('mouseout',  e => { if (e.target.closest(sel)) document.body.classList.remove('sobre-interactivo'); });
+})();
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') cerrarModal();
+});
+
+// Cerrar modal al hacer clic en overlay
+document.getElementById('modal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'modal') cerrarModal();
+});
+
+render();
+</script>
 </body>
 </html>

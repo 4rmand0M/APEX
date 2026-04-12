@@ -1578,3 +1578,71 @@ html {
     cursor: auto;
   }
 }
+
+/* ============================================================
+   APEX FITNESS — Workout Desktop Enhancements
+   Mejoras para la visualización en desktop
+============================================================ */
+
+@media (min-width: 820px) {
+  /* Feed de entrenos en desktop: 2 columnas */
+  .workout-feed {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    align-content: start;
+  }
+
+  /* Cada card de entreno */
+  .entreno-card {
+    min-height: auto;
+    scroll-snap-align: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .entreno-card-inner {
+    margin: 0;
+    height: 100%;
+  }
+
+  /* Ajustar altura de ejercicios para que quepan bien */
+  .entreno-ejercicios {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  /* Estado vacío centrado en ambas columnas */
+  .workout-vacio {
+    grid-column: 1 / -1;
+  }
+
+  /* Sentinel de scroll infinito */
+  #sentinel-scroll {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1200px) {
+  /* En pantallas muy grandes: 3 columnas */
+  .workout-feed {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding: 24px;
+  }
+}
+
+/* Asegurar que el scroll funcione correctamente */
+@media (min-width: 820px) {
+  .area-contenido {
+    overflow-y: auto;
+  }
+
+  .contenido-workout {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+}
+

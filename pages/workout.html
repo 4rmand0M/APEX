@@ -36,7 +36,7 @@
         <li><a href="workout.html"    class="enlace-nav activo" aria-current="page"><i data-lucide="dumbbell"></i><span>Workout</span></a></li>
         <li><a href="calendario.html" class="enlace-nav"><i data-lucide="calendar"></i><span>Calendario</span></a></li>
         <li><a href="ejercicios.html" class="enlace-nav"><i data-lucide="layers"></i><span>Ejercicios</span></a></li>
-        <li><a href="#"               class="enlace-nav"><i data-lucide="user"></i><span>Perfil</span></a></li>
+        <li><a href="perfil.html"     class="enlace-nav"><i data-lucide="user"></i><span>Perfil</span></a></li>
         <!-- Nuevas secciones -->
         <li><a href="entrenadores.html" class="enlace-nav"><i data-lucide="users"></i><span>Entrenadores</span></a></li>
         <li><a href="gyms.html" class="enlace-nav"><i data-lucide="map-pin"></i><span>Gimnasios</span></a></li>
@@ -44,10 +44,18 @@
       </ul>
     </nav>
     <div class="nav-inferior">
-      <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema">
-        <i data-lucide="sun"  class="icono-tema icono-claro"></i>
-        <i data-lucide="moon" class="icono-tema icono-oscuro"></i>
-      </button>
+      <div class="botones-legales">
+        <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema">
+          <i data-lucide="sun"  class="icono-tema icono-claro"></i>
+          <i data-lucide="moon" class="icono-tema icono-oscuro"></i>
+        </button>
+        <a href="privacidad.html" class="boton-legal" aria-label="Privacidad" title="Privacidad">
+          <i data-lucide="shield" class="icono-legal"></i>
+        </a>
+        <a href="terminos.html" class="boton-legal" aria-label="Términos y Condiciones" title="Términos">
+          <i data-lucide="file-text" class="icono-legal"></i>
+        </a>
+      </div>
       <hr class="separador-nav"/>
       <!-- BACKEND: datos del usuario autenticado (JWT) -->
       <a href="#" class="usuario-barra">
@@ -367,7 +375,7 @@
     <a href="ejercicios.html" class="enlace-nav-movil" aria-label="Ejercicios">
       <i data-lucide="dumbbell"></i><span>Ejercicios</span>
     </a>
-    <a href="#" class="enlace-nav-movil" aria-label="Perfil">
+    <a href="perfil.html" class="enlace-nav-movil" aria-label="Perfil">
       <i data-lucide="user"></i><span>Perfil</span>
     </a>
   </nav>

@@ -295,3 +295,45 @@ body.sobre-interactivo #cursor-punto {
   background: var(--borde);
   margin: 6px 0;
 }
+
+/* ============================================================
+   BOTONES LEGALES EN SIDEBAR (Privacidad / Términos)
+============================================================ */
+.botones-legales {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.boton-legal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--borde);
+  background: none;
+  color: var(--texto-atenuado);
+  cursor: none;
+  text-decoration: none;
+  transition: color 0.14s, border-color 0.14s, background 0.14s;
+}
+
+.boton-legal:hover {
+  color: var(--texto);
+  border-color: var(--borde-hover);
+  background: var(--superficie-2);
+}
+
+.icono-legal {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.8;
+}
+
+@media (hover: none), (max-width: 820px) {
+  .boton-legal {
+    cursor: auto;
+  }
+}

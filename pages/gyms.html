@@ -1,80 +1,511 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-tema="oscuro">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex - Gimnasios</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        :root { --bg: #0a0a0a; --fg: #ffffff; --card: #141414; --border: #262626; --primary: #ef4444; }
-        body { background: var(--bg); color: var(--fg); font-family: sans-serif; margin: 0; }
-        .container { padding: 100px 52px; max-width: 1200px; margin: 0 auto; }
-        .badge { border: 1px solid var(--border); color: var(--primary); padding: 4px 12px; border-radius: 99px; font-size: 12px; letter-spacing: 2px; }
-        .title { font-family: 'Bebas Neue'; font-size: 72px; margin: 20px 0 40px; line-height: 0.9; }
-        .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .map-box { background: #1a1a1a; border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; }
-        .gym-item { background: var(--card); border: 1px solid var(--border); border-radius: 8px; display: flex; margin-bottom: 15px; cursor: pointer; transition: 0.3s; overflow: hidden; }
-        .gym-item:hover { border-color: var(--primary); }
-        .gym-item img { width: 140px; height: 100px; object-fit: cover; }
-        .gym-info { padding: 15px; }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
-        .modal.active { display: flex; }
-        .modal-content { background: var(--card); border: 1px solid var(--border); padding: 30px; width: 500px; border-radius: 12px; position: relative; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APEX FITNESS — Gimnasios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="../assets/css/variables.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/workout.css" />
+  <style>
+    .contenido-gyms {
+      padding: 32px 24px 100px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .cabecera-gyms {
+      margin-bottom: 36px;
+    }
+
+    .badge-seccion {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--acento);
+      margin-bottom: 12px;
+    }
+
+    .badge-seccion::before {
+      content: '';
+      width: 18px;
+      height: 1px;
+      background: var(--acento);
+      flex-shrink: 0;
+    }
+
+    [data-tema="claro"] .badge-seccion {
+      color: var(--texto-sub);
+    }
+
+    [data-tema="claro"] .badge-seccion::before {
+      background: var(--texto-sub);
+    }
+
+    .titulo-gyms {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 52px;
+      letter-spacing: 6px;
+      color: var(--texto);
+      line-height: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .subtitulo-gyms {
+      font-size: 14px;
+      color: var(--texto-atenuado);
+      font-weight: 300;
+    }
+
+    .layout-gyms {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .mapa-placeholder {
+      background: var(--superficie);
+      border: 1px solid var(--borde);
+      border-radius: 16px;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--texto-atenuado);
+    }
+
+    .mapa-placeholder i {
+      width: 48px;
+      height: 48px;
+      stroke-width: 1.5;
+      color: var(--acento);
+    }
+
+    [data-tema="claro"] .mapa-placeholder i {
+      color: var(--texto-sub);
+    }
+
+    .mapa-placeholder-titulo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 28px;
+      letter-spacing: 2px;
+      color: var(--texto);
+    }
+
+    .lista-gyms {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .gym-item {
+      background: var(--superficie);
+      border: 1px solid var(--borde);
+      border-radius: 14px;
+      display: flex;
+      overflow: hidden;
+      cursor: none;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .gym-item:hover {
+      border-color: var(--borde-hover);
+      transform: translateX(2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+
+    .gym-imagen {
+      width: 160px;
+      height: 120px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .gym-info {
+      padding: 18px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .gym-nombre {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--texto);
+      margin-bottom: 6px;
+      line-height: 1;
+    }
+
+    .gym-direccion {
+      font-size: 13px;
+      color: var(--texto-atenuado);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gym-direccion i {
+      width: 12px;
+      height: 12px;
+      stroke-width: 2;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.activo {
+      display: flex;
+    }
+
+    .modal-contenido {
+      background: var(--superficie);
+      border: 1px solid var(--borde);
+      width: 100%;
+      max-width: 560px;
+      border-radius: 16px;
+      padding: 32px;
+      position: relative;
+      animation: modalEntrada 0.3s cubic-bezier(0.34, 1.45, 0.64, 1);
+    }
+
+    @keyframes modalEntrada {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-cerrar {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: var(--superficie-2);
+      border: 1px solid var(--borde);
+      color: var(--texto-atenuado);
+      border-radius: 50%;
+      cursor: none;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    .modal-cerrar:hover {
+      background: var(--borde);
+      color: var(--texto);
+      border-color: var(--borde-hover);
+    }
+
+    .modal-cerrar i {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+    }
+
+    .modal-titulo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 34px;
+      letter-spacing: 2px;
+      color: var(--texto);
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+
+    .modal-descripcion {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--texto-atenuado);
+      margin-bottom: 24px;
+    }
+
+    .modal-seccion-titulo {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--acento);
+      margin-bottom: 12px;
+    }
+
+    [data-tema="claro"] .modal-seccion-titulo {
+      color: var(--texto-atenuado);
+    }
+
+    .modal-servicios {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge-servicio {
+      display: inline-flex;
+      align-items: center;
+      background: var(--superficie-2);
+      border: 1px solid var(--borde);
+      color: var(--texto);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 6px 12px;
+      border-radius: 99px;
+    }
+
+    @media (min-width: 820px) {
+      .contenido-gyms {
+        padding: 40px 32px 60px;
+      }
+
+      .titulo-gyms {
+        font-size: 64px;
+      }
+
+      .layout-gyms {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .gym-imagen {
+        width: 180px;
+        height: 140px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <span class="badge">UBICACIONES</span>
-        <h1 class="title">NUESTROS GIMNASIOS</h1>
-        <div class="layout">
-            <div class="map-box">
-                <i data-lucide="map-pin" style="width: 48px; height: 48px; color: var(--primary)"></i>
-                <p style="font-family: 'Bebas Neue'; font-size: 24px;">MAPA INTERACTIVO</p>
-            </div>
-            <div id="list"></div>
+
+<div id="cursor-punto" aria-hidden="true"></div>
+
+<div class="contenedor-app" id="app">
+
+  <!-- SIDEBAR DESKTOP -->
+  <aside class="barra-lateral" role="navigation" aria-label="Navegación principal">
+    <a href="#" class="logo-barra" aria-label="APEX FITNESS">
+      <svg width="26" height="26" viewBox="0 0 42 42" fill="none">
+        <rect x="3"  y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="34" y="18" width="5"  height="6"  rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="8"  y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="30" y="15" width="4"  height="12" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-texto">APEX</span>
+    </a>
+    <nav class="nav-principal">
+      <ul class="lista-nav" role="list">
+        <li><a href="workout.html"    class="enlace-nav"><i data-lucide="dumbbell"></i><span>Workout</span></a></li>
+        <li><a href="calendario.html" class="enlace-nav"><i data-lucide="calendar"></i><span>Calendario</span></a></li>
+        <li><a href="ejercicios.html" class="enlace-nav"><i data-lucide="layers"></i><span>Ejercicios</span></a></li>
+        <li><a href="perfil.html"     class="enlace-nav"><i data-lucide="user"></i><span>Perfil</span></a></li>
+        <li><a href="entrenadores.html" class="enlace-nav"><i data-lucide="users"></i><span>Entrenadores</span></a></li>
+        <li><a href="gyms.html" class="enlace-nav activo" aria-current="page"><i data-lucide="map-pin"></i><span>Gimnasios</span></a></li>
+        <li><a href="comunity.html" class="enlace-nav"><i data-lucide="globe"></i><span>Comunidad</span></a></li>
+      </ul>
+    </nav>
+    <div class="nav-inferior">
+      <div class="botones-legales">
+        <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema">
+          <i data-lucide="sun"  class="icono-tema icono-claro"></i>
+          <i data-lucide="moon" class="icono-tema icono-oscuro"></i>
+        </button>
+        <a href="privacidad.html" class="boton-legal" aria-label="Privacidad" title="Privacidad">
+          <i data-lucide="shield" class="icono-legal"></i>
+        </a>
+        <a href="terminos.html" class="boton-legal" aria-label="Términos y Condiciones" title="Términos">
+          <i data-lucide="file-text" class="icono-legal"></i>
+        </a>
+      </div>
+      <hr class="separador-nav"/>
+      <a href="#" class="usuario-barra">
+        <div class="avatar-barra">J</div>
+        <div class="info-usuario-barra">
+          <span class="nombre-usuario-barra">Jeremy Infante</span>
+          <span class="handle-usuario-barra">@jeremyinfante</span>
         </div>
+        <i data-lucide="log-out" class="icono-logout"></i>
+      </a>
     </div>
+  </aside>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <button onclick="closeModal()" style="position: absolute; top:15px; right:15px; background:none; border:1px solid #262626; color:white; border-radius:50%; cursor:pointer;"><i data-lucide="x"></i></button>
-            <div id="modal-body"></div>
+  <!-- CONTENIDO -->
+  <div class="area-contenido">
+    <main class="contenido-gyms" role="main">
+      
+      <header class="cabecera-gyms">
+        <span class="badge-seccion">UBICACIONES</span>
+        <h1 class="titulo-gyms">NUESTROS GIMNASIOS</h1>
+        <p class="subtitulo-gyms">Encuentra la sucursal más cercana a ti</p>
+      </header>
+
+      <div class="layout-gyms">
+        <div class="mapa-placeholder">
+          <i data-lucide="map-pin"></i>
+          <p class="mapa-placeholder-titulo">MAPA INTERACTIVO</p>
         </div>
+
+        <div class="lista-gyms" id="lista-gyms"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- NAV MÓVIL -->
+  <nav class="nav-movil" aria-label="Navegación móvil">
+    <a href="workout.html" class="enlace-nav-movil" aria-label="Workout">
+      <i data-lucide="home"></i><span>Workout</span>
+    </a>
+    <a href="calendario.html" class="enlace-nav-movil" aria-label="Calendario">
+      <i data-lucide="clipboard-list"></i><span>Calendario</span>
+    </a>
+    <button class="enlace-nav-movil enlace-nav-movil-central" aria-label="Nuevo entreno">
+      <i data-lucide="plus"></i>
+    </button>
+    <a href="ejercicios.html" class="enlace-nav-movil" aria-label="Ejercicios">
+      <i data-lucide="dumbbell"></i><span>Ejercicios</span>
+    </a>
+    <a href="#" class="enlace-nav-movil activo" aria-current="page" aria-label="Gimnasios">
+      <i data-lucide="map-pin"></i><span>Gyms</span>
+    </a>
+  </nav>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal-contenido">
+    <button class="modal-cerrar" onclick="cerrarModal()" aria-label="Cerrar">
+      <i data-lucide="x"></i>
+    </button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const gyms = [
+  { 
+    id: 1, 
+    name: "APEX CENTRAL", 
+    address: "Av. Principal 123, Santo Domingo", 
+    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400", 
+    description: "Nuestra sede principal con equipamiento de última generación y espacios de entrenamiento funcional.", 
+    services: ["Parking Gratis", "Duchas", "Sauna", "Zona Cardio", "Peso Libre"] 
+  },
+  { 
+    id: 2, 
+    name: "APEX NORTE", 
+    address: "Calle Santiago 456, Santiago", 
+    image: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=400", 
+    description: "Gimnasio boutique enfocado en entrenamiento personalizado y clases grupales.", 
+    services: ["Clases Grupales", "Duchas", "WiFi", "Zona CrossFit"] 
+  },
+  { 
+    id: 3, 
+    name: "APEX SUR", 
+    address: "Boulevard Sur 789, La Romana", 
+    image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400", 
+    description: "Instalaciones completas con piscina olímpica y cancha de basketball.", 
+    services: ["Piscina", "Cancha", "Parking", "Cafetería", "Tienda"] 
+  }
+];
+
+function render() {
+  document.getElementById('lista-gyms').innerHTML = gyms.map(g => `
+    <article class="gym-item" onclick="abrirModal(${g.id})">
+      <img src="${g.image}" alt="${g.name}" class="gym-imagen">
+      <div class="gym-info">
+        <h3 class="gym-nombre">${g.name}</h3>
+        <p class="gym-direccion">
+          <i data-lucide="map-pin"></i>
+          <span>${g.address}</span>
+        </p>
+      </div>
+    </article>
+  `).join('');
+  lucide.createIcons();
+}
+
+function abrirModal(id) {
+  const g = gyms.find(x => x.id === id);
+  document.getElementById('modal-body').innerHTML = `
+    <h2 class="modal-titulo">${g.name}</h2>
+    <p class="modal-descripcion">${g.description}</p>
+    <div>
+      <p class="modal-seccion-titulo">SERVICIOS</p>
+      <div class="modal-servicios">
+        ${g.services.map(s => `<span class="badge-servicio">${s}</span>`).join('')}
+      </div>
     </div>
+  `;
+  document.getElementById('modal').classList.add('activo');
+  lucide.createIcons();
+}
 
-    <script>
-        const gyms = [{ id: 1, name: "APEX CENTRAL", address: "Av. Principal 123", image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400", description: "Nuestra sede principal.", services: ["Parking", "Duchas"] }];
-        
-        function render() {
-            document.getElementById('list').innerHTML = gyms.map(g => `
-                <div class="gym-item" onclick="openModal(${g.id})">
-                    <img src="${g.image}">
-                    <div class="gym-info">
-                        <h3 style="font-family: 'Bebas Neue'; margin: 0">${g.name}</h3>
-                        <p style="font-size: 12px; color: #a3a3a3">${g.address}</p>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
+function cerrarModal() {
+  document.getElementById('modal').classList.remove('activo');
+}
 
-        function openModal(id) {
-            const g = gyms.find(x => x.id === id);
-            document.getElementById('modal-body').innerHTML = `
-                <h2 style="font-family:'Bebas Neue'; font-size: 32px; margin: 0">${g.name}</h2>
-                <p style="font-size: 14px; color: #a3a3a3">${g.description}</p>
-                <div style="margin-top: 15px">
-                    <p style="font-size: 10px; color: var(--primary); letter-spacing: 2px">SERVICIOS</p>
-                    ${g.services.map(s => `<span class="badge" style="font-size: 9px; margin-right: 5px">${s}</span>`).join('')}
-                </div>
-            `;
-            document.getElementById('modal').classList.add('active');
-            lucide.createIcons();
-        }
+// Tema
+const tema = localStorage.getItem('apex_tema') || 'oscuro';
+document.documentElement.setAttribute('data-tema', tema);
 
-        function closeModal() { document.getElementById('modal').classList.remove('active'); }
-        render();
-    </script>
+document.getElementById('boton-tema')?.addEventListener('click', () => {
+  const actual = document.documentElement.getAttribute('data-tema');
+  const nuevo = actual === 'oscuro' ? 'claro' : 'oscuro';
+  document.documentElement.setAttribute('data-tema', nuevo);
+  localStorage.setItem('apex_tema', nuevo);
+});
+
+// Cursor
+(function() {
+  const punto = document.getElementById('cursor-punto');
+  if (!punto) return;
+  if (window.matchMedia('(hover: none), (max-width: 820px)').matches) return;
+  let raf;
+  document.addEventListener('mousemove', e => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      punto.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+    });
+  });
+  const sel = 'button, a, input';
+  document.addEventListener('mouseover', e => { if (e.target.closest(sel)) document.body.classList.add('sobre-interactivo'); });
+  document.addEventListener('mouseout',  e => { if (e.target.closest(sel)) document.body.classList.remove('sobre-interactivo'); });
+})();
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') cerrarModal();
+});
+
+// Cerrar modal al hacer clic en overlay
+document.getElementById('modal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'modal') cerrarModal();
+});
+
+render();
+</script>
 </body>
 </html>
