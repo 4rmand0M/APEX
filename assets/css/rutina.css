@@ -70,10 +70,17 @@ html {
   border-top: 1px solid var(--borde);
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  justify-content: flex-start;
+  gap: 16px;
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
   z-index: 100;
   backdrop-filter: blur(12px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav-movil::-webkit-scrollbar {
+  display: none;
 }
 
 .enlace-nav-movil {
@@ -89,6 +96,7 @@ html {
   border-radius: 10px;
   transition: color 0.14s ease;
   min-width: 48px;
+  flex-shrink: 0;
 }
 
 .enlace-nav-movil i {
@@ -1819,6 +1827,16 @@ html {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.lista-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.lista-nav li {
+  flex-shrink: 0;
 }
 
 .enlace-nav {
@@ -1854,6 +1872,7 @@ html {
 
 .nav-inferior {
   margin-top: auto;
+  flex-shrink: 0;
 }
 
 .separador-nav {
