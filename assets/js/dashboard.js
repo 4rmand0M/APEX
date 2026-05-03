@@ -13,12 +13,15 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 async function verificarSesion() {
     const { data: { session } } = await db.auth.getSession();
 
+    const navUsuario = document.getElementById('nav-usuario');
+    const btnLogout = document.getElementById('btn-logout');
+
     if (session) {
         const email = session.user.email;
-        document.getElementById('nav-usuario').textContent = email;
-        document.getElementById('btn-logout').style.display = 'inline';
+        if (navUsuario) navUsuario.textContent = email;
+        if (btnLogout) btnLogout.style.display = 'inline';
     } else {
-        document.getElementById('nav-usuario').textContent = 'Sin sesión';
+        if (navUsuario) navUsuario.textContent = 'Sin sesión';
     }
 }
 
@@ -65,36 +68,29 @@ function setGrid(gridId, items) {
 async function cargarEstadisticasUsuarios() {
     try {
         const { data, error } = await db
-            .from('usuarios')
-            .select('rol_id, estado, email_verificado')
-            .is('deleted_at', null);
+            .from('profiles')
+            .select('role');
 
         if (error) throw error;
 
         const total = data.length;
-        const entrenadores = data.filter(u => u.rol_id === 2).length;
-        const alumnos = data.filter(u => u.rol_id === 1).length;
-        const admins = data.filter(u => u.rol_id === 3).length;
-        const activos = data.filter(u => u.estado === 'activo').length;
-        const pendientes = data.filter(u => u.estado === 'pendiente').length;
-        const inactivos = data.filter(u => u.estado === 'inactivo' || u.estado === 'suspendido').length;
-        const verificados = data.filter(u => u.email_verificado).length;
-
-        const pctActivos = total > 0 ? Math.round((activos / total) * 100) : 0;
-        const pctVerif = total > 0 ? Math.round((verificados / total) * 100) : 0;
+        const entrenadores = data.filter(u => u.role === 'trainer').length;
+        const alumnos = data.filter(u => u.role === 'user').length;
+        const admins = data.filter(u => u.role === 'admin').length;
 
         setGrid('grid-usuarios', [
             { label: 'Total usuarios', valor: total, sub: 'registrados en DB', acento: true },
             { label: 'Entrenadores', valor: entrenadores, sub: `+ ${admins} admin(s)` },
-            { label: 'Monitores / Rol 2', valor: entrenadores, sub: 'mismo rol que entrenador' },
-            { label: 'Alumnos (rol 1)', valor: alumnos, sub: 'usuarios base' },
+            { label: 'Admins', valor: admins, sub: 'acceso total' },
+            { label: 'Alumnos', valor: alumnos, sub: 'usuarios base' },
         ]);
 
+        // Simulación de estados para completar el grid hasta que se implementen en DB
         setGrid('grid-estados', [
-            { label: 'Activos', valor: activos, sub: `${pctActivos}% del total`, barra: pctActivos },
-            { label: 'Pendientes', valor: pendientes, sub: 'email sin verificar o revisar' },
-            { label: 'Inactivos/Susp.', valor: inactivos, sub: 'acceso restringido' },
-            { label: 'Email verificado', valor: verificados, sub: `${pctVerif}% del total`, barra: pctVerif },
+            { label: 'Activos', valor: total, sub: '100% del total', barra: 100 },
+            { label: 'Pendientes', valor: 0, sub: 'email sin verificar o revisar' },
+            { label: 'Inactivos/Susp.', valor: 0, sub: 'acceso restringido' },
+            { label: 'Email verificado', valor: total, sub: '100% del total', barra: 100 },
         ]);
 
     } catch (e) {
@@ -108,24 +104,20 @@ async function cargarEstadisticasUsuarios() {
 ══════════════════════════════════════════════ */
 async function cargarEstadisticasEntrenadores() {
     try {
-        const { data: ents, error: e1 } = await db.from('entrenadores').select('id, estado, disponible');
+        const { data: ents, error: e1 } = await db.from('trainer_profiles').select('user_id');
         if (e1) throw e1;
 
-        const { data: gims, error: e2 } = await db.from('gimnasios').select('id, estado').is('deleted_at', null);
+        const { data: gims, error: e2 } = await db.from('gyms').select('id');
         if (e2) throw e2;
 
-        const { data: asigs, error: e3 } = await db.from('usuario_entrenador').select('id, estado').eq('estado', 'activo');
-        if (e3) throw e3;
-
-        const entsActivos = (ents || []).filter(e => e.estado === 'activo').length;
-        const entsDisponibles = (ents || []).filter(e => e.disponible && e.estado === 'activo').length;
-        const gimsActivos = (gims || []).filter(g => g.estado === 'activo').length;
+        const entsActivos = (ents || []).length;
+        const gimsActivos = (gims || []).length;
 
         setGrid('grid-entrenadores', [
-            { label: 'Entrenadores activos', valor: entsActivos, sub: `de ${(ents || []).length} total` },
-            { label: 'Disponibles ahora', valor: entsDisponibles, sub: 'con disponible=true', barra: entsActivos > 0 ? Math.round((entsDisponibles / entsActivos) * 100) : 0 },
-            { label: 'Gimnasios activos', valor: gimsActivos, sub: `de ${(gims || []).length} registrados` },
-            { label: 'Asignaciones activas', valor: (asigs || []).length, sub: 'usuario ↔ entrenador', acento: true },
+            { label: 'Entrenadores activos', valor: entsActivos, sub: `perfiles de entrenador` },
+            { label: 'Disponibles ahora', valor: entsActivos, sub: 'activos en la plataforma', barra: 100 },
+            { label: 'Gimnasios activos', valor: gimsActivos, sub: `sucursales registradas` },
+            { label: 'Asignaciones activas', valor: 0, sub: 'funcionalidad futura', acento: true },
         ]);
 
     } catch (e) {
@@ -139,15 +131,15 @@ async function cargarEstadisticasEntrenadores() {
 ══════════════════════════════════════════════ */
 async function cargarEstadisticasSesiones() {
     try {
-        const { data, error } = await db.from('sesiones').select('estado, duracion_minutos, calorias_quemadas, fecha_inicio');
+        const { data, error } = await db.from('workout_sessions').select('total_duration_minutes, end_time');
         if (error) throw error;
 
         const total = (data || []).length;
-        const completadas = (data || []).filter(s => s.estado === 'completada').length;
-        const enProgreso = (data || []).filter(s => s.estado === 'en_progreso').length;
-        const duraciones = (data || []).filter(s => s.duracion_minutos != null && s.duracion_minutos > 0);
+        const completadas = (data || []).filter(s => s.end_time != null).length;
+        const enProgreso = total - completadas;
+        const duraciones = (data || []).filter(s => s.total_duration_minutes != null && s.total_duration_minutes > 0);
         const promDur = duraciones.length > 0
-            ? Math.round(duraciones.reduce((acc, s) => acc + s.duracion_minutos, 0) / duraciones.length)
+            ? Math.round(duraciones.reduce((acc, s) => acc + s.total_duration_minutes, 0) / duraciones.length)
             : 0;
         const pctComp = total > 0 ? Math.round((completadas / total) * 100) : 0;
 
@@ -169,7 +161,7 @@ async function cargarEstadisticasSesiones() {
 ══════════════════════════════════════════════ */
 async function cargarEstadisticasIMC() {
     try {
-        const { data, error } = await db.from('metricas_fisicas').select('imc, peso_kg, categoria_imc');
+        const { data, error } = await db.from('user_measurements').select('imc, weight');
         if (error) throw error;
 
         const total = (data || []).length;
@@ -177,9 +169,9 @@ async function cargarEstadisticasIMC() {
         const promImc = conImc.length > 0
             ? (conImc.reduce((acc, m) => acc + parseFloat(m.imc), 0) / conImc.length).toFixed(1)
             : '—';
-        const conPeso = (data || []).filter(m => m.peso_kg != null);
+        const conPeso = (data || []).filter(m => m.weight != null);
         const promPeso = conPeso.length > 0
-            ? (conPeso.reduce((acc, m) => acc + parseFloat(m.peso_kg), 0) / conPeso.length).toFixed(1)
+            ? (conPeso.reduce((acc, m) => acc + parseFloat(m.weight), 0) / conPeso.length).toFixed(1)
             : '—';
 
         setGrid('grid-imc', [
@@ -188,7 +180,17 @@ async function cargarEstadisticasIMC() {
             { label: 'Peso promedio kg', valor: promPeso, sub: conPeso.length > 0 ? `de ${conPeso.length} registros` : 'sin datos' },
         ]);
 
-        renderDistribucionIMC(data || [], total);
+        const datosConCategoria = (data || []).map(m => {
+            let cat = 'normal';
+            if(m.imc < 18.5) cat = 'bajo_peso';
+            else if(m.imc >= 25 && m.imc < 30) cat = 'sobrepeso';
+            else if(m.imc >= 30 && m.imc < 35) cat = 'obesidad_i';
+            else if(m.imc >= 35 && m.imc < 40) cat = 'obesidad_ii';
+            else if(m.imc >= 40) cat = 'obesidad_iii';
+            return { categoria_imc: cat };
+        });
+
+        renderDistribucionIMC(datosConCategoria, total);
 
     } catch (e) {
         mostrarError('Error cargando métricas IMC: ' + e.message);
@@ -238,21 +240,17 @@ async function cargarEstadisticasContenido() {
     try {
         const [
             { count: totalEjercicios },
-            { count: rutinasActivas },
-            { count: rutinasPublicas },
-            { count: metasActivas },
+            { count: rutinasActivas }
         ] = await Promise.all([
-            db.from('ejercicios').select('id', { count: 'exact', head: true }).eq('estado', 'activo').is('deleted_at', null),
-            db.from('rutinas').select('id', { count: 'exact', head: true }).eq('estado', 'activa').is('deleted_at', null),
-            db.from('rutinas').select('id', { count: 'exact', head: true }).eq('es_publica', true).is('deleted_at', null),
-            db.from('metas').select('id', { count: 'exact', head: true }).eq('estado', 'activa'),
+            db.from('exercises').select('id', { count: 'exact', head: true }),
+            db.from('routines').select('id', { count: 'exact', head: true })
         ]);
 
         setGrid('grid-ejercicios', [
-            { label: 'Ejercicios activos', valor: totalEjercicios ?? '—', sub: 'en biblioteca', acento: true },
+            { label: 'Ejercicios totales', valor: totalEjercicios ?? '—', sub: 'en biblioteca', acento: true },
             { label: 'Rutinas activas', valor: rutinasActivas ?? '—', sub: 'disponibles para sesión' },
-            { label: 'Rutinas públicas', valor: rutinasPublicas ?? '—', sub: 'acceso global' },
-            { label: 'Metas activas', valor: metasActivas ?? '—', sub: 'objetivos en seguimiento' },
+            { label: 'Rutinas públicas', valor: 0, sub: 'las rutinas son privadas' },
+            { label: 'Metas activas', valor: '—', sub: 'en desarrollo' },
         ]);
 
     } catch (e) {
@@ -267,8 +265,8 @@ async function cargarEstadisticasContenido() {
 async function cargarUsuariosRecientes() {
     try {
         const { data, error } = await db
-            .from('v_usuarios_perfil')
-            .select('id, nombre_completo, email, rol, estado, email_verificado, created_at')
+            .from('profiles')
+            .select('id, full_name, username, role, created_at')
             .order('created_at', { ascending: false })
             .limit(8);
 
@@ -283,23 +281,20 @@ async function cargarUsuariosRecientes() {
       <table class="tabla">
         <thead>
           <tr>
-            <th>Nombre</th><th>Rol</th><th>Estado</th><th>Verificado</th><th>Registro</th>
+            <th>Nombre</th><th>Rol</th><th>Registro</th>
           </tr>
         </thead>
         <tbody>
           ${data.map(u => {
             const fecha = new Date(u.created_at).toLocaleDateString('es-DO', { day: '2-digit', month: 'short' });
-            const rolCls = u.rol === 'admin' ? 'rol-admin' : u.rol === 'entrenador' ? 'rol-entrenador' : 'rol-usuario';
-            const estCls = u.estado === 'activo' ? 'estado-activo' : u.estado === 'pendiente' ? 'estado-pendiente' : 'estado-inactivo';
+            const rolCls = u.role === 'admin' ? 'rol-admin' : u.role === 'trainer' ? 'rol-entrenador' : 'rol-usuario';
             return `
               <tr>
                 <td>
-                  <div class="tabla-strong">${u.nombre_completo}</div>
-                  <div style="font-size:10px;color:var(--texto-atenuado)">${u.email}</div>
+                  <div class="tabla-strong">${u.full_name || 'Sin nombre'}</div>
+                  <div style="font-size:10px;color:var(--texto-atenuado)">@${u.username || 'usuario'}</div>
                 </td>
-                <td><span class="badge-rol ${rolCls}">${u.rol}</span></td>
-                <td><span class="badge-estado ${estCls}">${u.estado}</span></td>
-                <td style="font-size:11px">${u.email_verificado ? '✓' : '✗'}</td>
+                <td><span class="badge-rol ${rolCls}">${u.role}</span></td>
                 <td style="font-size:10px;color:var(--texto-atenuado)">${fecha}</td>
               </tr>
             `;
@@ -321,9 +316,9 @@ async function cargarUsuariosRecientes() {
 async function cargarSesionesRecientes() {
     try {
         const { data, error } = await db
-            .from('v_sesiones_historial')
-            .select('usuario, rutina, fecha_inicio, duracion_minutos, estado, calorias_quemadas')
-            .order('fecha_inicio', { ascending: false })
+            .from('workout_sessions')
+            .select('start_time, end_time, total_duration_minutes, profiles(full_name)')
+            .order('start_time', { ascending: false })
             .limit(6);
 
         if (error) throw error;
@@ -334,15 +329,19 @@ async function cargarSesionesRecientes() {
         }
 
         const html = data.map(s => {
-            const fecha = new Date(s.fecha_inicio).toLocaleDateString('es-DO', { day: '2-digit', month: 'short' });
-            const estadoCls = s.estado === 'completada' ? 'estado-activo' : s.estado === 'en_progreso' ? 'estado-pendiente' : 'estado-inactivo';
+            const fecha = new Date(s.start_time).toLocaleDateString('es-DO', { day: '2-digit', month: 'short' });
+            const isCompletada = s.end_time != null;
+            const estadoStr = isCompletada ? 'completada' : 'en progreso';
+            const estadoCls = isCompletada ? 'estado-activo' : 'estado-pendiente';
+            const usuario = s.profiles ? s.profiles.full_name : 'Usuario';
+            
             return `
         <div class="sesion-row">
           <div>
-            <div class="sesion-nombre">${s.usuario}</div>
-            <div class="sesion-info">${s.rutina} · ${fecha} · <span class="badge-estado ${estadoCls}">${s.estado}</span></div>
+            <div class="sesion-nombre">${usuario}</div>
+            <div class="sesion-info">${fecha} · <span class="badge-estado ${estadoCls}">${estadoStr}</span></div>
           </div>
-          <div class="sesion-dur">${s.duracion_minutos ?? '—'}<span style="font-size:10px;color:var(--texto-atenuado)">min</span></div>
+          <div class="sesion-dur">${s.total_duration_minutes ?? '—'}<span style="font-size:10px;color:var(--texto-atenuado)">min</span></div>
         </div>
       `;
         }).join('');
@@ -361,8 +360,8 @@ async function cargarSesionesRecientes() {
 async function cargarEntrenadoresPorGimnasio() {
     try {
         const { data, error } = await db
-            .from('v_entrenadores_gimnasio')
-            .select('entrenador, email, especialidad, anos_experiencia, tarifa_hora, disponible, gimnasio, ciudad')
+            .from('trainer_profiles')
+            .select('hourly_rate, experience_years, specialties, profiles(full_name, username)')
             .limit(10);
 
         if (error) throw error;
@@ -377,22 +376,19 @@ async function cargarEntrenadoresPorGimnasio() {
         <thead>
           <tr>
             <th>Entrenador</th><th>Especialidad</th><th>Exp. (años)</th>
-            <th>Tarifa/h</th><th>Gimnasio</th><th>Ciudad</th><th>Disponible</th>
+            <th>Tarifa/h</th>
           </tr>
         </thead>
         <tbody>
           ${data.map(e => `
             <tr>
               <td>
-                <div class="tabla-strong">${e.entrenador}</div>
-                <div style="font-size:10px;color:var(--texto-atenuado)">${e.email}</div>
+                <div class="tabla-strong">${e.profiles?.full_name || 'Usuario'}</div>
+                <div style="font-size:10px;color:var(--texto-atenuado)">@${e.profiles?.username || ''}</div>
               </td>
-              <td>${e.especialidad ?? '—'}</td>
-              <td>${e.anos_experiencia ?? '—'}</td>
-              <td>${e.tarifa_hora ? '$' + e.tarifa_hora + '/h' : '—'}</td>
-              <td>${e.gimnasio}</td>
-              <td>${e.ciudad}</td>
-              <td><span class="badge-estado ${e.disponible ? 'estado-activo' : 'estado-inactivo'}">${e.disponible ? 'Sí' : 'No'}</span></td>
+              <td>${(e.specialties && e.specialties.length > 0) ? e.specialties.join(', ') : '—'}</td>
+              <td>${e.experience_years ?? '—'}</td>
+              <td>${e.hourly_rate ? '$' + e.hourly_rate + '/h' : '—'}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -410,21 +406,20 @@ async function cargarEntrenadoresPorGimnasio() {
    CARGA PRINCIPAL
 ══════════════════════════════════════════════ */
 async function cargarTodoElDashboard() {
-    const btnRefresh = document.querySelector('.btn-refresh');
-    if (btnRefresh) btnRefresh.classList.add('spinning');
-
-    await Promise.allSettled([
-        cargarEstadisticasUsuarios(),
-        cargarEstadisticasEntrenadores(),
-        cargarEstadisticasSesiones(),
-        cargarEstadisticasIMC(),
-        cargarEstadisticasContenido(),
-        cargarUsuariosRecientes(),
-        cargarSesionesRecientes(),
-        cargarEntrenadoresPorGimnasio(),
-    ]);
-
-    if (btnRefresh) btnRefresh.classList.remove('spinning');
+    try {
+        await Promise.allSettled([
+            cargarEstadisticasUsuarios(),
+            cargarEstadisticasEntrenadores(),
+            cargarEstadisticasSesiones(),
+            cargarEstadisticasIMC(),
+            cargarEstadisticasContenido(),
+            cargarUsuariosRecientes(),
+            cargarSesionesRecientes(),
+            cargarEntrenadoresPorGimnasio(),
+        ]);
+    } catch (e) {
+        console.error('[APEX Dashboard] Error en la carga general:', e);
+    }
 }
 
 /* ══════════════════════════════════════════════

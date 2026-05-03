@@ -605,16 +605,6 @@ body.sobre-interactivo #cursor-punto {
     color: var(--texto);
 }
 
-.btn-refresh.spinning {
-    animation: girar 0.8s linear infinite;
-}
-
-@keyframes girar {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 
 /* ─── 17. CTA GRID ──────────────────────────────────────── */
 
