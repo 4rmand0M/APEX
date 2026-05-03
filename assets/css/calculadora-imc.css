@@ -65,17 +65,17 @@ body {
 }
 
 .nav-back {
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--texto-atenuado);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
   text-decoration: none;
-  cursor: none;
-  transition: color .14s;
+  opacity: 0.7;
+  transition: opacity .14s;
 }
 
 .nav-back:hover {
-  color: var(--texto);
+  opacity: 1;
 }
 
 .boton-tema {
@@ -127,6 +127,20 @@ body {
   background: currentColor;
   flex-shrink: 0;
 }
+.btn-volver {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4a7a00;
+  text-decoration: none;
+  opacity: 0.4;
+  flex-shrink: 0;
+  transition: opacity .1s;
+}
+
+.btn-volver:hover {
+  opacity: 1;
+} 
 
 [data-tema="claro"] .cabecera-badge {
   color: var(--texto-sub);
