@@ -348,6 +348,7 @@ function cerrarMenu() {
 }
 
 function inicializarMenu() {
+  document.getElementById('cal-menu-cerrar')?.addEventListener('click', cerrarMenu);
   document.getElementById('cal-hamburguesa')?.addEventListener('click', abrirMenu);
   document.getElementById('cal-overlay')?.addEventListener('click', cerrarMenu);
   document.querySelectorAll('.cal-vista-opcion').forEach(btn => {

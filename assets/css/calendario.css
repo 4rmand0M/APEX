@@ -294,17 +294,36 @@ html { scrollbar-width: thin; scrollbar-color: var(--borde-hover) var(--fondo); 
   position: fixed; inset: 0; background: rgba(0,0,0,.5);
   backdrop-filter: blur(2px); z-index: 198; cursor: none;
 }
+
 .cal-menu-lateral {
-  position: fixed; top: 0; left: 0; bottom: 0;
-  width: min(80vw, 320px);
+  position: fixed; top: 0; left: 0; right: 0;
+  max-height: 90dvh;
   background: var(--superficie);
-  border-right: 1px solid var(--borde);
+  border-bottom: 1px solid var(--borde);
   z-index: 199;
   overflow-y: auto;
-  transform: translateX(-100%);
+  transform: translateY(-100%);
   transition: transform .3s cubic-bezier(0.34, 1.1, 0.64, 1);
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.3);
 }
-.cal-menu-lateral.abierto { transform: translateX(0); }
+.cal-menu-lateral.abierto { transform: translateY(0); }
+
+.cal-menu-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px 12px;
+  border-bottom: 1px solid var(--borde);
+}
+.cal-menu-titulo {
+  font-family: 'Bebas Neue', cursive; font-size: 20px; letter-spacing: 3px; color: var(--texto);
+}
+.cal-menu-cerrar {
+  background: none; border: none; color: var(--texto-atenuado); cursor: none;
+  display: flex; align-items: center; padding: 6px; border-radius: 8px;
+  transition: color .14s, background .14s;
+}
+.cal-menu-cerrar i { width: 20px; height: 20px; stroke-width: 2.5; }
+.cal-menu-cerrar:hover { color: var(--texto); background: var(--superficie-2); }
 
 .cal-menu-inner { padding: 20px 0 32px; }
 .cal-menu-seccion { padding: 8px 0; }
@@ -384,7 +403,7 @@ html { scrollbar-width: thin; scrollbar-color: var(--borde-hover) var(--fondo); 
   .nav-movil { display:none; }
 
   /* El menú lateral en desktop parte desde la columna de contenido */
-  .cal-menu-lateral { left: 240px; }
+  .cal-menu-lateral { left: 240px; right: 0; border-radius: 0 0 20px 0; }
 }
 
 @media (min-width: 1200px) {
