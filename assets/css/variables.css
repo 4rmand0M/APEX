@@ -4,6 +4,15 @@
    Importar primero antes que cualquier otro CSS.
 ============================================================ */
 
+
+*, *::before, *::after {
+  cursor: auto !important;
+}
+
+a, button, [role="button"], label, select, input[type="submit"] {
+  cursor: pointer !important;
+}
+
 :root[data-tema="oscuro"] {
   --fondo:           #080808;
   --superficie:      #111111;

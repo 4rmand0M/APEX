@@ -20,8 +20,6 @@
 
 <body>
 
-  <div id="cursor-punto" aria-hidden="true"></div>
-
   <!-- APP SHELL -->
   <div class="contenedor-app" id="app">
 
@@ -39,17 +37,20 @@
       </a>
       <nav class="nav-principal">
         <ul class="lista-nav" role="list">
-          <li><a href="dashboard.html" class="enlace-nav"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+          <li><a href="dashboard.html" class="enlace-nav"><i
+                data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
           <li><a href="workout.html" class="enlace-nav activo" aria-current="page"><i
                 data-lucide="dumbbell"></i><span>Workout</span></a></li>
           <li><a href="calendario.html" class="enlace-nav"><i data-lucide="calendar"></i><span>Calendario</span></a>
           </li>
           <li><a href="ejercicios.html" class="enlace-nav"><i data-lucide="layers"></i><span>Ejercicios</span></a></li>
           <li><a href="perfil.html" class="enlace-nav"><i data-lucide="user"></i><span>Perfil</span></a></li>
-          <li><a href="entrenadores.html" class="enlace-nav"><i data-lucide="users"></i><span>Entrenadores</span></a></li>
+          <li><a href="entrenadores.html" class="enlace-nav"><i data-lucide="users"></i><span>Entrenadores</span></a>
+          </li>
           <li><a href="gyms.html" class="enlace-nav"><i data-lucide="map-pin"></i><span>Gimnasios</span></a></li>
           <li><a href="comunity.html" class="enlace-nav"><i data-lucide="globe"></i><span>Comunidad</span></a></li>
-          <li><a href="calculadora-imc.html" class="enlace-nav"><i data-lucide="calculator"></i><span>Calculadora IMC</span></a></li>
+          <li><a href="calculadora-imc.html" class="enlace-nav"><i data-lucide="calculator"></i><span>Calculadora
+                IMC</span></a></li>
         </ul>
       </nav>
       <div class="nav-inferior">
@@ -113,7 +114,7 @@
                 <i data-lucide="more-vertical"></i>
               </button>
               <div class="dropdown-menu oculto" id="dropdown-menu-workout" role="menu">
-                <button class="dropdown-item" role="menuitem"><i data-lucide="activity"></i> Seguidor Corporal</button>
+                <button class="dropdown-item" id="btn-abrir-corporal" role="menuitem"><i data-lucide="activity"></i> Seguidor Corporal</button>
                 <button class="dropdown-item" id="btn-abrir-analisis" role="menuitem">
                   <i data-lucide="bar-chart-2"></i> Análisis
                 </button>
@@ -647,281 +648,475 @@
     <i data-lucide="check-circle" class="toast-icono"></i>
     <span class="toast-mensaje" id="toast-mensaje">Listo</span>
   </div>
-  <div class="drawer-analisis oculto" id="drawer-analisis" role="dialog" aria-modal="true" aria-label="Análisis de entrenamiento">
-  <div class="drawer-handle" aria-hidden="true"></div>
- 
-  <!-- CABECERA -->
-  <div class="da-top">
-    <button class="da-btn-cerrar" id="da-cerrar" aria-label="Cerrar análisis">
-      <i data-lucide="x"></i>
-    </button>
-    <h2 class="da-titulo">
-      <i data-lucide="bar-chart-2"></i>
-      Análisis
-    </h2>
-    <!-- Export -->
-    <button class="da-btn-export" id="da-export" aria-label="Exportar análisis">
-      <i data-lucide="share-2"></i>
-    </button>
-  </div>
- 
-  <!-- FILTROS DE PERÍODO -->
-  <!-- BACKEND: parámetro ?period= en todas las llamadas de análisis -->
-  <div class="da-filtros" role="tablist" aria-label="Período de análisis">
-    <button class="da-filtro activo" role="tab" aria-selected="true"  data-periodo="7d">7D</button>
-    <button class="da-filtro"        role="tab" aria-selected="false" data-periodo="30d">30D</button>
-    <button class="da-filtro"        role="tab" aria-selected="false" data-periodo="3m">3M</button>
-    <button class="da-filtro"        role="tab" aria-selected="false" data-periodo="6m">6M</button>
-    <button class="da-filtro"        role="tab" aria-selected="false" data-periodo="1y">1A</button>
-    <button class="da-filtro"        role="tab" aria-selected="false" data-periodo="all">Todo</button>
-  </div>
- 
-  <!-- SCROLL BODY -->
-  <div class="da-body" id="da-body">
- 
-    <!-- ── KPIs ── -->
-    <!-- BACKEND: GET /analytics/summary?user_id={userId}&period={periodo} -->
-    <section class="da-seccion" aria-labelledby="da-titulo-kpis">
-      <h3 class="da-seccion-titulo" id="da-titulo-kpis">
-        <i data-lucide="zap"></i> Resumen
-      </h3>
-      <div class="da-kpi-grid">
-        <div class="da-kpi">
-          <span class="da-kpi-icono" style="--kc:#7EB8A4"><i data-lucide="dumbbell"></i></span>
-          <span class="da-kpi-valor" id="da-kpi-sesiones">—</span>
-          <span class="da-kpi-label">Sesiones</span>
-          <span class="da-kpi-delta" id="da-delta-sesiones"></span>
-        </div>
-        <div class="da-kpi">
-          <span class="da-kpi-icono" style="--kc:#5B9BD5"><i data-lucide="layers"></i></span>
-          <span class="da-kpi-valor" id="da-kpi-series">—</span>
-          <span class="da-kpi-label">Series</span>
-          <span class="da-kpi-delta" id="da-delta-series"></span>
-        </div>
-        <div class="da-kpi">
-          <span class="da-kpi-icono" style="--kc:#E67E22"><i data-lucide="weight"></i></span>
-          <span class="da-kpi-valor" id="da-kpi-volumen">—</span>
-          <span class="da-kpi-label">Volumen</span>
-          <span class="da-kpi-delta" id="da-delta-volumen"></span>
-        </div>
-        <div class="da-kpi">
-          <span class="da-kpi-icono" style="--kc:#F1C40F"><i data-lucide="trophy"></i></span>
-          <span class="da-kpi-valor" id="da-kpi-prs">—</span>
-          <span class="da-kpi-label">PRs</span>
-          <span class="da-kpi-delta" id="da-delta-prs"></span>
-        </div>
-        <div class="da-kpi">
-          <span class="da-kpi-icono" style="--kc:#48C9B0"><i data-lucide="flame"></i></span>
-          <span class="da-kpi-valor" id="da-kpi-racha">—</span>
-          <span class="da-kpi-label">Racha</span>
-          <span class="da-kpi-delta" id="da-delta-racha"></span>
-        </div>
-        <div class="da-kpi">
-          <span class="da-kpi-icono" style="--kc:#9B59B6"><i data-lucide="clock"></i></span>
-          <span class="da-kpi-valor" id="da-kpi-tiempo">—</span>
-          <span class="da-kpi-label">Tiempo</span>
-          <span class="da-kpi-delta" id="da-delta-tiempo"></span>
-        </div>
-      </div>
-    </section>
- 
-    <!-- ── FRECUENCIA ── -->
-    <!-- BACKEND: GET /analytics/frequency?user_id={userId}&period={periodo} -->
-    <section class="da-seccion" aria-labelledby="da-titulo-freq">
-      <div class="da-seccion-header">
-        <h3 class="da-seccion-titulo" id="da-titulo-freq">
-          <i data-lucide="calendar-days"></i> Frecuencia
+  <div class="drawer-analisis oculto" id="drawer-analisis" role="dialog" aria-modal="true"
+    aria-label="Análisis de entrenamiento">
+    <div class="drawer-handle" aria-hidden="true"></div>
+
+    <!-- CABECERA -->
+    <div class="da-top">
+      <button class="da-btn-cerrar" id="da-cerrar" aria-label="Cerrar análisis">
+        <i data-lucide="x"></i>
+      </button>
+      <h2 class="da-titulo">
+        <i data-lucide="bar-chart-2"></i>
+        Análisis
+      </h2>
+      <!-- Export -->
+      <button class="da-btn-export" id="da-export" aria-label="Exportar análisis">
+        <i data-lucide="share-2"></i>
+      </button>
+    </div>
+
+    <!-- FILTROS DE PERÍODO -->
+    <!-- BACKEND: parámetro ?period= en todas las llamadas de análisis -->
+    <div class="da-filtros" role="tablist" aria-label="Período de análisis">
+      <button class="da-filtro activo" role="tab" aria-selected="true" data-periodo="7d">7D</button>
+      <button class="da-filtro" role="tab" aria-selected="false" data-periodo="30d">30D</button>
+      <button class="da-filtro" role="tab" aria-selected="false" data-periodo="3m">3M</button>
+      <button class="da-filtro" role="tab" aria-selected="false" data-periodo="6m">6M</button>
+      <button class="da-filtro" role="tab" aria-selected="false" data-periodo="1y">1A</button>
+      <button class="da-filtro" role="tab" aria-selected="false" data-periodo="all">Todo</button>
+    </div>
+
+    <!-- SCROLL BODY -->
+    <div class="da-body" id="da-body">
+
+      <!-- ── KPIs ── -->
+      <!-- BACKEND: GET /analytics/summary?user_id={userId}&period={periodo} -->
+      <section class="da-seccion" aria-labelledby="da-titulo-kpis">
+        <h3 class="da-seccion-titulo" id="da-titulo-kpis">
+          <i data-lucide="zap"></i> Resumen
         </h3>
-        <span class="da-seccion-meta" id="da-meta-freq">— días/sem</span>
-      </div>
-      <div class="da-grafico-wrap">
-        <canvas id="da-grafico-frecuencia" aria-label="Frecuencia semanal" role="img"></canvas>
-      </div>
-    </section>
- 
-    <!-- ── VOLUMEN POR MÚSCULO ── -->
-    <!-- BACKEND: GET /analytics/volume-by-muscle?user_id={userId}&period={periodo} -->
-    <section class="da-seccion" aria-labelledby="da-titulo-musculos">
-      <h3 class="da-seccion-titulo" id="da-titulo-musculos">
-        <i data-lucide="activity"></i> Volumen por músculo
-      </h3>
-      <div class="da-barras-lista" id="da-barras-lista">
-        <!-- JS inserta filas .da-barra-fila -->
-      </div>
-    </section>
- 
-    <!-- ── PROGRESIÓN ── -->
-    <!-- BACKEND: GET /analytics/exercise-progress?user_id={userId}&exercise_id={id}&period={periodo} -->
-    <section class="da-seccion" aria-labelledby="da-titulo-prog">
-      <div class="da-seccion-header">
-        <h3 class="da-seccion-titulo" id="da-titulo-prog">
-          <i data-lucide="trending-up"></i> Progresión
+        <div class="da-kpi-grid">
+          <div class="da-kpi">
+            <span class="da-kpi-icono" style="--kc:#7EB8A4"><i data-lucide="dumbbell"></i></span>
+            <span class="da-kpi-valor" id="da-kpi-sesiones">—</span>
+            <span class="da-kpi-label">Sesiones</span>
+            <span class="da-kpi-delta" id="da-delta-sesiones"></span>
+          </div>
+          <div class="da-kpi">
+            <span class="da-kpi-icono" style="--kc:#5B9BD5"><i data-lucide="layers"></i></span>
+            <span class="da-kpi-valor" id="da-kpi-series">—</span>
+            <span class="da-kpi-label">Series</span>
+            <span class="da-kpi-delta" id="da-delta-series"></span>
+          </div>
+          <div class="da-kpi">
+            <span class="da-kpi-icono" style="--kc:#E67E22"><i data-lucide="weight"></i></span>
+            <span class="da-kpi-valor" id="da-kpi-volumen">—</span>
+            <span class="da-kpi-label">Volumen</span>
+            <span class="da-kpi-delta" id="da-delta-volumen"></span>
+          </div>
+          <div class="da-kpi">
+            <span class="da-kpi-icono" style="--kc:#F1C40F"><i data-lucide="trophy"></i></span>
+            <span class="da-kpi-valor" id="da-kpi-prs">—</span>
+            <span class="da-kpi-label">PRs</span>
+            <span class="da-kpi-delta" id="da-delta-prs"></span>
+          </div>
+          <div class="da-kpi">
+            <span class="da-kpi-icono" style="--kc:#48C9B0"><i data-lucide="flame"></i></span>
+            <span class="da-kpi-valor" id="da-kpi-racha">—</span>
+            <span class="da-kpi-label">Racha</span>
+            <span class="da-kpi-delta" id="da-delta-racha"></span>
+          </div>
+          <div class="da-kpi">
+            <span class="da-kpi-icono" style="--kc:#9B59B6"><i data-lucide="clock"></i></span>
+            <span class="da-kpi-valor" id="da-kpi-tiempo">—</span>
+            <span class="da-kpi-label">Tiempo</span>
+            <span class="da-kpi-delta" id="da-delta-tiempo"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── FRECUENCIA ── -->
+      <!-- BACKEND: GET /analytics/frequency?user_id={userId}&period={periodo} -->
+      <section class="da-seccion" aria-labelledby="da-titulo-freq">
+        <div class="da-seccion-header">
+          <h3 class="da-seccion-titulo" id="da-titulo-freq">
+            <i data-lucide="calendar-days"></i> Frecuencia
+          </h3>
+          <span class="da-seccion-meta" id="da-meta-freq">— días/sem</span>
+        </div>
+        <div class="da-grafico-wrap">
+          <canvas id="da-grafico-frecuencia" aria-label="Frecuencia semanal" role="img"></canvas>
+        </div>
+      </section>
+
+      <!-- ── VOLUMEN POR MÚSCULO ── -->
+      <!-- BACKEND: GET /analytics/volume-by-muscle?user_id={userId}&period={periodo} -->
+      <section class="da-seccion" aria-labelledby="da-titulo-musculos">
+        <h3 class="da-seccion-titulo" id="da-titulo-musculos">
+          <i data-lucide="activity"></i> Volumen por músculo
         </h3>
-        <span class="da-pr-badge" id="da-pr-badge">PR — lbs</span>
-      </div>
- 
-      <!-- Selector ejercicio -->
-      <div class="da-selector-wrap">
-        <button class="da-selector-btn" id="da-selector-btn" aria-haspopup="listbox" aria-expanded="false">
-          <span class="da-sel-dot" id="da-sel-dot" style="background:#7EB8A4"></span>
-          <span class="da-sel-nombre" id="da-sel-nombre">Jalón Al Pecho Neutro</span>
-          <i data-lucide="chevron-down" class="da-sel-chevron" id="da-sel-chevron"></i>
-        </button>
-        <!-- BACKEND: lista de ejercicios del usuario -->
-        <ul class="da-sel-dropdown oculto" id="da-sel-dropdown" role="listbox" aria-label="Seleccionar ejercicio">
-          <li role="option" class="da-sel-opcion activa" data-ej-id="ej-001" data-color="#7EB8A4">
-            <span class="da-sel-opt-dot" style="background:#7EB8A4"></span>Jalón Al Pecho Neutro
+        <div class="da-barras-lista" id="da-barras-lista">
+          <!-- JS inserta filas .da-barra-fila -->
+        </div>
+      </section>
+
+      <!-- ── PROGRESIÓN ── -->
+      <!-- BACKEND: GET /analytics/exercise-progress?user_id={userId}&exercise_id={id}&period={periodo} -->
+      <section class="da-seccion" aria-labelledby="da-titulo-prog">
+        <div class="da-seccion-header">
+          <h3 class="da-seccion-titulo" id="da-titulo-prog">
+            <i data-lucide="trending-up"></i> Progresión
+          </h3>
+          <span class="da-pr-badge" id="da-pr-badge">PR — lbs</span>
+        </div>
+
+        <!-- Selector ejercicio -->
+        <div class="da-selector-wrap">
+          <button class="da-selector-btn" id="da-selector-btn" aria-haspopup="listbox" aria-expanded="false">
+            <span class="da-sel-dot" id="da-sel-dot" style="background:#7EB8A4"></span>
+            <span class="da-sel-nombre" id="da-sel-nombre">Jalón Al Pecho Neutro</span>
+            <i data-lucide="chevron-down" class="da-sel-chevron" id="da-sel-chevron"></i>
+          </button>
+          <!-- BACKEND: lista de ejercicios del usuario -->
+          <ul class="da-sel-dropdown oculto" id="da-sel-dropdown" role="listbox" aria-label="Seleccionar ejercicio">
+            <li role="option" class="da-sel-opcion activa" data-ej-id="ej-001" data-color="#7EB8A4">
+              <span class="da-sel-opt-dot" style="background:#7EB8A4"></span>Jalón Al Pecho Neutro
+            </li>
+            <li role="option" class="da-sel-opcion" data-ej-id="ej-002" data-color="#7EB8A4">
+              <span class="da-sel-opt-dot" style="background:#7EB8A4"></span>Remo Cerrado En Polea
+            </li>
+            <li role="option" class="da-sel-opcion" data-ej-id="ej-003" data-color="#7EB8A4">
+              <span class="da-sel-opt-dot" style="background:#7EB8A4"></span>Jalón Unilateral Con Polea
+            </li>
+            <li role="option" class="da-sel-opcion" data-ej-id="ej-004" data-color="#5CB85C">
+              <span class="da-sel-opt-dot" style="background:#5CB85C"></span>Curl Bíceps Mancuerna
+            </li>
+            <li role="option" class="da-sel-opcion" data-ej-id="ej-006" data-color="#5CB85C">
+              <span class="da-sel-opt-dot" style="background:#5CB85C"></span>Press Inclinado Mancuerna
+            </li>
+            <li role="option" class="da-sel-opcion" data-ej-id="ej-007" data-color="#5CB85C">
+              <span class="da-sel-opt-dot" style="background:#5CB85C"></span>Apertura De Pecho Maquina
+            </li>
+            <li role="option" class="da-sel-opcion" data-ej-id="ej-010" data-color="#5B9BD5">
+              <span class="da-sel-opt-dot" style="background:#5B9BD5"></span>Elevaciones Laterales
+            </li>
+          </ul>
+        </div>
+
+        <div class="da-grafico-wrap da-grafico-wrap-tall">
+          <canvas id="da-grafico-progresion" aria-label="Progresión del ejercicio seleccionado" role="img"></canvas>
+        </div>
+      </section>
+
+      <!-- ── PRs RECIENTES ── -->
+      <!-- BACKEND: GET /analytics/personal-records?user_id={userId}&limit=8 -->
+      <section class="da-seccion" aria-labelledby="da-titulo-prs">
+        <h3 class="da-seccion-titulo" id="da-titulo-prs">
+          <i data-lucide="trophy"></i> Récords Personales
+        </h3>
+        <ul class="da-pr-lista" id="da-pr-lista" aria-label="Récords personales recientes">
+          <!-- BACKEND: Iterar PRs ordenados por fecha DESC -->
+          <li class="da-pr-item">
+            <span class="da-pr-dot" style="--c:#7EB8A4"></span>
+            <div class="da-pr-info">
+              <span class="da-pr-ejercicio">Jalón Al Pecho Neutro</span>
+              <span class="da-pr-musculo" style="color:#7EB8A4">Espalda</span>
+            </div>
+            <div class="da-pr-nums">
+              <span class="da-pr-peso">120.0 lbs</span>
+              <span class="da-pr-reps">× 10</span>
+              <span class="da-pr-fecha">20 Mar</span>
+            </div>
           </li>
-          <li role="option" class="da-sel-opcion" data-ej-id="ej-002" data-color="#7EB8A4">
-            <span class="da-sel-opt-dot" style="background:#7EB8A4"></span>Remo Cerrado En Polea
+          <li class="da-pr-item">
+            <span class="da-pr-dot" style="--c:#7EB8A4"></span>
+            <div class="da-pr-info">
+              <span class="da-pr-ejercicio">Remo Cerrado En Polea</span>
+              <span class="da-pr-musculo" style="color:#7EB8A4">Espalda</span>
+            </div>
+            <div class="da-pr-nums">
+              <span class="da-pr-peso">133.0 lbs</span>
+              <span class="da-pr-reps">× 10</span>
+              <span class="da-pr-fecha">20 Mar</span>
+            </div>
           </li>
-          <li role="option" class="da-sel-opcion" data-ej-id="ej-003" data-color="#7EB8A4">
-            <span class="da-sel-opt-dot" style="background:#7EB8A4"></span>Jalón Unilateral Con Polea
+          <li class="da-pr-item">
+            <span class="da-pr-dot" style="--c:#5CB85C"></span>
+            <div class="da-pr-info">
+              <span class="da-pr-ejercicio">Apertura De Pecho Maquina</span>
+              <span class="da-pr-musculo" style="color:#5CB85C">Pecho</span>
+            </div>
+            <div class="da-pr-nums">
+              <span class="da-pr-peso">110.0 lbs</span>
+              <span class="da-pr-reps">× 10</span>
+              <span class="da-pr-fecha">19 Mar</span>
+            </div>
           </li>
-          <li role="option" class="da-sel-opcion" data-ej-id="ej-004" data-color="#5CB85C">
-            <span class="da-sel-opt-dot" style="background:#5CB85C"></span>Curl Bíceps Mancuerna
+          <li class="da-pr-item">
+            <span class="da-pr-dot" style="--c:#5CB85C"></span>
+            <div class="da-pr-info">
+              <span class="da-pr-ejercicio">Curl Bíceps Mancuerna</span>
+              <span class="da-pr-musculo" style="color:#5CB85C">Bíceps</span>
+            </div>
+            <div class="da-pr-nums">
+              <span class="da-pr-peso">22.0 lbs</span>
+              <span class="da-pr-reps">× 12</span>
+              <span class="da-pr-fecha">20 Mar</span>
+            </div>
           </li>
-          <li role="option" class="da-sel-opcion" data-ej-id="ej-006" data-color="#5CB85C">
-            <span class="da-sel-opt-dot" style="background:#5CB85C"></span>Press Inclinado Mancuerna
-          </li>
-          <li role="option" class="da-sel-opcion" data-ej-id="ej-007" data-color="#5CB85C">
-            <span class="da-sel-opt-dot" style="background:#5CB85C"></span>Apertura De Pecho Maquina
-          </li>
-          <li role="option" class="da-sel-opcion" data-ej-id="ej-010" data-color="#5B9BD5">
-            <span class="da-sel-opt-dot" style="background:#5B9BD5"></span>Elevaciones Laterales
+          <li class="da-pr-item">
+            <span class="da-pr-dot" style="--c:#5B9BD5"></span>
+            <div class="da-pr-info">
+              <span class="da-pr-ejercicio">Elevaciones Laterales</span>
+              <span class="da-pr-musculo" style="color:#5B9BD5">Hombro</span>
+            </div>
+            <div class="da-pr-nums">
+              <span class="da-pr-peso">11.0 lbs</span>
+              <span class="da-pr-reps">× 20</span>
+              <span class="da-pr-fecha">19 Mar</span>
+            </div>
           </li>
         </ul>
-      </div>
- 
-      <div class="da-grafico-wrap da-grafico-wrap-tall">
-        <canvas id="da-grafico-progresion" aria-label="Progresión del ejercicio seleccionado" role="img"></canvas>
-      </div>
-    </section>
- 
-    <!-- ── PRs RECIENTES ── -->
-    <!-- BACKEND: GET /analytics/personal-records?user_id={userId}&limit=8 -->
-    <section class="da-seccion" aria-labelledby="da-titulo-prs">
-      <h3 class="da-seccion-titulo" id="da-titulo-prs">
-        <i data-lucide="trophy"></i> Récords Personales
-      </h3>
-      <ul class="da-pr-lista" id="da-pr-lista" aria-label="Récords personales recientes">
-        <!-- BACKEND: Iterar PRs ordenados por fecha DESC -->
-        <li class="da-pr-item">
-          <span class="da-pr-dot" style="--c:#7EB8A4"></span>
-          <div class="da-pr-info">
-            <span class="da-pr-ejercicio">Jalón Al Pecho Neutro</span>
-            <span class="da-pr-musculo" style="color:#7EB8A4">Espalda</span>
-          </div>
-          <div class="da-pr-nums">
-            <span class="da-pr-peso">120.0 lbs</span>
-            <span class="da-pr-reps">× 10</span>
-            <span class="da-pr-fecha">20 Mar</span>
-          </div>
-        </li>
-        <li class="da-pr-item">
-          <span class="da-pr-dot" style="--c:#7EB8A4"></span>
-          <div class="da-pr-info">
-            <span class="da-pr-ejercicio">Remo Cerrado En Polea</span>
-            <span class="da-pr-musculo" style="color:#7EB8A4">Espalda</span>
-          </div>
-          <div class="da-pr-nums">
-            <span class="da-pr-peso">133.0 lbs</span>
-            <span class="da-pr-reps">× 10</span>
-            <span class="da-pr-fecha">20 Mar</span>
-          </div>
-        </li>
-        <li class="da-pr-item">
-          <span class="da-pr-dot" style="--c:#5CB85C"></span>
-          <div class="da-pr-info">
-            <span class="da-pr-ejercicio">Apertura De Pecho Maquina</span>
-            <span class="da-pr-musculo" style="color:#5CB85C">Pecho</span>
-          </div>
-          <div class="da-pr-nums">
-            <span class="da-pr-peso">110.0 lbs</span>
-            <span class="da-pr-reps">× 10</span>
-            <span class="da-pr-fecha">19 Mar</span>
-          </div>
-        </li>
-        <li class="da-pr-item">
-          <span class="da-pr-dot" style="--c:#5CB85C"></span>
-          <div class="da-pr-info">
-            <span class="da-pr-ejercicio">Curl Bíceps Mancuerna</span>
-            <span class="da-pr-musculo" style="color:#5CB85C">Bíceps</span>
-          </div>
-          <div class="da-pr-nums">
-            <span class="da-pr-peso">22.0 lbs</span>
-            <span class="da-pr-reps">× 12</span>
-            <span class="da-pr-fecha">20 Mar</span>
-          </div>
-        </li>
-        <li class="da-pr-item">
-          <span class="da-pr-dot" style="--c:#5B9BD5"></span>
-          <div class="da-pr-info">
-            <span class="da-pr-ejercicio">Elevaciones Laterales</span>
-            <span class="da-pr-musculo" style="color:#5B9BD5">Hombro</span>
-          </div>
-          <div class="da-pr-nums">
-            <span class="da-pr-peso">11.0 lbs</span>
-            <span class="da-pr-reps">× 20</span>
-            <span class="da-pr-fecha">19 Mar</span>
-          </div>
-        </li>
-      </ul>
-    </section>
- 
-    <!-- ── CONSISTENCIA (HEATMAP) ── -->
-    <!-- BACKEND: GET /analytics/heatmap?user_id={userId}&year={año} -->
-    <section class="da-seccion" aria-labelledby="da-titulo-heatmap">
-      <div class="da-seccion-header">
-        <h3 class="da-seccion-titulo" id="da-titulo-heatmap">
-          <i data-lucide="grid"></i> Consistencia
+      </section>
+
+      <!-- ── CONSISTENCIA (HEATMAP) ── -->
+      <!-- BACKEND: GET /analytics/heatmap?user_id={userId}&year={año} -->
+      <section class="da-seccion" aria-labelledby="da-titulo-heatmap">
+        <div class="da-seccion-header">
+          <h3 class="da-seccion-titulo" id="da-titulo-heatmap">
+            <i data-lucide="grid"></i> Consistencia
+          </h3>
+          <span class="da-seccion-meta" id="da-meta-heatmap">— días</span>
+        </div>
+        <div class="da-heatmap-wrap" id="da-heatmap-wrap" aria-label="Mapa de calor anual"></div>
+        <div class="da-heatmap-leyenda">
+          <span class="da-hm-label">Menos</span>
+          <span class="da-hm-escala">
+            <span class="da-hm-celda" data-nivel="0"></span>
+            <span class="da-hm-celda" data-nivel="1"></span>
+            <span class="da-hm-celda" data-nivel="2"></span>
+            <span class="da-hm-celda" data-nivel="3"></span>
+            <span class="da-hm-celda" data-nivel="4"></span>
+          </span>
+          <span class="da-hm-label">Más</span>
+        </div>
+      </section>
+
+      <!-- ── RACHAS ── -->
+      <!-- BACKEND: GET /analytics/streaks?user_id={userId} -->
+      <section class="da-seccion" aria-labelledby="da-titulo-rachas">
+        <h3 class="da-seccion-titulo" id="da-titulo-rachas">
+          <i data-lucide="flame"></i> Rachas
         </h3>
-        <span class="da-seccion-meta" id="da-meta-heatmap">— días</span>
-      </div>
-      <div class="da-heatmap-wrap" id="da-heatmap-wrap" aria-label="Mapa de calor anual"></div>
-      <div class="da-heatmap-leyenda">
-        <span class="da-hm-label">Menos</span>
-        <span class="da-hm-escala">
-          <span class="da-hm-celda" data-nivel="0"></span>
-          <span class="da-hm-celda" data-nivel="1"></span>
-          <span class="da-hm-celda" data-nivel="2"></span>
-          <span class="da-hm-celda" data-nivel="3"></span>
-          <span class="da-hm-celda" data-nivel="4"></span>
-        </span>
-        <span class="da-hm-label">Más</span>
-      </div>
-    </section>
- 
-    <!-- ── RACHAS ── -->
-    <!-- BACKEND: GET /analytics/streaks?user_id={userId} -->
-    <section class="da-seccion" aria-labelledby="da-titulo-rachas">
-      <h3 class="da-seccion-titulo" id="da-titulo-rachas">
-        <i data-lucide="flame"></i> Rachas
-      </h3>
-      <div class="da-rachas-grid">
-        <div class="da-racha-card">
-          <i data-lucide="flame" style="color:#E67E22"></i>
-          <span class="da-racha-val" id="da-racha-actual">7</span>
-          <span class="da-racha-lbl">Racha actual</span>
-          <span class="da-racha-sub">días seguidos</span>
+        <div class="da-rachas-grid">
+          <div class="da-racha-card">
+            <i data-lucide="flame" style="color:#E67E22"></i>
+            <span class="da-racha-val" id="da-racha-actual">7</span>
+            <span class="da-racha-lbl">Racha actual</span>
+            <span class="da-racha-sub">días seguidos</span>
+          </div>
+          <div class="da-racha-card">
+            <i data-lucide="award" style="color:#F1C40F"></i>
+            <span class="da-racha-val" id="da-racha-mejor">14</span>
+            <span class="da-racha-lbl">Mejor racha</span>
+            <span class="da-racha-sub">días seguidos</span>
+          </div>
+          <div class="da-racha-card">
+            <i data-lucide="calendar-check" style="color:#5CB85C"></i>
+            <span class="da-racha-val" id="da-racha-semanas">6/8</span>
+            <span class="da-racha-lbl">Semanas activas</span>
+            <span class="da-racha-sub">últimas 8 semanas</span>
+          </div>
         </div>
-        <div class="da-racha-card">
-          <i data-lucide="award" style="color:#F1C40F"></i>
-          <span class="da-racha-val" id="da-racha-mejor">14</span>
-          <span class="da-racha-lbl">Mejor racha</span>
-          <span class="da-racha-sub">días seguidos</span>
-        </div>
-        <div class="da-racha-card">
-          <i data-lucide="calendar-check" style="color:#5CB85C"></i>
-          <span class="da-racha-val" id="da-racha-semanas">6/8</span>
-          <span class="da-racha-lbl">Semanas activas</span>
-          <span class="da-racha-sub">últimas 8 semanas</span>
-        </div>
-      </div>
-    </section>
- 
+      </section>
+
+    </div>
   </div>
-</div>
+  <!-- ════════════════════════════════════════════════════
+     DRAWER — SEGUIDOR CORPORAL
+     Slide-up. Registra peso, grasa corporal y medidas.
+     BACKEND: POST /body-tracking
+════════════════════════════════════════════════════ -->
+  <div class="drawer-corporal oculto" id="drawer-corporal" role="dialog" aria-modal="true"
+    aria-label="Seguidor Corporal">
+    <div class="drawer-handle" aria-hidden="true"></div>
+
+    <div class="drawer-top">
+      <button class="drawer-btn-cancelar" id="corporal-cancelar">Cancelar</button>
+      <h2 class="drawer-titulo">Seguidor Corporal</h2>
+      <button class="drawer-btn-guardar" id="corporal-guardar">Guardar</button>
+    </div>
+
+    <div class="corporal-body" id="corporal-body">
+
+      <!-- Fecha -->
+      <div class="corporal-fecha-row">
+        <i data-lucide="calendar-days"></i>
+        <span id="corporal-fecha-texto">Hoy</span>
+      </div>
+
+      <!-- Sección: Peso y Composición -->
+      <section class="corporal-seccion">
+        <h3 class="corporal-sec-titulo">
+          <i data-lucide="weight"></i>
+          Peso y Composición
+        </h3>
+        <div class="corporal-grid">
+          <div class="corporal-campo">
+            <label class="corporal-label">Peso</label>
+            <div class="corporal-input-wrap">
+              <input type="number" class="corporal-input" id="corp-peso" placeholder="0.0" min="20" max="300"
+                step="0.1" />
+              <span class="corporal-unidad">lbs</span>
+            </div>
+          </div>
+          <div class="corporal-campo">
+            <label class="corporal-label">% Grasa</label>
+            <div class="corporal-input-wrap">
+              <input type="number" class="corporal-input" id="corp-grasa" placeholder="0.0" min="1" max="60"
+                step="0.1" />
+              <span class="corporal-unidad">%</span>
+            </div>
+          </div>
+          <div class="corporal-campo">
+            <label class="corporal-label">Masa Muscular</label>
+            <div class="corporal-input-wrap">
+              <input type="number" class="corporal-input" id="corp-musculo" placeholder="0.0" min="0" max="200"
+                step="0.1" />
+              <span class="corporal-unidad">lbs</span>
+            </div>
+          </div>
+          <div class="corporal-campo">
+            <label class="corporal-label">Agua Corporal</label>
+            <div class="corporal-input-wrap">
+              <input type="number" class="corporal-input" id="corp-agua" placeholder="0.0" min="0" max="100"
+                step="0.1" />
+              <span class="corporal-unidad">%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección: Medidas -->
+      <section class="corporal-seccion">
+        <h3 class="corporal-sec-titulo">
+          <i data-lucide="ruler"></i>
+          Medidas Corporales
+        </h3>
+        <div class="corporal-medidas-lista">
+          <div class="corporal-medida-fila">
+            <div class="corporal-medida-icono" style="--mc:#7EB8A4">
+              <i data-lucide="move-vertical"></i>
+            </div>
+            <span class="corporal-medida-nombre">Cuello</span>
+            <div class="corporal-input-wrap corporal-input-sm">
+              <input type="number" class="corporal-input" id="corp-cuello" placeholder="—" min="0" step="0.1" />
+              <span class="corporal-unidad">in</span>
+            </div>
+          </div>
+          <div class="corporal-medida-fila">
+            <div class="corporal-medida-icono" style="--mc:#5CB85C">
+              <i data-lucide="circle"></i>
+            </div>
+            <span class="corporal-medida-nombre">Pecho</span>
+            <div class="corporal-input-wrap corporal-input-sm">
+              <input type="number" class="corporal-input" id="corp-pecho" placeholder="—" min="0" step="0.1" />
+              <span class="corporal-unidad">in</span>
+            </div>
+          </div>
+          <div class="corporal-medida-fila">
+            <div class="corporal-medida-icono" style="--mc:#E67E22">
+              <i data-lucide="circle"></i>
+            </div>
+            <span class="corporal-medida-nombre">Cintura</span>
+            <div class="corporal-input-wrap corporal-input-sm">
+              <input type="number" class="corporal-input" id="corp-cintura" placeholder="—" min="0" step="0.1" />
+              <span class="corporal-unidad">in</span>
+            </div>
+          </div>
+          <div class="corporal-medida-fila">
+            <div class="corporal-medida-icono" style="--mc:#9B59B6">
+              <i data-lucide="circle"></i>
+            </div>
+            <span class="corporal-medida-nombre">Cadera</span>
+            <div class="corporal-input-wrap corporal-input-sm">
+              <input type="number" class="corporal-input" id="corp-cadera" placeholder="—" min="0" step="0.1" />
+              <span class="corporal-unidad">in</span>
+            </div>
+          </div>
+          <div class="corporal-medida-fila">
+            <div class="corporal-medida-icono" style="--mc:#5B9BD5">
+              <i data-lucide="circle"></i>
+            </div>
+            <span class="corporal-medida-nombre">Bíceps (izq)</span>
+            <div class="corporal-input-wrap corporal-input-sm">
+              <input type="number" class="corporal-input" id="corp-biceps-izq" placeholder="—" min="0" step="0.1" />
+              <span class="corporal-unidad">in</span>
+            </div>
+          </div>
+          <div class="corporal-medida-fila">
+            <div class="corporal-medida-icono" style="--mc:#5B9BD5">
+              <i data-lucide="circle"></i>
+            </div>
+            <span class="corporal-medida-nombre">Bíceps (der)</span>
+            <div class="corporal-input-wrap corporal-input-sm">
+              <input type="number" class="corporal-input" id="corp-biceps-der" placeholder="—" min="0" step="0.1" />
+              <span class="corporal-unidad">in</span>
+            </div>
+          </div>
+          <div class="corporal-medida-fila">
+            <div class="corporal-medida-icono" style="--mc:#48C9B0">
+              <i data-lucide="circle"></i>
+            </div>
+            <span class="corporal-medida-nombre">Muslo (izq)</span>
+            <div class="corporal-input-wrap corporal-input-sm">
+              <input type="number" class="corporal-input" id="corp-muslo-izq" placeholder="—" min="0" step="0.1" />
+              <span class="corporal-unidad">in</span>
+            </div>
+          </div>
+          <div class="corporal-medida-fila">
+            <div class="corporal-medida-icono" style="--mc:#48C9B0">
+              <i data-lucide="circle"></i>
+            </div>
+            <span class="corporal-medida-nombre">Muslo (der)</span>
+            <div class="corporal-input-wrap corporal-input-sm">
+              <input type="number" class="corporal-input" id="corp-muslo-der" placeholder="—" min="0" step="0.1" />
+              <span class="corporal-unidad">in</span>
+            </div>
+          </div>
+          <div class="corporal-medida-fila">
+            <div class="corporal-medida-icono" style="--mc:#F1C40F">
+              <i data-lucide="circle"></i>
+            </div>
+            <span class="corporal-medida-nombre">Pantorrilla (izq)</span>
+            <div class="corporal-input-wrap corporal-input-sm">
+              <input type="number" class="corporal-input" id="corp-pant-izq" placeholder="—" min="0" step="0.1" />
+              <span class="corporal-unidad">in</span>
+            </div>
+          </div>
+          <div class="corporal-medida-fila">
+            <div class="corporal-medida-icono" style="--mc:#F1C40F">
+              <i data-lucide="circle"></i>
+            </div>
+            <span class="corporal-medida-nombre">Pantorrilla (der)</span>
+            <div class="corporal-input-wrap corporal-input-sm">
+              <input type="number" class="corporal-input" id="corp-pant-der" placeholder="—" min="0" step="0.1" />
+              <span class="corporal-unidad">in</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección: Historial reciente -->
+      <!-- BACKEND: GET /body-tracking?user_id={id}&limit=5 -->
+      <section class="corporal-seccion corporal-historial-sec">
+        <h3 class="corporal-sec-titulo">
+          <i data-lucide="history"></i>
+          Historial reciente
+        </h3>
+        <div class="corporal-historial" id="corporal-historial">
+          <!-- JS inserta filas -->
+          <div class="corporal-hist-vacio">
+            <i data-lucide="scale"></i>
+            <span>Sin registros anteriores</span>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /corporal-body -->
+  </div>
 
   <script src="../assets/js/workout.js"></script>
   <script src="../assets/js/analisis.js"></script>

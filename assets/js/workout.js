@@ -1,42 +1,30 @@
-/* ============================================================
-   APEX FITNESS — Workout (workout.js)
-   Módulos:
-   1.  Arranque: carga, cursor, tema, íconos.
-   2.  Navegación de fecha (←/→).
-   3.  Drawer de nuevo entreno (abrir/cerrar/guardar).
-   4.  Sheet de selección de ejercicios (abrir/cerrar/buscar).
-   5.  CRUD de ejercicios y series dentro del drawer.
-   6.  Compartir entreno.
-   7.  Toast de notificación.
-   8.  Scroll infinito (sentinel).
-============================================================ */
-
 'use strict';
 
-/* ──────────────────────────────────────────────────────────
+/* ══════════════════════════════════════════════════════════
    0. CONFIG
-   BACKEND: Cambiar BASE_URL al endpoint real.
-────────────────────────────────────────────────────────── */
+══════════════════════════════════════════════════════════ */
 const CONFIG = {
   BASE_URL: 'https://api.fitmoca.edu',
   JWT_KEY:  'apex_token',
   TEMA_KEY: 'apex_tema',
 };
 
-/* Estado global */
 const Estado = {
-  fechaActual:        new Date(),
-  drawerAbierto:      false,
-  sheetAbierto:       false,
-  ejerciciosEntreno:  [], // [{ id, nombre, musculo, color, series:[{kg,reps}] }]
-  contadorEj:         0,
-  contadorSerie:      0,
+  fechaActual:       new Date(),
+  drawerAbierto:     false,
+  sheetAbierto:      false,
+  corporalAbierto:   false,
+  ejerciciosEntreno: [],
+  contadorEj:        0,
+  contadorSerie:     0,
 };
+
+const DIAS  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 /* ══════════════════════════════════════════════════════════
    1. ARRANQUE
 ══════════════════════════════════════════════════════════ */
-
 function inicializarCursor() {
   const punto = document.getElementById('cursor-punto');
   if (!punto) return;
@@ -68,21 +56,14 @@ function inicializarIconos() {
   if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
-
 /* ══════════════════════════════════════════════════════════
    2. NAVEGACIÓN DE FECHA
-   BACKEND: Al cambiar fecha, hacer GET /sessions?user_id={id}&date={fecha}
 ══════════════════════════════════════════════════════════ */
-
-const DIAS    = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-const MESES   = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-
 function formatearFechaLabel(fecha) {
-  const hoy   = new Date();
-  const ayer  = new Date(); ayer.setDate(hoy.getDate() - 1);
-  const mismoD = d1 => d1.toDateString() === fecha.toDateString();
-  if (mismoD(hoy))  return 'HOY';
-  if (mismoD(ayer)) return 'AYER';
+  const hoy  = new Date();
+  const ayer = new Date(); ayer.setDate(hoy.getDate() - 1);
+  if (fecha.toDateString() === hoy.toDateString())  return 'HOY';
+  if (fecha.toDateString() === ayer.toDateString()) return 'AYER';
   return `${DIAS[fecha.getDay()]}, ${MESES[fecha.getMonth()].toUpperCase()} ${fecha.getDate()}`;
 }
 
@@ -95,28 +76,72 @@ function inicializarNavFecha() {
   document.getElementById('btn-fecha-prev')?.addEventListener('click', () => {
     Estado.fechaActual.setDate(Estado.fechaActual.getDate() - 1);
     actualizarFechaLabel();
-    // BACKEND: cargarSesionesPorFecha(Estado.fechaActual);
   });
   document.getElementById('btn-fecha-next')?.addEventListener('click', () => {
-    const hoy = new Date();
-    if (Estado.fechaActual >= hoy) return; // no avanzar más allá de hoy
+    if (Estado.fechaActual >= new Date()) return;
     Estado.fechaActual.setDate(Estado.fechaActual.getDate() + 1);
     actualizarFechaLabel();
-    // BACKEND: cargarSesionesPorFecha(Estado.fechaActual);
   });
   actualizarFechaLabel();
 }
 
+/* ══════════════════════════════════════════════════════════
+   3. DROPDOWN DE 3 PUNTOS
+══════════════════════════════════════════════════════════ */
+function inicializarDropdown() {
+  const btnOpciones = document.getElementById('btn-opciones-workout');
+  const menuDropdown = document.getElementById('dropdown-menu-workout');
+
+  if (!btnOpciones || !menuDropdown) return;
+
+  // Abrir / cerrar al hacer clic en el botón
+  btnOpciones.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const estaOculto = menuDropdown.classList.contains('oculto');
+    // Cerrar todos los dropdowns primero
+    document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('oculto'));
+    // Abrir este si estaba cerrado
+    if (estaOculto) {
+      menuDropdown.classList.remove('oculto');
+      btnOpciones.setAttribute('aria-expanded', 'true');
+    } else {
+      btnOpciones.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Evitar que clic dentro del menú lo cierre
+  menuDropdown.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  // Cerrar al hacer clic fuera
+  document.addEventListener('click', () => {
+    if (!menuDropdown.classList.contains('oculto')) {
+      menuDropdown.classList.add('oculto');
+      btnOpciones.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Ítem: Análisis
+  document.getElementById('btn-abrir-analisis')?.addEventListener('click', () => {
+    menuDropdown.classList.add('oculto');
+    abrirAnalisis();
+  });
+
+  // Ítem: Seguidor Corporal
+  document.getElementById('btn-abrir-corporal')?.addEventListener('click', () => {
+    menuDropdown.classList.add('oculto');
+    abrirDrawerCorporal();
+  });
+}
 
 /* ══════════════════════════════════════════════════════════
-   3. DRAWER — NUEVO ENTRENO
+   4. DRAWER — NUEVO ENTRENO
 ══════════════════════════════════════════════════════════ */
-
 function abrirDrawer() {
   Estado.drawerAbierto = true;
   document.getElementById('drawer-nuevo')?.classList.add('abierto');
   document.getElementById('overlay-global')?.classList.remove('oculto');
-  // Actualizar fecha en el drawer
   const hoy = new Date();
   const el  = document.getElementById('drawer-fecha-texto');
   if (el) el.textContent = `${DIAS[hoy.getDay()]}, ${hoy.getDate()} de ${MESES[hoy.getMonth()]} ${hoy.getFullYear()}`;
@@ -126,73 +151,49 @@ function abrirDrawer() {
 function cerrarDrawer() {
   Estado.drawerAbierto = false;
   document.getElementById('drawer-nuevo')?.classList.remove('abierto');
-  if (!Estado.sheetAbierto) {
+  if (!Estado.sheetAbierto && !Estado.corporalAbierto) {
     document.getElementById('overlay-global')?.classList.add('oculto');
   }
 }
 
 function inicializarDrawer() {
-  // Botones que abren el drawer
-  ['btn-nuevo-workout-nav','btn-vacio-nuevo'].forEach(id => {
+  ['btn-nuevo-workout-nav', 'btn-vacio-nuevo'].forEach(id => {
     document.getElementById(id)?.addEventListener('click', abrirDrawer);
   });
   document.getElementById('drawer-cancelar')?.addEventListener('click', cerrarDrawer);
   document.getElementById('overlay-global')?.addEventListener('click', () => {
     cerrarDrawer();
     cerrarSheet();
+    cerrarDrawerCorporal();
   });
-
-  // Guardar entreno
-  // BACKEND: POST /sessions con ejerciciosEntreno
   document.getElementById('drawer-guardar')?.addEventListener('click', guardarEntreno);
-
-  // Abrir sheet de ejercicios
   document.getElementById('drawer-btn-anadir')?.addEventListener('click', abrirSheet);
 }
 
-/**
- * Recoge los datos del entreno y los envía al backend.
- * BACKEND: POST /sessions
- *   Body: { fecha: ..., ejercicios: Estado.ejerciciosEntreno }
- *   Headers: { Authorization: Bearer {jwt} }
- */
 async function guardarEntreno() {
   if (Estado.ejerciciosEntreno.length === 0) {
     mostrarToast('Añade al menos un ejercicio');
     return;
   }
-
   const payload = {
-    usuario_id:  'usuario-actual', // BACKEND: extraer del JWT
-    fecha:       new Date().toISOString(),
-    ejercicios:  Estado.ejerciciosEntreno.map(ej => ({
+    usuario_id: 'usuario-actual',
+    fecha:      new Date().toISOString(),
+    ejercicios: Estado.ejerciciosEntreno.map(ej => ({
       ejercicio_id: ej.id,
       nombre:       ej.nombre,
       series:       ej.series,
     })),
   };
-
-  console.log('[APEX] POST /sessions — payload:', JSON.stringify(payload, null, 2));
-  // BACKEND:
-  // const res = await fetch(`${CONFIG.BASE_URL}/sessions`, {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem(CONFIG.JWT_KEY)}` },
-  //   body: JSON.stringify(payload),
-  // });
-  // if (!res.ok) { mostrarToast('Error al guardar'); return; }
-
+  console.log('[APEX] POST /sessions —', payload);
   mostrarToast('Entreno guardado ✓');
   Estado.ejerciciosEntreno = [];
   renderizarListaDrawer();
   cerrarDrawer();
 }
 
-
 /* ══════════════════════════════════════════════════════════
-   4. SHEET — SELECTOR DE EJERCICIOS
-   Búsqueda en tiempo real sobre los grupos/ejercicios del DOM.
+   5. SHEET — SELECTOR DE EJERCICIOS
 ══════════════════════════════════════════════════════════ */
-
 function abrirSheet() {
   Estado.sheetAbierto = true;
   document.getElementById('sheet-ejercicios')?.classList.add('abierto');
@@ -203,7 +204,7 @@ function abrirSheet() {
 function cerrarSheet() {
   Estado.sheetAbierto = false;
   document.getElementById('sheet-ejercicios')?.classList.remove('abierto');
-  if (!Estado.drawerAbierto) {
+  if (!Estado.drawerAbierto && !Estado.corporalAbierto) {
     document.getElementById('overlay-global')?.classList.add('oculto');
   }
 }
@@ -211,48 +212,42 @@ function cerrarSheet() {
 function inicializarSheet() {
   document.getElementById('sheet-cerrar')?.addEventListener('click', cerrarSheet);
 
-  // Expandir/colapsar grupos
   document.querySelectorAll('.sheet-grupo-row').forEach(btn => {
     btn.addEventListener('click', () => {
-      const expandido  = btn.getAttribute('aria-expanded') === 'true';
-      const targetId   = btn.getAttribute('aria-controls');
-      const lista      = document.getElementById(targetId);
+      const expandido = btn.getAttribute('aria-expanded') === 'true';
+      const lista     = document.getElementById(btn.getAttribute('aria-controls'));
       btn.setAttribute('aria-expanded', String(!expandido));
       lista?.classList.toggle('oculto', expandido);
     });
   });
 
-  // Seleccionar ejercicio
   document.getElementById('sheet-grupos')?.addEventListener('click', e => {
     const btn = e.target.closest('.sg-ej-btn');
     if (!btn) return;
     const item = btn.closest('.sg-ej-item');
     if (!item) return;
-    const ejId     = item.dataset.ejId;
-    const ejNombre = item.querySelector('.sg-ej-nombre')?.textContent || '';
-    const ejMusculo = item.dataset.ejMusculo || '';
-    const ejColor   = item.dataset.ejColor   || '#888';
-    agregarEjercicioAlEntreno(ejId, ejNombre, ejMusculo, ejColor);
+    agregarEjercicioAlEntreno(
+      item.dataset.ejId,
+      item.querySelector('.sg-ej-nombre')?.textContent || '',
+      item.dataset.ejMusculo || '',
+      item.dataset.ejColor   || '#888'
+    );
     cerrarSheet();
   });
 
-  // Búsqueda
   document.getElementById('sheet-search')?.addEventListener('input', e => {
-    const q = e.target.value.trim().toLowerCase();
-    buscarEnSheet(q);
+    buscarEnSheet(e.target.value.trim().toLowerCase());
   });
 }
 
 function buscarEnSheet(query) {
-  const grupos   = document.querySelectorAll('.sheet-grupo-item');
-  const sinRes   = document.getElementById('sheet-sin-res');
-  let   hayAlgo  = false;
+  const grupos = document.querySelectorAll('.sheet-grupo-item');
+  const sinRes = document.getElementById('sheet-sin-res');
+  let hayAlgo  = false;
 
   grupos.forEach(grupo => {
-    const ejercicios = grupo.querySelectorAll('.sg-ej-item');
-    let grupoCoinc   = false;
-
-    ejercicios.forEach(ej => {
+    let grupoCoinc = false;
+    grupo.querySelectorAll('.sg-ej-item').forEach(ej => {
       const nombre = ej.querySelector('.sg-ej-nombre')?.textContent.toLowerCase() || '';
       const coinc  = !query || nombre.includes(query);
       ej.style.display = coinc ? '' : 'none';
@@ -261,43 +256,36 @@ function buscarEnSheet(query) {
 
     if (!query) {
       grupo.style.display = '';
-      // restaurar estado colapsado
+      hayAlgo = true;
     } else {
       grupo.style.display = grupoCoinc ? '' : 'none';
       if (grupoCoinc) {
-        // Expandir automáticamente si hay coincidencias
-        const btn    = grupo.querySelector('.sheet-grupo-row');
-        const ctrlId = btn?.getAttribute('aria-controls');
-        const lista  = ctrlId ? document.getElementById(ctrlId) : null;
+        const btn  = grupo.querySelector('.sheet-grupo-row');
+        const lista = document.getElementById(btn?.getAttribute('aria-controls'));
         btn?.setAttribute('aria-expanded', 'true');
         lista?.classList.remove('oculto');
         hayAlgo = true;
       }
     }
-    if (!query) hayAlgo = true;
   });
 
-  if (sinRes) sinRes.classList.toggle('oculto', hayAlgo || !query);
+  sinRes?.classList.toggle('oculto', hayAlgo || !query);
 }
 
-
 /* ══════════════════════════════════════════════════════════
-   5. CRUD DE EJERCICIOS Y SERIES EN EL DRAWER
+   6. CRUD EJERCICIOS Y SERIES
 ══════════════════════════════════════════════════════════ */
-
 function agregarEjercicioAlEntreno(id, nombre, musculo, color) {
-  // Evitar duplicados
   if (Estado.ejerciciosEntreno.find(e => e.id === id)) {
     mostrarToast(`"${nombre}" ya está en el entreno`);
     return;
   }
   Estado.contadorEj++;
-  const ejLocal = {
+  Estado.ejerciciosEntreno.push({
     localId: `ej-local-${Estado.contadorEj}`,
     id, nombre, musculo, color,
     series: [{ localId: `s-${++Estado.contadorSerie}`, kg: '', reps: '' }],
-  };
-  Estado.ejerciciosEntreno.push(ejLocal);
+  });
   renderizarListaDrawer();
   mostrarToast(`${nombre} añadido`);
 }
@@ -309,14 +297,15 @@ function eliminarEjercicioDelEntreno(localId) {
 
 function agregarSerieAEjercicio(localId) {
   const ej = Estado.ejerciciosEntreno.find(e => e.localId === localId);
-  if (!ej) return;
-  ej.series.push({ localId: `s-${++Estado.contadorSerie}`, kg: '', reps: '' });
-  renderizarListaDrawer();
+  if (ej) {
+    ej.series.push({ localId: `s-${++Estado.contadorSerie}`, kg: '', reps: '' });
+    renderizarListaDrawer();
+  }
 }
 
 function eliminarSerieDeEjercicio(ejLocalId, serieLocalId) {
   const ej = Estado.ejerciciosEntreno.find(e => e.localId === ejLocalId);
-  if (!ej || ej.series.length <= 1) return; // mínimo 1 serie
+  if (!ej || ej.series.length <= 1) return;
   ej.series = ej.series.filter(s => s.localId !== serieLocalId);
   renderizarListaDrawer();
 }
@@ -327,27 +316,19 @@ function actualizarValorSerie(ejLocalId, serieLocalId, campo, valor) {
   if (serie) serie[campo] = valor;
 }
 
-/**
- * Re-renderiza la lista de ejercicios dentro del drawer.
- * Se llama cada vez que el estado cambia.
- */
 function renderizarListaDrawer() {
-  const lista   = document.getElementById('drawer-lista-ejercicios');
-  const hint    = document.getElementById('drawer-empty-hint');
+  const lista = document.getElementById('drawer-lista-ejercicios');
+  const hint  = document.getElementById('drawer-empty-hint');
   if (!lista) return;
 
-  // Limpiar excepto el hint
   lista.querySelectorAll('.drawer-ejercicio-item').forEach(el => el.remove());
-
-  const estaVacio = Estado.ejerciciosEntreno.length === 0;
-  hint?.classList.toggle('oculto', !estaVacio);
+  hint?.classList.toggle('oculto', Estado.ejerciciosEntreno.length !== 0);
 
   Estado.ejerciciosEntreno.forEach((ej, ejIdx) => {
     const li = document.createElement('li');
-    li.className  = 'drawer-ejercicio-item';
+    li.className = 'drawer-ejercicio-item';
     li.dataset.ejLocalId = ej.localId;
 
-    // Series HTML
     const seriesHTML = ej.series.map((s, sIdx) => `
       <li class="drawer-ej-serie-fila" data-serie-local-id="${s.localId}">
         <span class="serie-num-badge">${sIdx + 1}</span>
@@ -357,7 +338,7 @@ function renderizarListaDrawer() {
         <input type="number" class="drawer-input-serie" placeholder="reps" value="${s.reps}"
                data-campo="reps" data-ej-id="${ej.localId}" data-serie-id="${s.localId}"
                aria-label="Repeticiones" min="1" step="1" />
-        <button class="drawer-ej-del-serie" data-ej-id="${ej.localId}" data-serie-id="${s.localId}" aria-label="Eliminar serie ${sIdx+1}">
+        <button class="drawer-ej-del-serie" data-ej-id="${ej.localId}" data-serie-id="${s.localId}">
           <i data-lucide="x"></i>
         </button>
       </li>`).join('');
@@ -368,21 +349,19 @@ function renderizarListaDrawer() {
           <span class="drawer-ej-dot" style="--c:${ej.color}"></span>
           <span class="drawer-ej-nombre">${ej.nombre}</span>
         </div>
-        <button class="drawer-ej-eliminar" data-ej-id="${ej.localId}" aria-label="Eliminar ${ej.nombre}">
+        <button class="drawer-ej-eliminar" data-ej-id="${ej.localId}">
           <i data-lucide="trash-2"></i>
         </button>
       </div>
       <ul class="drawer-ej-series">${seriesHTML}</ul>
-      <button class="drawer-btn-add-serie" data-ej-id="${ej.localId}" aria-label="Añadir serie">
+      <button class="drawer-btn-add-serie" data-ej-id="${ej.localId}">
         <i data-lucide="plus"></i> Añadir serie
       </button>`;
 
     lista.appendChild(li);
   });
 
-  lucide.createIcons(); // Re-inicializar íconos para elementos nuevos
-
-  // Eventos sobre los elementos nuevos (delegación en el contenedor)
+  lucide.createIcons();
 }
 
 function inicializarEventosDrawerLista() {
@@ -390,20 +369,16 @@ function inicializarEventosDrawerLista() {
   if (!lista) return;
 
   lista.addEventListener('click', e => {
-    // Eliminar ejercicio
     const btnElimEj = e.target.closest('.drawer-ej-eliminar');
     if (btnElimEj) { eliminarEjercicioDelEntreno(btnElimEj.dataset.ejId); return; }
 
-    // Eliminar serie
     const btnElimSerie = e.target.closest('.drawer-ej-del-serie');
     if (btnElimSerie) { eliminarSerieDeEjercicio(btnElimSerie.dataset.ejId, btnElimSerie.dataset.serieId); return; }
 
-    // Añadir serie
     const btnAddSerie = e.target.closest('.drawer-btn-add-serie');
     if (btnAddSerie) { agregarSerieAEjercicio(btnAddSerie.dataset.ejId); return; }
   });
 
-  // Actualizar valores de inputs en tiempo real
   lista.addEventListener('change', e => {
     const input = e.target.closest('.drawer-input-serie');
     if (!input) return;
@@ -411,12 +386,95 @@ function inicializarEventosDrawerLista() {
   });
 }
 
+/* ══════════════════════════════════════════════════════════
+   7. SEGUIDOR CORPORAL
+══════════════════════════════════════════════════════════ */
+const HISTORIAL_CORPORAL_MOCK = [
+  { fecha: '18 Mar', peso: 187.4, grasa: 18.2, delta: -0.6 },
+  { fecha: '11 Mar', peso: 188.0, grasa: 18.5, delta: +0.4 },
+  { fecha: '04 Mar', peso: 187.6, grasa: 18.3, delta: -1.2 },
+  { fecha: '25 Feb', peso: 188.8, grasa: 18.9, delta: -0.3 },
+];
+
+function abrirDrawerCorporal() {
+  Estado.corporalAbierto = true;
+  const drawer = document.getElementById('drawer-corporal');
+  if (!drawer) return;
+  drawer.classList.remove('oculto');
+  requestAnimationFrame(() => drawer.classList.add('abierto'));
+  document.getElementById('overlay-global')?.classList.remove('oculto');
+
+  const hoy = new Date();
+  const el  = document.getElementById('corporal-fecha-texto');
+  if (el) el.textContent = `${DIAS[hoy.getDay()]}, ${hoy.getDate()} de ${MESES[hoy.getMonth()]} ${hoy.getFullYear()}`;
+
+  renderizarHistorialCorporal();
+  lucide.createIcons();
+}
+
+function cerrarDrawerCorporal() {
+  Estado.corporalAbierto = false;
+  const drawer = document.getElementById('drawer-corporal');
+  if (!drawer) return;
+  drawer.classList.remove('abierto');
+  setTimeout(() => drawer.classList.add('oculto'), 360);
+  if (!Estado.drawerAbierto && !Estado.sheetAbierto) {
+    document.getElementById('overlay-global')?.classList.add('oculto');
+  }
+}
+
+function renderizarHistorialCorporal() {
+  const cont = document.getElementById('corporal-historial');
+  if (!cont || HISTORIAL_CORPORAL_MOCK.length === 0) return;
+
+  cont.innerHTML = HISTORIAL_CORPORAL_MOCK.map(r => {
+    const signo = r.delta > 0 ? '+' : '';
+    const cls   = r.delta < 0 ? 'baja' : r.delta > 0 ? 'sube' : 'igual';
+    return `
+      <div class="corporal-hist-fila">
+        <span class="corporal-hist-fecha">${r.fecha}</span>
+        <span class="corporal-hist-peso">${r.peso} lbs</span>
+        <span class="corporal-hist-grasa">${r.grasa}% grasa</span>
+        <span class="corporal-hist-delta ${cls}">${signo}${r.delta} lbs</span>
+      </div>`;
+  }).join('');
+}
+
+function guardarCorporal() {
+  const campos = ['peso','grasa','musculo','agua','cuello','pecho','cintura','cadera',
+                  'biceps-izq','biceps-der','muslo-izq','muslo-der','pant-izq','pant-der'];
+  const payload = { fecha: new Date().toISOString() };
+  campos.forEach(c => {
+    const val = document.getElementById(`corp-${c}`)?.value;
+    if (val) payload[c.replace(/-/g, '_')] = parseFloat(val);
+  });
+
+  if (!payload.peso) { mostrarToast('Ingresa al menos el peso'); return; }
+  console.log('[APEX] POST /body-tracking —', payload);
+  mostrarToast('Medidas guardadas ✓');
+  cerrarDrawerCorporal();
+}
+
+function inicializarSeguiderCorporal() {
+  document.getElementById('corporal-cancelar')?.addEventListener('click', cerrarDrawerCorporal);
+  document.getElementById('corporal-guardar')?.addEventListener('click', guardarCorporal);
+}
 
 /* ══════════════════════════════════════════════════════════
-   6. COMPARTIR ENTRENO
-   BACKEND: Generar URL sharable de la sesión
+   8. ANÁLISIS (abrir drawer existente)
 ══════════════════════════════════════════════════════════ */
+function abrirAnalisis() {
+  const drawer = document.getElementById('drawer-analisis');
+  if (!drawer) return;
+  drawer.classList.remove('oculto');
+  requestAnimationFrame(() => drawer.classList.add('abierto'));
+  document.getElementById('overlay-global')?.classList.remove('oculto');
+  lucide.createIcons();
+}
 
+/* ══════════════════════════════════════════════════════════
+   9. COMPARTIR
+══════════════════════════════════════════════════════════ */
 function inicializarCompartir() {
   document.addEventListener('click', e => {
     const btn = e.target.closest('.btn-compartir');
@@ -424,7 +482,6 @@ function inicializarCompartir() {
     const card      = btn.closest('.entreno-card');
     const sessionId = card?.dataset.sessionId || '';
     const url       = `${window.location.origin}/sesion/${sessionId}`;
-
     if (navigator.share) {
       navigator.share({ title: 'APEX FITNESS — Mi entreno', url }).catch(() => {});
     } else {
@@ -433,15 +490,13 @@ function inicializarCompartir() {
   });
 }
 
-
 /* ══════════════════════════════════════════════════════════
-   7. TOAST
+   10. TOAST
 ══════════════════════════════════════════════════════════ */
-
 let toastTimer;
 function mostrarToast(msg, ms = 3000) {
-  const t  = document.getElementById('toast-notificacion');
-  const m  = document.getElementById('toast-mensaje');
+  const t = document.getElementById('toast-notificacion');
+  const m = document.getElementById('toast-mensaje');
   if (!t || !m) return;
   m.textContent = msg;
   t.classList.add('visible');
@@ -449,95 +504,51 @@ function mostrarToast(msg, ms = 3000) {
   toastTimer = setTimeout(() => t.classList.remove('visible'), ms);
 }
 
-
 /* ══════════════════════════════════════════════════════════
-   8. SCROLL INFINITO
-   BACKEND: Observer en #sentinel-scroll dispara
-            GET /sessions?page={n+1}&date={fecha}
+   11. SCROLL INFINITO
 ══════════════════════════════════════════════════════════ */
-
 function inicializarScrollInfinito() {
   const sentinel = document.getElementById('sentinel-scroll');
   if (!sentinel) return;
-  const obs = new IntersectionObserver(entries => {
+  new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) {
       // BACKEND: cargarMasSesiones();
     }
-  }, { rootMargin: '200px' });
-  obs.observe(sentinel);
+  }, { rootMargin: '200px' }).observe(sentinel);
 }
-
 
 /* ══════════════════════════════════════════════════════════
-   INICIALIZACIÓN PRINCIPAL
+   12. SCROLL BOTONES ARRIBA / ABAJO
 ══════════════════════════════════════════════════════════ */
+function inicializarScrollBotones() {
+  const btnUp   = document.getElementById('btn-scroll-up');
+  const btnDown = document.getElementById('btn-scroll-down');
+  const feed    = document.querySelector('.workout-feed');
+  if (!btnUp || !btnDown || !feed) return;
 
-function inicializarApp() {
-  inicializarNavFecha();
-  inicializarDrawer();
-  inicializarSheet();
-  inicializarEventosDrawerLista();
-  inicializarCompartir();
-  inicializarScrollInfinito();
-  console.log('[APEX] Workout inicializado.');
+  btnUp.addEventListener('click', () => {
+    feed.scrollBy({ top: -window.innerHeight, behavior: 'smooth' });
+  });
+  btnDown.addEventListener('click', () => {
+    feed.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+  });
 }
 
+/* ══════════════════════════════════════════════════════════
+   INICIALIZACIÓN
+══════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   inicializarTema();
   inicializarCursor();
   inicializarIconos();
-  inicializarApp();
-});
-
-/* ══════════════════════════════════════════════════════════
-   GLOBAL DROPDOWN LOGIC
-══════════════════════════════════════════════════════════ */
-document.addEventListener('click', (e) => {
-  const isDropdownBtn = e.target.closest('.btn-opciones');
-  const isDropdownMenu = e.target.closest('.dropdown-menu');
-  
-  // Toggle the specific dropdown menu
-  if (isDropdownBtn) {
-    const parentWrap = isDropdownBtn.closest('.dropdown-wrap');
-    if (parentWrap) {
-      const dropdown = parentWrap.querySelector('.dropdown-menu');
-      if (dropdown) {
-        // Close others first
-        document.querySelectorAll('.dropdown-menu').forEach(m => {
-          if (m !== dropdown) m.classList.add('oculto');
-        });
-        dropdown.classList.toggle('oculto');
-      }
-    }
-  } else if (!isDropdownMenu) {
-    // Click outside -> close all dropdowns
-    document.querySelectorAll('.dropdown-menu').forEach(m => {
-      // no cerrar el drawer o el sheet que no tengan dropdown-wrap, 
-      // asumiendo que esos tienen sus propios comportamientos o clases diferentes.
-      if (m.closest('.dropdown-wrap')) {
-        m.classList.add('oculto');
-      }
-    });
-  }
-});
-
-/* ══════════════════════════════════════════════════════════
-   UP / DOWN SCROLL BUTTON LOGIC (REELS STYLE)
-══════════════════════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
-  const btnUp = document.getElementById('btn-scroll-up');
-  const btnDown = document.getElementById('btn-scroll-down');
-  const feed = document.querySelector('.workout-feed');
-
-  if (btnUp && btnDown && feed) {
-    btnUp.addEventListener('click', () => {
-      // Al presionar el botón de arriba, saltar directamente un viewport height hacia arriba
-      feed.scrollBy({ top: -window.innerHeight, left: 0, behavior: 'smooth' });
-    });
-
-    btnDown.addEventListener('click', () => {
-      // Al presionar el botón de abajo, saltar directamente un viewport height hacia abajo
-      feed.scrollBy({ top: window.innerHeight, left: 0, behavior: 'smooth' });
-    });
-  }
+  inicializarNavFecha();
+  inicializarDropdown();
+  inicializarDrawer();
+  inicializarSheet();
+  inicializarEventosDrawerLista();
+  inicializarSeguiderCorporal();
+  inicializarCompartir();
+  inicializarScrollInfinito();
+  inicializarScrollBotones();
+  console.log('[APEX] Workout inicializado.');
 });
