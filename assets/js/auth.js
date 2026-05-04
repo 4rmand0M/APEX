@@ -340,10 +340,24 @@ async function manejarRegistro() {
 
   setBtnCargando('btn-registro', true, 'Crear Cuenta');
 
+  // Mapear roles del frontend a los permitidos por la base de datos
+  const mapeoRoles = {
+    'entrenador': 'trainer',
+    'monitor': 'trainer',
+    'alumno': 'user'
+  };
+  const roleParaBD = mapeoRoles[rolSeleccionado] || 'user';
+
   const { data: authData, error: authError } = await db.auth.signUp({
     email:    correo,
     password: contrasena,
-    options:  { data: { nombre, apellido, rol: rolSeleccionado } }
+    options:  { 
+      data: { 
+        full_name: nombreCompleto,
+        username: correo.split('@')[0] + Math.floor(Math.random() * 1000), // Username más único
+        role: roleParaBD 
+      } 
+    }
   });
 
   if (authError) {

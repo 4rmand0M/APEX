@@ -1794,3 +1794,186 @@ canvas {
 [data-tema="claro"] :focus-visible {
   outline-color: var(--texto);
 }
+
+/* ════════════════════════════════════════════════════════════
+   MODAL CRUD EJERCICIOS
+════════════════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-ejercicio {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--borde);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.modal-cerrar {
+  background: none;
+  border: none;
+  color: var(--texto-atenuado);
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.modal-cerrar:hover {
+  color: var(--texto);
+}
+
+.modal-form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-campo label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--texto-atenuado);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modal-campo input,
+.modal-campo select,
+.modal-campo textarea {
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--texto);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modal-campo input:focus,
+.modal-campo select:focus,
+.modal-campo textarea:focus {
+  border-color: var(--acento);
+  box-shadow: 0 0 0 3px rgba(var(--acento-rgb), 0.1);
+}
+
+.modal-fila-doble {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.modal-footer button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secundario {
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+  color: var(--texto);
+}
+
+.btn-secundario:hover {
+  background: var(--borde);
+}
+
+.btn-primario {
+  background: var(--acento);
+  border: none;
+  color: var(--texto-boton);
+}
+
+.btn-primario:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* ─── BOTONES CRUD EN DETALLE ─── */
+.detalle-acciones-crud {
+  display: flex;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.btn-crud {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  border: 1px solid var(--borde);
+  background: var(--superficie-2);
+  color: var(--texto-atenuado);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-crud i {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-crud:hover {
+  color: var(--texto);
+  border-color: var(--borde-hover);
+}
+
+.btn-crud-eliminar:hover {
+  background: rgba(255, 101, 101, 0.1);
+  color: var(--error);
+  border-color: rgba(255, 101, 101, 0.3);
+}

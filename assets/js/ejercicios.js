@@ -107,7 +107,7 @@ async function obtenerDatosEjercicio(ejercicioId) {
   try {
     const { data: ej, error } = await db
       .from('exercises')
-      .select('*')
+      .select('*, created_by')
       .eq('id', ejercicioId)
       .single();
 
@@ -121,6 +121,8 @@ async function obtenerDatosEjercicio(ejercicioId) {
       musculo_primario: ej.muscle_group || '—',
       musculos_primarios: [ej.muscle_group],
       musculos_secundarios: [],
+      descripcion: ej.description || '',
+      created_by: ej.created_by,
       // Usamos el mock de estadísticas ya que aún no hay tabla para eso
       stats: EJERCICIOS_MOCK['ej-001']?.stats || { mejorPeso: '—', rm1: '—', volumen: '—', sesiones: '0' },
       datos_grafica: EJERCICIOS_MOCK['ej-001']?.datos_grafica || { peso: { labels: [], data: [] }, reps: { labels: [], data: [] }, '1rm': { labels: [], data: [] }, volumen: { labels: [], data: [] } },
@@ -285,7 +287,7 @@ function inicializarSeleccionEjercicio() {
     // BACKEND: Obtener datos completos del ejercicio
     try {
       const datos = await obtenerDatosEjercicio(ejercicioId);
-      poblarDetalle(datos);
+      await poblarDetalle(datos);
     } catch (err) {
       console.error('[APEX] Error al cargar ejercicio:', err);
       mostrarToast('Error al cargar el ejercicio');
@@ -297,7 +299,7 @@ function inicializarSeleccionEjercicio() {
  * Puebla el panel de detalle con los datos del ejercicio seleccionado.
  * @param {Object} datos - Objeto del ejercicio (del backend o mock)
  */
-function poblarDetalle(datos) {
+async function poblarDetalle(datos) {
   // Mostrar el contenido y ocultar el estado vacío
   document.getElementById('detalle-vacio')?.classList.add('oculto');
   const contenido = document.getElementById('detalle-contenido');
@@ -310,6 +312,26 @@ function poblarDetalle(datos) {
   if (elNombre) elNombre.textContent = datos.nombre || '—';
   if (elEquipo) elEquipo.textContent = datos.equipo || '—';
   if (elMusculo) elMusculo.textContent = datos.musculo_primario || '—';
+
+  // Acciones CRUD (Editar/Eliminar)
+  const user = await window.ApexAuth.getUser();
+  const accionesWrap = document.getElementById('detalle-acciones-crud');
+  if (accionesWrap) {
+    if (user && datos.created_by === user.id) {
+      accionesWrap.innerHTML = `
+        <button class="btn-crud" id="btn-ejercicio-editar" title="Editar">
+          <i data-lucide="edit-3"></i>
+        </button>
+        <button class="btn-crud btn-crud-eliminar" id="btn-ejercicio-eliminar" title="Eliminar">
+          <i data-lucide="trash-2"></i>
+        </button>
+      `;
+      document.getElementById('btn-ejercicio-editar')?.addEventListener('click', () => abrirModalEditar(datos));
+      document.getElementById('btn-ejercicio-eliminar')?.addEventListener('click', () => eliminarEjercicio(datos.id));
+    } else {
+      accionesWrap.innerHTML = '';
+    }
+  }
 
   // Estadísticas rápidas
   const s = datos.stats || {};
@@ -722,9 +744,8 @@ function inicializarOtrosEventos() {
   });
 
   // Botón "Crear ejercicio personalizado"
-  // BACKEND: POST /exercises
   document.getElementById('boton-ejercicio-custom')?.addEventListener('click', () => {
-    mostrarToast('Conectar a POST /exercises');
+    abrirModalCrear();
   });
 
   // Botón cerrar animación (placeholder)
@@ -732,6 +753,152 @@ function inicializarOtrosEventos() {
     const wrap = document.getElementById('animacion-ejercicio');
     if (wrap) { wrap.style.transition = 'opacity 0.2s'; wrap.style.opacity = '0'; setTimeout(() => { wrap.style.display = 'none'; }, 200); }
   });
+
+  inicializarModalEjercicio();
+}
+
+/* ══════════════════════════════════════════════════════════
+   11. LÓGICA MODAL CRUD EJERCICIO
+══════════════════════════════════════════════════════════ */
+
+function inicializarModalEjercicio() {
+  const overlay = document.getElementById('modal-ejercicio-overlay');
+  const btnCerrar = document.getElementById('btn-modal-cerrar');
+  const btnCancelar = document.getElementById('btn-modal-cancelar');
+  const form = document.getElementById('form-ejercicio');
+
+  if (!overlay || !form) return;
+
+  const cerrar = () => overlay.classList.add('oculto');
+  
+  btnCerrar?.addEventListener('click', cerrar);
+  btnCancelar?.addEventListener('click', cerrar);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) cerrar();
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await guardarEjercicio();
+  });
+}
+
+function abrirModalCrear() {
+  const titulo = document.getElementById('modal-ejercicio-titulo');
+  const form = document.getElementById('form-ejercicio');
+  const editId = document.getElementById('edit-ejercicio-id');
+  
+  if (titulo) titulo.textContent = 'Crear Ejercicio';
+  if (form) form.reset();
+  if (editId) editId.value = '';
+
+  document.getElementById('modal-ejercicio-overlay')?.classList.remove('oculto');
+}
+
+function abrirModalEditar(datos) {
+  const titulo = document.getElementById('modal-ejercicio-titulo');
+  const editId = document.getElementById('edit-ejercicio-id');
+  
+  if (titulo) titulo.textContent = 'Editar Ejercicio';
+  if (editId) editId.value = datos.id;
+
+  document.getElementById('ejercicio-nombre').value = datos.nombre;
+  document.getElementById('ejercicio-musculo').value = datos.musculo_primario;
+  document.getElementById('ejercicio-equipo').value = datos.equipo;
+  document.getElementById('ejercicio-descripcion').value = datos.descripcion || '';
+
+  document.getElementById('modal-ejercicio-overlay')?.classList.remove('oculto');
+}
+
+async function guardarEjercicio() {
+  const user = await window.ApexAuth.getUser();
+  if (!user) return;
+
+  const editId = document.getElementById('edit-ejercicio-id').value;
+  const nombre = document.getElementById('ejercicio-nombre').value;
+  const musculo = document.getElementById('ejercicio-musculo').value;
+  const equipo = document.getElementById('ejercicio-equipo').value;
+  const desc = document.getElementById('ejercicio-descripcion').value;
+
+  const payload = {
+    name: nombre,
+    muscle_group: musculo,
+    equipment: equipo,
+    description: desc,
+    created_by: user.id
+  };
+
+  const btn = document.getElementById('btn-modal-guardar');
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+
+  try {
+    let error;
+    if (editId) {
+      // Update
+      const { error: err } = await db
+        .from('exercises')
+        .update(payload)
+        .eq('id', editId);
+      error = err;
+    } else {
+      // Insert
+      const { error: err } = await db
+        .from('exercises')
+        .insert(payload);
+      error = err;
+    }
+
+    if (error) throw error;
+
+    mostrarToast(editId ? 'Ejercicio actualizado ✓' : 'Ejercicio creado ✓');
+    document.getElementById('modal-ejercicio-overlay')?.classList.add('oculto');
+    
+    // Recargar lista
+    await cargarEjerciciosBackend(Estado.musculoFiltro, Estado.queryBusqueda);
+    
+    // Si estábamos editando, refrescar el detalle
+    if (editId === Estado.ejercicioActivo) {
+      const datosNuevos = await obtenerDatosEjercicio(editId);
+      await poblarDetalle(datosNuevos);
+    }
+
+  } catch (err) {
+    console.error('[APEX] Error al guardar ejercicio:', err);
+    mostrarToast('Error al guardar');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Guardar Ejercicio';
+  }
+}
+
+async function eliminarEjercicio(id) {
+  if (!confirm('¿Estás seguro de eliminar este ejercicio permanentemente?')) return;
+
+  try {
+    const { error } = await db
+      .from('exercises')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    mostrarToast('Ejercicio eliminado ✓');
+    
+    // Limpiar detalle si era el activo
+    if (Estado.ejercicioActivo === id) {
+      Estado.ejercicioActivo = null;
+      document.getElementById('detalle-contenido')?.classList.add('oculto');
+      document.getElementById('detalle-vacio')?.classList.remove('oculto');
+    }
+
+    // Recargar lista
+    await cargarEjerciciosBackend(Estado.musculoFiltro, Estado.queryBusqueda);
+
+  } catch (err) {
+    console.error('[APEX] Error al eliminar ejercicio:', err);
+    mostrarToast('Error al eliminar');
+  }
 }
 
 

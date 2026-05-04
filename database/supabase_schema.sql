@@ -179,12 +179,13 @@ CREATE TABLE IF NOT EXISTS public.trainer_profiles (
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, username, full_name, avatar_url)
+  INSERT INTO public.profiles (id, username, full_name, avatar_url, role)
   VALUES (
     new.id,
     new.raw_user_meta_data->>'username',
     new.raw_user_meta_data->>'full_name',
-    new.raw_user_meta_data->>'avatar_url'
+    new.raw_user_meta_data->>'avatar_url',
+    COALESCE(new.raw_user_meta_data->>'role', 'user')
   );
   RETURN new;
 END;

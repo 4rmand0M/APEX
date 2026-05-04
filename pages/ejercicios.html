@@ -122,7 +122,10 @@
                 </div>
                 <div class="detalle-meta">
                   <!-- BACKEND: {{ejercicio.nombre}} -->
-                  <h1 class="detalle-nombre" id="detalle-nombre">Bench Press (Barbell)</h1>
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <h1 class="detalle-nombre" id="detalle-nombre">Bench Press (Barbell)</h1>
+                    <div class="detalle-acciones-crud" id="detalle-acciones-crud"></div>
+                  </div>
                   <div class="detalle-badges" id="detalle-badges">
                     <!-- BACKEND: {{ejercicio.equipo}} -->
                     <span class="badge-detalle badge-equipo">
@@ -949,6 +952,61 @@
     </ul>
   </div>
   <div class="dropdown-overlay oculto" id="dropdown-overlay"></div>
+
+  <!-- ═══ MODAL CRUD EJERCICIO ═══ -->
+  <div class="modal-overlay oculto" id="modal-ejercicio-overlay">
+    <div class="modal-ejercicio">
+      <div class="modal-header">
+        <h3 id="modal-ejercicio-titulo">Crear Ejercicio</h3>
+        <button class="modal-cerrar" id="btn-modal-cerrar"><i data-lucide="x"></i></button>
+      </div>
+      <form class="modal-form" id="form-ejercicio">
+        <input type="hidden" id="edit-ejercicio-id" value="">
+        
+        <div class="modal-campo">
+          <label for="ejercicio-nombre">Nombre del ejercicio</label>
+          <input type="text" id="ejercicio-nombre" placeholder="Ej: Press Militar con Barra" required>
+        </div>
+
+        <div class="modal-fila-doble">
+          <div class="modal-campo">
+            <label for="ejercicio-musculo">Músculo principal</label>
+            <select id="ejercicio-musculo" required>
+              <option value="Pecho">Pecho</option>
+              <option value="Espalda">Espalda</option>
+              <option value="Hombros">Hombros</option>
+              <option value="Bíceps">Bíceps</option>
+              <option value="Tríceps">Tríceps</option>
+              <option value="Piernas">Piernas</option>
+              <option value="Core">Core</option>
+              <option value="Cardio">Cardio</option>
+            </select>
+          </div>
+          <div class="modal-campo">
+            <label for="ejercicio-equipo">Equipo</label>
+            <select id="ejercicio-equipo">
+              <option value="Barra">Barra</option>
+              <option value="Mancuernas">Mancuernas</option>
+              <option value="Máquina">Máquina</option>
+              <option value="Peso Corporal">Peso Corporal</option>
+              <option value="Polea">Polea</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-campo">
+          <label for="ejercicio-descripcion">Descripción (opcional)</label>
+          <textarea id="ejercicio-descripcion" rows="3" placeholder="Breve descripción del ejercicio..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secundario" id="btn-modal-cancelar">Cancelar</button>
+          <button type="submit" class="btn-primario" id="btn-modal-guardar">Guardar Ejercicio</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Toast global -->
   <div class="toast-notificacion" id="toast-notificacion" role="alert" aria-live="polite" aria-atomic="true">
