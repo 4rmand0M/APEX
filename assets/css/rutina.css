@@ -2143,3 +2143,262 @@ html {
 [data-tema="claro"] :focus-visible {
   outline-color: var(--texto);
 }
+/* ═══════════════════════════════════════════════
+   DRAWER: BIBLIOTECA DE EJERCICIOS
+═══════════════════════════════════════════════ */
+.drawer-biblioteca {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  max-width: 450px;
+  height: 100%;
+  background: var(--superficie);
+  z-index: 2000;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-biblioteca.activo {
+  right: 0;
+}
+
+.drawer-biblioteca-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--borde);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer-biblioteca-titulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: var(--texto);
+}
+
+.drawer-biblioteca-titulo i {
+  color: var(--acento);
+  width: 24px;
+  height: 24px;
+}
+
+.drawer-biblioteca-cerrar {
+  background: none;
+  border: none;
+  color: var(--texto-atenuado);
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.2s;
+}
+
+.drawer-biblioteca-cerrar:hover {
+  color: var(--texto);
+}
+
+.drawer-biblioteca-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Buscador en el drawer */
+.biblioteca-buscador-wrap {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.biblioteca-buscador-wrap i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--texto-atenuado);
+  width: 18px;
+  height: 18px;
+}
+
+.biblioteca-buscador-wrap input {
+  width: 100%;
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 12px 12px 12px 40px;
+  color: var(--texto);
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.biblioteca-buscador-wrap input:focus {
+  border-color: var(--acento);
+  box-shadow: 0 0 0 3px rgba(200, 244, 0, 0.1);
+}
+
+/* Filtros en el drawer */
+.biblioteca-filtros-wrap {
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.biblioteca-filtros-wrap::-webkit-scrollbar {
+  height: 4px;
+}
+
+.biblioteca-filtros {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.chip-filtro {
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: var(--texto-atenuado);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chip-filtro:hover {
+  border-color: var(--texto-atenuado);
+}
+
+.chip-filtro.activo {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: #000;
+}
+
+/* Lista de ejercicios en el drawer */
+.biblioteca-lista {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item-ejercicio-biblioteca {
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.item-ejercicio-biblioteca:hover {
+  transform: translateX(4px);
+  border-color: var(--acento);
+}
+
+.item-ejercicio-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--superficie);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.item-ejercicio-img i {
+  color: var(--texto-atenuado);
+  width: 20px;
+  height: 20px;
+}
+
+.item-ejercicio-info {
+  flex: 1;
+}
+
+.item-ejercicio-nombre {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--texto);
+  margin-bottom: 2px;
+}
+
+.item-ejercicio-musculo {
+  display: block;
+  font-size: 12px;
+  color: var(--texto-atenuado);
+}
+
+.item-ejercicio-anadir {
+  color: var(--acento);
+  background: rgba(200, 244, 0, 0.1);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Overlay */
+.overlay-biblioteca {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.overlay-biblioteca.activo {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Loading/Empty states */
+.biblioteca-loading, .biblioteca-vacio {
+  padding: 40px;
+  text-align: center;
+  color: var(--texto-atenuado);
+  font-size: 14px;
+}
+
+.rutina-loading {
+  padding: 60px;
+  text-align: center;
+  grid-column: 1 / -1;
+  color: var(--texto-atenuado);
+}
+
+@media (max-width: 500px) {
+  .drawer-biblioteca {
+    max-width: 100%;
+  }
+}
+
+.editando-titulo {
+  border-bottom: 2px dashed var(--acento);
+  outline: none;
+  cursor: text;
+  padding-bottom: 2px;
+}
+
+[data-tema="claro"] .editando-titulo {
+  border-bottom-color: var(--texto);
+}

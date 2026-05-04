@@ -581,74 +581,7 @@ function inicializarSelectorMetrica() {
 
 
 
-/* ══════════════════════════════════════════════════════════
-   7. DROPDOWN "AÑADIR A RUTINA"
-   BACKEND: Al abrir el dropdown, llamar a GET /routines?user_id={userId}
-            y renderizar los items dinámicamente.
-            Al seleccionar una rutina, llamar a:
-            POST /routines/{routineId}/exercises
-            Body: { exercise_id: Estado.ejercicioActivo }
-══════════════════════════════════════════════════════════ */
 
-function inicializarDropdownRutinas() {
-  const btnAbrir = document.getElementById('boton-anadir-rutina');
-  const dropdown = document.getElementById('dropdown-rutinas');
-  const overlay = document.getElementById('dropdown-overlay');
-  const btnCerrar = document.getElementById('dropdown-cerrar');
-  if (!btnAbrir || !dropdown) return;
-
-  const abrir = () => {
-    if (!Estado.ejercicioActivo) {
-      mostrarToast('Selecciona un ejercicio primero');
-      return;
-    }
-
-    // Posicionar el dropdown debajo del botón
-    const rect = btnAbrir.getBoundingClientRect();
-    dropdown.style.top = `${rect.bottom + 6}px`;
-    dropdown.style.right = `${window.innerWidth - rect.right}px`;
-    dropdown.style.left = 'auto';
-
-    dropdown.classList.remove('oculto');
-    overlay?.classList.remove('oculto');
-    btnAbrir.setAttribute('aria-expanded', 'true');
-
-    // BACKEND: Cargar rutinas dinámicamente
-    // cargarRutinasDropdown();
-  };
-
-  const cerrar = () => {
-    dropdown.classList.add('oculto');
-    overlay?.classList.add('oculto');
-    btnAbrir.setAttribute('aria-expanded', 'false');
-  };
-
-  btnAbrir.addEventListener('click', abrir);
-  btnCerrar?.addEventListener('click', cerrar);
-  overlay?.addEventListener('click', cerrar);
-
-  // Seleccionar rutina del dropdown
-  document.getElementById('dropdown-lista')?.addEventListener('click', async e => {
-    const item = e.target.closest('.dropdown-item');
-    if (!item) return;
-
-    const rutinaId = item.dataset.rutinaId;
-    const rutinaNombre = item.textContent.trim();
-
-    // BACKEND: POST /routines/{rutinaId}/exercises
-    //   body: JSON.stringify({ exercise_id: Estado.ejercicioActivo })
-    //   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwt}` }
-    console.log(`[APEX] Añadir ejercicio ${Estado.ejercicioActivo} a rutina ${rutinaId}`);
-
-    mostrarToast(`Añadido a "${rutinaNombre}"`);
-    cerrar();
-  });
-
-  // Cerrar con Escape
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !dropdown.classList.contains('oculto')) cerrar();
-  });
-}
 
 
 /* ══════════════════════════════════════════════════════════
@@ -947,7 +880,7 @@ async function inicializarApp() {
   inicializarBuscador();
   inicializarSeleccionEjercicio();
   inicializarSelectorMetrica();
-  inicializarDropdownRutinas();
+
   inicializarOtrosEventos();
 
   inicializarModalProgreso();

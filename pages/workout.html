@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>APEX FITNESS — Workout</title>
+  <title>APEX FITNESS — Journal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -39,7 +39,7 @@
       <nav class="nav-principal">
         <ul class="lista-nav" role="list">
           <li><a href="dashboard.html" class="enlace-nav"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
-          <li><a href="workout.html" class="enlace-nav activo" aria-current="page"><i data-lucide="dumbbell"></i><span>Workout</span></a></li>
+          <li><a href="workout.html" class="enlace-nav activo" aria-current="page"><i data-lucide="dumbbell"></i><span>Journal</span></a></li>
           <li><a href="calendario.html" class="enlace-nav"><i data-lucide="calendar"></i><span>Calendario</span></a></li>
           <li><a href="ejercicios.html" class="enlace-nav"><i data-lucide="layers"></i><span>Ejercicios</span></a></li>
           <li><a href="rutina.html" class="enlace-nav"><i data-lucide="clipboard-list"></i><span>Rutinas</span></a></li>
@@ -120,15 +120,8 @@
           </div>
         </header>
 
-        <!-- BOTONES FLOTANTES DE NAVEGACION (SCROLL) -->
-        <div class="floating-scroll-btns">
-          <button class="fab-scroll" id="btn-scroll-up" aria-label="Scroll Arriba">
-            <i data-lucide="chevron-up"></i>
-          </button>
-          <button class="fab-scroll" id="btn-scroll-down" aria-label="Scroll Abajo">
-            <i data-lucide="chevron-down"></i>
-          </button>
-        </div>
+
+
 
         <!-- ════════════════════════════════════════
            SCROLL FEED — cards apiladas verticalmente
@@ -343,6 +336,26 @@
             </div>
           </article>
 
+          <!-- SECCIÓN: SELECCIONAR RUTINA -->
+          <section class="journal-section">
+            <h2 class="journal-sec-titulo">Mis Rutinas</h2>
+            <div class="rutinas-grid" id="rutinas-grid">
+              <!-- JS carga las rutinas aquí -->
+              <div class="rutina-loading">
+                <div class="spinner"></div>
+                <span>Cargando rutinas...</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECCIÓN: HISTORIAL RECIENTE -->
+          <section class="journal-section">
+            <h2 class="journal-sec-titulo">Historial Reciente</h2>
+            <div id="journal-historial-lista">
+              <!-- JS carga las sesiones aquí -->
+            </div>
+          </section>
+
           <!-- Estado vacío — BACKEND: mostrar si sesiones.length === 0 -->
           <div class="workout-vacio oculto" id="workout-vacio">
             <div class="workout-vacio-icono" aria-hidden="true">
@@ -354,13 +367,13 @@
                 <line x1="12" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
               </svg>
             </div>
-            <p class="workout-vacio-titulo">Workout Log Empty</p>
+            <p class="workout-vacio-titulo">Journal Log Empty</p>
             <!-- BACKEND: al clic abre drawer de nuevo entreno -->
             <button class="btn-vacio-nuevo" id="btn-vacio-nuevo">
-              <i data-lucide="plus"></i> Start New Workout
+              <i data-lucide="plus"></i> Start New Journal
             </button>
             <button class="btn-vacio-copiar" id="btn-vacio-copiar">
-              <i data-lucide="copy"></i> Copy Previous Workout
+              <i data-lucide="copy"></i> Copy Previous Journal
             </button>
           </div>
 
@@ -377,8 +390,8 @@
       <a href="dashboard.html" class="enlace-nav-movil" aria-label="Dashboard">
         <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
       </a>
-      <a href="workout.html" class="enlace-nav-movil activo" aria-current="page" aria-label="Workout">
-        <i data-lucide="dumbbell"></i><span>Workout</span>
+      <a href="workout.html" class="enlace-nav-movil activo" aria-current="page" aria-label="Journal">
+        <i data-lucide="dumbbell"></i><span>Journal</span>
       </a>
       <a href="calendario.html" class="enlace-nav-movil" aria-label="Calendario">
         <i data-lucide="calendar"></i><span>Calendario</span>
@@ -1108,11 +1121,27 @@
 
     </div><!-- /corporal-body -->
   </div>
+  
+  <!-- Modal: Detalles del Análisis Corporal -->
+  <div class="modal-overlay oculto" id="modal-detalle-corporal-overlay">
+    <div class="modal-contenido modal-pequeno">
+      <div class="modal-header">
+        <h2 class="modal-titulo">Detalles del Análisis</h2>
+        <button class="modal-cerrar" id="btn-cerrar-detalle-corporal"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body-scroll">
+        <div class="detalle-corporal-grid" id="detalle-corporal-grid">
+          <!-- JS inserta aquí los detalles -->
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="../assets/js/config.js"></script>
   <script src="../assets/js/supabase-client.js"></script>
   <script src="../assets/js/workout.js"></script>
   <script src="../assets/js/analisis.js"></script>
+  <script src="../assets/js/chat-widget.js"></script>
 </body>
 
 </html>

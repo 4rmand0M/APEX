@@ -300,3 +300,36 @@ ON public.personal_progress
 FOR ALL 
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
+/* ══════════════════════════════════════════════════════════
+   BODY TRACKING TABLE
+   Para guardar análisis corporales detallados (peso, grasa, medidas)
+══════════════════════════════════════════════════════════ */
+
+CREATE TABLE IF NOT EXISTS public.body_tracking (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    weight DECIMAL(5,2),
+    body_fat DECIMAL(5,2),
+    muscle_mass DECIMAL(5,2),
+    body_water DECIMAL(5,2),
+    neck DECIMAL(5,2),
+    chest DECIMAL(5,2),
+    waist DECIMAL(5,2),
+    hip DECIMAL(5,2),
+    biceps_left DECIMAL(5,2),
+    biceps_right DECIMAL(5,2),
+    thigh_left DECIMAL(5,2),
+    thigh_right DECIMAL(5,2),
+    calf_left DECIMAL(5,2),
+    calf_right DECIMAL(5,2),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.body_tracking ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can manage their own body tracking" ON public.body_tracking;
+CREATE POLICY "Users can manage their own body tracking" 
+ON public.body_tracking 
+FOR ALL 
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);

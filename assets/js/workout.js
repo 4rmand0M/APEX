@@ -19,6 +19,7 @@ const Estado = {
   ejerciciosEntreno: [],
   contadorEj:        0,
   contadorSerie:     0,
+  rutinas:           [],
 };
 
 const DIAS  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -430,14 +431,7 @@ function inicializarEventosDrawerLista() {
 /* ══════════════════════════════════════════════════════════
    7. SEGUIDOR CORPORAL
 ══════════════════════════════════════════════════════════ */
-const HISTORIAL_CORPORAL_MOCK = [
-  { fecha: '18 Mar', peso: 187.4, grasa: 18.2, delta: -0.6 },
-  { fecha: '11 Mar', peso: 188.0, grasa: 18.5, delta: +0.4 },
-  { fecha: '04 Mar', peso: 187.6, grasa: 18.3, delta: -1.2 },
-  { fecha: '25 Feb', peso: 188.8, grasa: 18.9, delta: -0.3 },
-];
-
-function abrirDrawerCorporal() {
+async function abrirDrawerCorporal() {
   Estado.corporalAbierto = true;
   const drawer = document.getElementById('drawer-corporal');
   if (!drawer) return;
@@ -464,55 +458,176 @@ function cerrarDrawerCorporal() {
   }
 }
 
-function renderizarHistorialCorporal() {
+async function renderizarHistorialCorporal() {
   const cont = document.getElementById('corporal-historial');
-  if (!cont || HISTORIAL_CORPORAL_MOCK.length === 0) return;
+  if (!cont) return;
 
-  cont.innerHTML = HISTORIAL_CORPORAL_MOCK.map(r => {
-    const signo = r.delta > 0 ? '+' : '';
-    const cls   = r.delta < 0 ? 'baja' : r.delta > 0 ? 'sube' : 'igual';
+  const user = await window.ApexAuth.getUser();
+  if (!user) return;
+
+  const { data, error } = await db
+    .from('body_tracking')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  if (error || !data || data.length === 0) {
+    cont.innerHTML = `
+      <div class="corporal-hist-vacio">
+        <i data-lucide="scale"></i>
+        <span>Sin registros anteriores</span>
+      </div>`;
+    lucide.createIcons();
+    return;
+  }
+
+  cont.innerHTML = data.map((r, index) => {
+    const fecha = new Date(r.created_at);
+    const fechaTxt = `${fecha.getDate()} ${MESES[fecha.getMonth()].substring(0,3)}`;
+    
+    // Calcular delta con el registro anterior (si existe)
+    let delta = 0;
+    if (index < data.length - 1) {
+      delta = r.weight - data[index + 1].weight;
+    }
+    
+    const signo = delta > 0 ? '+' : '';
+    const cls   = delta < 0 ? 'baja' : delta > 0 ? 'sube' : 'igual';
+    
     return `
-      <div class="corporal-hist-fila">
-        <span class="corporal-hist-fecha">${r.fecha}</span>
-        <span class="corporal-hist-peso">${r.peso} lbs</span>
-        <span class="corporal-hist-grasa">${r.grasa}% grasa</span>
-        <span class="corporal-hist-delta ${cls}">${signo}${r.delta} lbs</span>
+      <div class="corporal-hist-fila clickable" data-id="${r.id}">
+        <span class="corporal-hist-fecha">${fechaTxt}</span>
+        <span class="corporal-hist-peso">${r.weight} lbs</span>
+        <span class="corporal-hist-grasa">${r.body_fat || '—'}% grasa</span>
+        <span class="corporal-hist-delta ${cls}">${delta !== 0 ? `${signo}${delta.toFixed(1)} lbs` : '—'}</span>
       </div>`;
   }).join('');
+
+  // Eventos de clic
+  cont.querySelectorAll('.corporal-hist-fila').forEach(el => {
+    el.addEventListener('click', () => mostrarDetalleCorporal(el.dataset.id));
+  });
+}
+
+async function mostrarDetalleCorporal(id) {
+  const { data, error } = await db.from('body_tracking').select('*').eq('id', id).single();
+  if (error || !data) {
+    mostrarToast('Error al cargar detalles');
+    return;
+  }
+
+  const grid = document.getElementById('detalle-corporal-grid');
+  const titulo = document.querySelector('#modal-detalle-corporal-overlay .modal-titulo');
+  if (!grid) return;
+
+  const fecha = new Date(data.created_at);
+  if (titulo) titulo.textContent = `Análisis del ${fecha.getDate()} ${MESES[fecha.getMonth()].substring(0,3)}`;
+
+  const labels = {
+    weight: 'Peso', body_fat: '% Grasa', muscle_mass: 'Masa Muscular', body_water: 'Agua Corporal',
+    neck: 'Cuello', chest: 'Pecho', waist: 'Cintura', hip: 'Cadera',
+    biceps_left: 'Bíceps (izq)', biceps_right: 'Bíceps (der)',
+    thigh_left: 'Muslo (izq)', thigh_right: 'Muslo (der)',
+    calf_left: 'Pantorrilla (izq)', calf_right: 'Pantorrilla (der)'
+  };
+
+  const unidades = {
+    weight: 'lbs', body_fat: '%', muscle_mass: 'lbs', body_water: '%',
+    neck: 'in', chest: 'in', waist: 'in', hip: 'in',
+    biceps_left: 'in', biceps_right: 'in',
+    thigh_left: 'in', thigh_right: 'in',
+    calf_left: 'in', calf_right: 'in'
+  };
+
+  const colores = {
+    weight: '#7EB8A4', body_fat: '#5CB85C', muscle_mass: '#E67E22', body_water: '#9B59B6',
+    neck: '#7EB8A4', chest: '#5CB85C', waist: '#E67E22', hip: '#9B59B6',
+    biceps_left: '#5B9BD5', biceps_right: '#5B9BD5',
+    thigh_left: '#48C9B0', thigh_right: '#48C9B0',
+    calf_left: '#F1C40F', calf_right: '#F1C40F'
+  };
+
+  grid.innerHTML = Object.entries(labels).map(([key, label]) => {
+    const val = data[key];
+    if (val === null) return '';
+    const color = colores[key] || 'var(--acento)';
+    return `
+      <div class="detalle-item" style="border-left: 3px solid ${color}">
+        <span class="detalle-label" style="color: ${color}">${label}</span>
+        <span class="detalle-valor">${val} <span>${unidades[key]}</span></span>
+      </div>`;
+  }).join('');
+
+  document.getElementById('modal-detalle-corporal-overlay')?.classList.remove('oculto');
+  lucide.createIcons();
 }
 
 async function guardarCorporal() {
-  const pesoVal = document.getElementById('corp-peso')?.value;
-  if (!pesoVal) { mostrarToast('Ingresa al menos el peso'); return; }
-
   const user = await window.ApexAuth.getUser();
   if (!user) {
     mostrarToast('Debes iniciar sesión para guardar');
     return;
   }
 
-  const payload = { 
-    user_id: user.id,
-    recorded_at: new Date().toISOString(),
-    weight: parseFloat(pesoVal),
-    body_fat_percentage: parseFloat(document.getElementById('corp-grasa')?.value) || null
+  const getVal = (id) => {
+    const val = document.getElementById(id)?.value;
+    return val ? parseFloat(val) : null;
   };
 
-  const { error } = await db.from('user_measurements').insert(payload);
-  
+  const peso = getVal('corp-peso');
+  if (peso === null) {
+    mostrarToast('Ingresa al menos el peso');
+    return;
+  }
+
+  const payload = {
+    user_id: user.id,
+    weight: peso,
+    body_fat: getVal('corp-grasa'),
+    muscle_mass: getVal('corp-musculo'),
+    body_water: getVal('corp-agua'),
+    neck: getVal('corp-cuello'),
+    chest: getVal('corp-pecho'),
+    waist: getVal('corp-cintura'),
+    hip: getVal('corp-cadera'),
+    biceps_left: getVal('corp-biceps-izq'),
+    biceps_right: getVal('corp-biceps-der'),
+    thigh_left: getVal('corp-muslo-izq'),
+    thigh_right: getVal('corp-muslo-der'),
+    calf_left: getVal('corp-pant-izq'),
+    calf_right: getVal('corp-pant-der')
+  };
+
+  const { error } = await db.from('body_tracking').insert(payload);
+
   if (error) {
     console.error('Error guardando medidas:', error);
     mostrarToast('Error al guardar');
     return;
   }
 
-  mostrarToast('Medidas guardadas ✓');
+  mostrarToast('Análisis guardado ✓');
+  
+  // Limpiar campos
+  const inputs = document.querySelectorAll('.corporal-input');
+  inputs.forEach(i => i.value = '');
+
   cerrarDrawerCorporal();
+  renderizarHistorialCorporal();
 }
 
 function inicializarSeguiderCorporal() {
   document.getElementById('corporal-cancelar')?.addEventListener('click', cerrarDrawerCorporal);
   document.getElementById('corporal-guardar')?.addEventListener('click', guardarCorporal);
+  
+  const modal = document.getElementById('modal-detalle-corporal-overlay');
+  const btnCerrar = document.getElementById('btn-cerrar-detalle-corporal');
+  
+  btnCerrar?.addEventListener('click', () => modal?.classList.add('oculto'));
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.add('oculto');
+  });
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -573,20 +688,187 @@ function inicializarScrollInfinito() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   12. SCROLL BOTONES ARRIBA / ABAJO
+   12. CARGA DE RUTINAS Y WIDGET
 ══════════════════════════════════════════════════════════ */
-function inicializarScrollBotones() {
-  const btnUp   = document.getElementById('btn-scroll-up');
-  const btnDown = document.getElementById('btn-scroll-down');
-  const feed    = document.querySelector('.workout-feed');
-  if (!btnUp || !btnDown || !feed) return;
+async function renderizarRutinas() {
+  const grid = document.getElementById('rutinas-grid');
+  if (!grid) return;
 
-  btnUp.addEventListener('click', () => {
-    feed.scrollBy({ top: -window.innerHeight, behavior: 'smooth' });
+  const user = await window.ApexAuth.getUser();
+  if (!user) return;
+
+  const { data: rutinas, error } = await db
+    .from('routines')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('name');
+
+  if (error) {
+    console.error('Error al cargar rutinas:', error);
+    grid.innerHTML = '<div class="rutina-error">Error al cargar rutinas</div>';
+    return;
+  }
+
+  Estado.rutinas = rutinas;
+
+  if (rutinas.length === 0) {
+    grid.innerHTML = `
+      <div class="rutina-vacia">
+        <p>No tienes rutinas creadas.</p>
+        <a href="rutina.html" class="enlace-acento">Crear rutina</a>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = rutinas.map(r => `
+    <div class="rutina-card" data-rutina-id="${r.id}">
+      <span class="rutina-nombre">${r.name}</span>
+      <div class="rutina-meta">
+        <i data-lucide="bar-chart"></i>
+        <span>${r.difficulty_level || 'General'}</span>
+      </div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.rutina-card').forEach(card => {
+    card.addEventListener('click', () => empezarEntrenoDesdeRutina(card.dataset.rutinaId));
   });
-  btnDown.addEventListener('click', () => {
-    feed.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+
+  lucide.createIcons();
+}
+
+async function empezarEntrenoDesdeRutina(rutinaId) {
+  const rutina = Estado.rutinas.find(r => r.id === rutinaId);
+  if (!rutina) return;
+
+  mostrarToast(`Iniciando ${rutina.name}...`);
+
+  // Obtener ejercicios de la rutina
+  const { data: ejercicios, error } = await db
+    .from('routine_exercises')
+    .select('*, exercises(*)')
+    .eq('routine_id', rutinaId)
+    .order('order');
+
+  if (error || !ejercicios) {
+    console.error('Error al cargar ejercicios de la rutina:', error);
+    mostrarToast('Error al cargar la rutina');
+    return;
+  }
+
+  // Limpiar entreno actual y cargar los de la rutina
+  Estado.ejerciciosEntreno = [];
+  ejercicios.forEach(re => {
+    const ex = re.exercises;
+    Estado.contadorEj++;
+    let finalSeries = [];
+    try {
+      if (re.target_reps && re.target_reps.startsWith('[')) {
+        const parsed = JSON.parse(re.target_reps);
+        finalSeries = parsed.map(s => ({
+          localId: `s-${++Estado.contadorSerie}`,
+          kg: s.kg || '',
+          reps: s.reps || ''
+        }));
+      }
+    } catch(e) {}
+
+    if (finalSeries.length === 0) {
+      const targetSets = re.target_sets || 3;
+      for (let i = 0; i < targetSets; i++) {
+        finalSeries.push({ localId: `s-${++Estado.contadorSerie}`, kg: '', reps: re.target_reps || '' });
+      }
+    }
+
+    Estado.ejerciciosEntreno.push({
+      localId: `ej-local-${Estado.contadorEj}`,
+      id: ex.id,
+      nombre: ex.name,
+      musculo: ex.muscle_group,
+      color: obtenerColorMusculo(ex.muscle_group),
+      series: finalSeries,
+    });
   });
+
+  renderizarListaDrawer();
+  abrirDrawer();
+}
+
+function obtenerColorMusculo(musculo) {
+  const colores = {
+    'Espalda': '#7EB8A4', 'Pecho': '#5CB85C', 'Hombro': '#5B9BD5',
+    'Bíceps': '#5CB85C', 'Tríceps': '#9B59B6', 'Piernas': '#48C9B0',
+    'Trapecios': '#5CB85C', 'Antebrazos': '#5B9BD5'
+  };
+  return colores[musculo] || '#888';
+}
+
+async function renderizarHistorialReciente() {
+  const cont = document.getElementById('journal-historial-lista');
+  if (!cont) return;
+
+  const user = await window.ApexAuth.getUser();
+  if (!user) return;
+
+  // Cargar las últimas 5 sesiones con sus logs
+  const { data: sesiones, error } = await db
+    .from('workout_sessions')
+    .select('*, workout_logs(*, exercises(*))')
+    .eq('user_id', user.id)
+    .order('start_time', { ascending: false })
+    .limit(5);
+
+  if (error || !sesiones || sesiones.length === 0) {
+    cont.innerHTML = '<div class="historial-vacio">Aún no has registrado entrenos.</div>';
+    return;
+  }
+
+  cont.innerHTML = sesiones.map(s => {
+    const fecha = new Date(s.start_time);
+    const diaNum = fecha.getDate();
+    const diaNom = DIAS[fecha.getDay()];
+    const mesNom = MESES[fecha.getMonth()];
+    
+    // Agrupar logs por ejercicio para mostrar resumen
+    const ejerciciosUnicos = [];
+    s.workout_logs.forEach(log => {
+      if (!ejerciciosUnicos.find(e => e.id === log.exercise_id)) {
+        ejerciciosUnicos.push(log.exercises);
+      }
+    });
+
+    return `
+      <article class="entreno-card">
+        <div class="entreno-card-inner">
+          <header class="entreno-card-cabecera">
+            <div class="entreno-fecha-bloque">
+              <time class="entreno-dia-num">${diaNum}</time>
+              <div>
+                <span class="entreno-dia-nombre">${diaNom}</span>
+                <span class="entreno-mes">${mesNom} ${fecha.getFullYear()}</span>
+              </div>
+            </div>
+            <div class="entreno-musculo-dots">
+              ${ejerciciosUnicos.slice(0, 4).map(e => `
+                <span class="musculo-dot" style="--c:${obtenerColorMusculo(e.muscle_group)}" title="${e.muscle_group}"></span>
+              `).join('')}
+            </div>
+          </header>
+          <ul class="entreno-ejercicios">
+            ${ejerciciosUnicos.slice(0, 3).map(e => `
+              <li class="ejercicio-bloque">
+                <div class="ejercicio-titulo-fila">
+                  <span class="ejercicio-dot" style="--c:${obtenerColorMusculo(e.muscle_group)}"></span>
+                  <span class="ejercicio-nombre">${e.name}</span>
+                </div>
+              </li>
+            `).join('')}
+            ${ejerciciosUnicos.length > 3 ? `<li class="ejercicio-mas">y ${ejerciciosUnicos.length - 3} más...</li>` : ''}
+          </ul>
+        </div>
+      </article>
+    `;
+  }).join('');
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -604,6 +886,10 @@ document.addEventListener('DOMContentLoaded', () => {
   inicializarSeguiderCorporal();
   inicializarCompartir();
   inicializarScrollInfinito();
-  inicializarScrollBotones();
-  console.log('[APEX] Workout inicializado.');
+  
+  // Cargas iniciales Journal
+  renderizarRutinas();
+  renderizarHistorialReciente();
+  
+  console.log('[APEX] Journal inicializado.');
 });

@@ -43,7 +43,7 @@
       <nav class="nav-principal">
         <ul class="lista-nav" role="list">
           <li><a href="dashboard.html" class="enlace-nav"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
-          <li><a href="workout.html" class="enlace-nav" data-pagina="workout"><i data-lucide="dumbbell"></i><span>Workout</span></a></li>
+          <li><a href="workout.html" class="enlace-nav" data-pagina="workout"><i data-lucide="dumbbell"></i><span>Journal</span></a></li>
           <li><a href="calendario.html" class="enlace-nav" data-pagina="calendario"><i data-lucide="calendar"></i><span>Calendario</span></a></li>
           <li><a href="ejercicios.html" class="enlace-nav activo" data-pagina="ejercicios" aria-current="page"><i data-lucide="layers"></i><span>Ejercicios</span></a></li>
           <li><a href="rutina.html" class="enlace-nav"><i data-lucide="clipboard-list"></i><span>Rutinas</span></a></li>
@@ -139,13 +139,7 @@
                     </span>
                   </div>
                 </div>
-                <!-- Botón añadir a rutina -->
-                <!-- BACKEND: Abre dropdown con GET /routines?user_id={userId} -->
-                <button class="boton-anadir-rutina" id="boton-anadir-rutina" aria-label="Añadir a una rutina"
-                  aria-haspopup="true" aria-expanded="false">
-                  <i data-lucide="plus"></i>
-                  <span>Añadir a rutina</span>
-                </button>
+
               </div>
 
 
@@ -263,8 +257,8 @@
       <a href="dashboard.html" class="enlace-nav-movil" aria-label="Dashboard">
         <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
       </a>
-      <a href="workout.html" class="enlace-nav-movil" aria-label="Workout">
-        <i data-lucide="dumbbell"></i><span>Workout</span>
+      <a href="workout.html" class="enlace-nav-movil" aria-label="Journal">
+        <i data-lucide="dumbbell"></i><span>Journal</span>
       </a>
       <a href="calendario.html" class="enlace-nav-movil" aria-label="Calendario">
         <i data-lucide="calendar"></i><span>Calendario</span>
@@ -292,27 +286,7 @@
 
   </div><!-- /contenedor-app -->
 
-  <!-- Dropdown "Añadir a rutina" -->
-  <!-- BACKEND: Poblar con GET /routines?user_id={userId} -->
-  <div class="dropdown-rutinas oculto" id="dropdown-rutinas" role="dialog" aria-modal="true"
-    aria-label="Seleccionar rutina">
-    <div class="dropdown-cabecera">
-      <span class="dropdown-titulo">Añadir a rutina</span>
-      <button class="dropdown-cerrar" id="dropdown-cerrar" aria-label="Cerrar"><i data-lucide="x"></i></button>
-    </div>
-    <!-- BACKEND: Iterar GET /routines?user_id={userId} y renderizar items -->
-    <ul class="dropdown-lista" id="dropdown-lista" role="list">
-      <li><button class="dropdown-item" data-rutina-id="rutina-jueves"><i data-lucide="clipboard-list"></i>
-          Jueves</button></li>
-      <li><button class="dropdown-item" data-rutina-id="rutina-pata"><i data-lucide="clipboard-list"></i>Miércoles</button>
-      </li>
-      <li><button class="dropdown-item" data-rutina-id="rutina-lunes"><i data-lucide="clipboard-list"></i>
-          Lunes</button></li>
-      <li><button class="dropdown-item" data-rutina-id="rutina-martes"><i data-lucide="clipboard-list"></i>
-          Martes</button></li>
-    </ul>
-  </div>
-  <div class="dropdown-overlay oculto" id="dropdown-overlay"></div>
+
 
   <!-- ═══ MODAL CRUD EJERCICIO ═══ -->
   <div class="modal-overlay oculto" id="modal-ejercicio-overlay">

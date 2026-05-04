@@ -18,21 +18,33 @@
 
 /* ──────────────────────────────────────────────────────────
    0. CONFIGURACIÓN
-   BACKEND: Ajusta BASE_URL al servidor real (C# / n8n).
 ────────────────────────────────────────────────────────── */
 const CONFIG = {
-  BASE_URL:  'https://api.fitmoca.edu',
-  JWT_KEY:   'apex_token',
-  TEMA_KEY:  'apex_tema',
+  JWT_KEY: 'apex_token',
+  TEMA_KEY: 'apex_tema',
 };
-const db = window.supabaseClient;
+
+function getDb() {
+  const db = window.supabaseClient;
+  if (!db) {
+    console.error('[APEX] Supabase client no inicializado');
+    console.warn('[APEX] Verifica que config.js y supabase-client.js estén en el HTML');
+  }
+  return db;
+}
 
 /* Estado global de la aplicación */
 const Estado = {
-  modoEdicion:       false,      // false = entrenamiento, true = edición
-  rutinaCargada:     null,       // ID de la rutina abierta actualmente
-  contadorEjercicio: 100,        // Contador para IDs únicos de nuevos ejercicios
-  contadorSerie:     1000,       // Contador para IDs únicos de nuevas series
+  modoEdicion: false,      // false = entrenamiento, true = edición
+  rutinaCargada: null,       // ID de la rutina abierta actualmente
+  ejerciciosEnRutina: [],    // Array de ejercicios en la rutina actual (draft)
+  contadorSerie: 0,        // Contador para generar IDs únicos de series
+  
+  // Estado de la biblioteca
+  bibliotecaAbierta: false,
+  musculoFiltro: 'todos',
+  queryBusqueda: '',
+  ejerciciosBiblioteca: [],
 };
 
 
@@ -87,7 +99,13 @@ function inicializarTema() {
 }
 
 function inicializarIconos() {
-  if (typeof lucide !== 'undefined') lucide.createIcons();
+  if (typeof lucide !== 'undefined') {
+    try {
+      lucide.createIcons();
+    } catch (e) {
+      console.warn('[APEX] Error lucide:', e.message);
+    }
+  }
 }
 
 
@@ -117,19 +135,39 @@ function mostrarVistaDetalle() {
  * BACKEND: Aquí harías GET /routines/{routineId} para cargar los ejercicios reales.
  * @param {string} rutinaId - ID de la rutina seleccionada
  */
-function abrirRutina(rutinaId) {
+async function abrirRutina(rutinaId) {
   Estado.rutinaCargada = rutinaId;
 
-  // Actualizar el título de la cabecera con el nombre de la tarjeta clicada
-  const tarjeta = document.querySelector(`.tarjeta-rutina[data-rutina-id="${rutinaId}"]`);
-  const nombre  = tarjeta?.querySelector('.tarjeta-rutina-nombre')?.textContent || 'Rutina';
-  const titulo  = document.getElementById('titulo-rutina-actual');
-  if (titulo) titulo.textContent = nombre;
+  // Actualizar el título de la cabecera
+  const titulo = document.getElementById('titulo-rutina-actual');
+  if (titulo) {
+    // Si la rutina viene de la lista, podemos sacar el nombre de ahí temporalmente
+    const tarjeta = document.querySelector(`.tarjeta-rutina[data-rutina-id="${rutinaId}"]`);
+    if (tarjeta) {
+      titulo.textContent = tarjeta.querySelector('.tarjeta-rutina-nombre').textContent;
+    }
+  }
 
-  // BACKEND: await cargarEjerciciosRutina(rutinaId);
-  //   const res  = await fetch(`${CONFIG.BASE_URL}/routines/${rutinaId}`, { headers: authHeaders() });
-  //   const data = await res.json();
-  //   renderizarEjerciciosRutina(data.exercises);
+  // Cargar ejercicios reales
+  await cargarEjerciciosRutina(rutinaId);
+
+  // Actualizar datos del creador en el panel
+  if (window.ApexAuth) {
+    const user = await window.ApexAuth.getUser();
+    if (user) {
+      const db = getDb();
+      if (db) {
+        const { data: profile } = await db.from('profiles').select('full_name, username').eq('id', user.id).single();
+        const fullName = profile?.full_name || user.user_metadata?.full_name || 'Usuario';
+        const handle = profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'usuario';
+        
+        const avatarEl = document.querySelector('.creador-avatar');
+        const handleEl = document.querySelector('.creador-handle');
+        if (avatarEl) avatarEl.textContent = fullName.charAt(0).toUpperCase();
+        if (handleEl) handleEl.textContent = '@' + handle;
+      }
+    }
+  }
 
   mostrarVistaDetalle();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -154,10 +192,69 @@ function inicializarNavegacion() {
   });
 
   // Botón nueva rutina
-  // BACKEND: POST /routines — crear rutina vacía y redirigir a su detalle en modo edición
-  document.getElementById('boton-nueva-rutina')?.addEventListener('click', () => {
-    mostrarToast('Función de nueva rutina: conectar a POST /routines');
+  document.getElementById('boton-nueva-rutina')?.addEventListener('click', crearNuevaRutina);
+  
+  // Botones de biblioteca
+  document.getElementById('boton-anadir-ejercicio')?.addEventListener('click', abrirBiblioteca);
+  document.getElementById('btn-biblioteca-cerrar')?.addEventListener('click', cerrarBiblioteca);
+  document.getElementById('overlay-biblioteca')?.addEventListener('click', cerrarBiblioteca);
+  
+  // Buscador y filtros de biblioteca
+  document.getElementById('input-busqueda-biblioteca')?.addEventListener('input', (e) => {
+    Estado.queryBusqueda = e.target.value;
+    filtrarBiblioteca();
   });
+  
+  document.getElementById('filtros-musculo-biblioteca')?.addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip-filtro');
+    if (!chip) return;
+    
+    document.querySelectorAll('.chip-filtro').forEach(c => c.classList.remove('activo'));
+    chip.classList.add('activo');
+    Estado.musculoFiltro = chip.dataset.musculo;
+    filtrarBiblioteca();
+  });
+}
+
+/**
+ * Crea una nueva rutina en la base de datos y la abre en modo edición.
+ */
+async function crearNuevaRutina() {
+  try {
+    const user = await window.ApexAuth.getUser();
+    if (!user) throw new Error('No autenticado');
+
+    const db = getDb();
+    const { data, error } = await db
+      .from('routines')
+      .insert({
+        user_id: user.id,
+        name: 'Nueva Rutina',
+        difficulty_level: 'Intermedio'
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    mostrarToast('Rutina creada');
+    await cargarRutinas(); // Recargar lista
+    abrirRutina(data.id);
+    activarModoEdicion();
+    
+    // Enfocar el nombre para editarlo
+    setTimeout(() => {
+      const inputNombre = document.getElementById('titulo-rutina-actual');
+      if (inputNombre) {
+        inputNombre.setAttribute('contenteditable', 'true');
+        inputNombre.focus();
+      }
+    }, 500);
+
+  } catch (err) {
+    console.error('[APEX] Error al crear rutina:', err);
+    mostrarToast('Error al crear la rutina');
+  }
 }
 
 
@@ -226,21 +323,112 @@ function aplicarModoEdicion(activo) {
   // Botón añadir ejercicio
   const btnAnadirEj = document.getElementById('boton-anadir-ejercicio');
   if (btnAnadirEj) activo ? btnAnadirEj.classList.remove('oculto') : btnAnadirEj.classList.add('oculto');
+
+  // Nombre de la rutina editable
+  const titulo = document.getElementById('titulo-rutina-actual');
+  if (titulo) {
+    if (activo) {
+      titulo.setAttribute('contenteditable', 'true');
+      titulo.classList.add('editando-titulo');
+    } else {
+      titulo.removeAttribute('contenteditable');
+      titulo.classList.remove('editando-titulo');
+    }
+  }
 }
 
 function inicializarToggleModo() {
   const toggle = document.getElementById('toggle-modo');
-  if (!toggle) return;
+  const btnGuardar = document.getElementById('boton-guardar-cambios');
+  const btnCancelar = document.getElementById('boton-cancelar-edicion');
 
-  const activar = () => {
-    if (Estado.modoEdicion) desactivarModoEdicion();
-    else                     activarModoEdicion();
-  };
-
-  toggle.addEventListener('click', activar);
-  toggle.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activar(); }
+  if (toggle) {
+    const activar = () => {
+      if (Estado.modoEdicion) desactivarModoEdicion();
+      else                     activarModoEdicion();
+    };
+    toggle.addEventListener('click', activar);
+  }
+  
+  btnGuardar?.addEventListener('click', guardarCambiosRutina);
+  btnCancelar?.addEventListener('click', () => {
+    desactivarModoEdicion();
+    cargarEjerciciosRutina(Estado.rutinaCargada); // Revertir cambios recargando
   });
+}
+
+/**
+ * Guarda los cambios de la rutina en el backend.
+ */
+async function guardarCambiosRutina() {
+  if (!Estado.rutinaCargada) return;
+
+  try {
+    const db = getDb();
+    const titulo = document.getElementById('titulo-rutina-actual').textContent;
+
+    // 1. Actualizar nombre de la rutina
+    const { error: errorRoutine } = await db
+      .from('routines')
+      .update({ name: titulo })
+      .eq('id', Estado.rutinaCargada);
+
+    if (errorRoutine) throw errorRoutine;
+
+    // 2. Sincronizar ejercicios (simplificado: borrar y re-insertar o upsert)
+    // Para esta versión, haremos un borrado de los ejercicios actuales y re-inserción
+    // para asegurar el orden y la integridad.
+    
+    const { error: errorDelete } = await db
+      .from('routine_exercises')
+      .delete()
+      .eq('routine_id', Estado.rutinaCargada);
+
+    if (errorDelete) throw errorDelete;
+
+    // Recopilar datos actuales de las tarjetas
+    const ejerciciosParaGuardar = [];
+    document.querySelectorAll('.tarjeta-ejercicio').forEach((tarjeta, index) => {
+      const exerciseId = tarjeta.dataset.realExerciseId;
+      const rest = parseInt(tarjeta.querySelector('.input-descanso').value) || 60;
+      
+      const setsData = [];
+      tarjeta.querySelectorAll('.fila-serie').forEach(fila => {
+        const kg = fila.querySelector('.celda-kg input')?.value || '';
+        const reps = fila.querySelector('.celda-reps input')?.value || '10';
+        const tipo = fila.dataset.tipo || 'normal';
+        setsData.push({ kg, reps, tipo });
+      });
+
+      const sets = setsData.length;
+
+      ejerciciosParaGuardar.push({
+        routine_id: Estado.rutinaCargada,
+        exercise_id: exerciseId,
+        order: index + 1,
+        target_sets: sets,
+        target_reps: JSON.stringify(setsData),
+        rest_time_seconds: rest
+      });
+    });
+
+    if (ejerciciosParaGuardar.length > 0) {
+      const { error: errorInsert } = await db
+        .from('routine_exercises')
+        .insert(ejerciciosParaGuardar);
+      
+      if (errorInsert) throw errorInsert;
+    }
+
+    mostrarToast('Cambios guardados correctamente');
+    desactivarModoEdicion();
+    await cargarRutinas(); // Recargar lista lateral
+    await cargarEjerciciosRutina(Estado.rutinaCargada); // Refrescar vista
+
+  } catch (err) {
+    console.error('[APEX] Error al guardar cambios:', err);
+    mostrarToast('Error al guardar los cambios');
+  }
 }
 
 
@@ -431,19 +619,32 @@ function cerrarModalConfirmacion() {
   overlay.classList.remove('activo');
 }
 
-function confirmarEliminacionRutina() {
+async function confirmarEliminacionRutina() {
   if (!MenuContexto.rutinaId) return;
 
-  const tarjeta = document.querySelector(`.tarjeta-rutina[data-rutina-id="${MenuContexto.rutinaId}"]`);
-  if (tarjeta) tarjeta.remove();
+  try {
+    const db = getDb();
+    const { error } = await db
+      .from('routines')
+      .delete()
+      .eq('id', MenuContexto.rutinaId);
 
-  if (Estado.rutinaCargada === MenuContexto.rutinaId) {
-    mostrarVistaLista();
+    if (error) throw error;
+
+    const tarjeta = document.querySelector(`.tarjeta-rutina[data-rutina-id="${MenuContexto.rutinaId}"]`);
+    if (tarjeta) tarjeta.remove();
+
+    if (Estado.rutinaCargada === MenuContexto.rutinaId) {
+      mostrarVistaLista();
+    }
+
+    actualizarBadgeTotalRutinas();
+    mostrarToast(`Rutina eliminada`);
+    cerrarModalConfirmacion();
+  } catch (err) {
+    console.error('[APEX] Error al eliminar rutina:', err);
+    mostrarToast('Error al eliminar la rutina');
   }
-
-  actualizarBadgeTotalRutinas();
-  mostrarToast(`Rutina “${MenuContexto.rutinaNombre}” eliminada`);
-  cerrarModalConfirmacion();
 }
 
 function actualizarBadgeTotalRutinas() {
@@ -475,7 +676,13 @@ function inicializarReordenamientoRutinas() {
   });
 
   // Convertir íconos recién insertados
-  if (typeof lucide !== 'undefined') lucide.createIcons();
+  if (typeof lucide !== 'undefined') {
+    try {
+      lucide.createIcons();
+    } catch (e) {
+      console.warn('[APEX] Error creando iconos drag:', e.message);
+    }
+  }
 
   let elementoArrastrado = null;
 
@@ -518,110 +725,172 @@ function inicializarReordenamientoRutinas() {
 
 
 
-/* ═════════════════════════════════════════════════════════════════   4. CRUD LOCAL — EJERCICIOS
+/* ══════════════════════════════════════════════════════════
+   4. CRUD BACKEND — RUTINAS Y EJERCICIOS
 ══════════════════════════════════════════════════════════ */
 
-/**
- * Genera el HTML de una nueva tarjeta de ejercicio vacía.
- * BACKEND: Conectar con GET /exercises para búsqueda real de ejercicios.
- * @param {string} ejId - ID único generado para el nuevo ejercicio
- */
-function plantillaEjercicio(ejId) {
-  return `
-  <article class="tarjeta-ejercicio" data-ejercicio-id="${ejId}" data-nombre="Nuevo ejercicio" role="listitem">
-    <div class="cabecera-ejercicio">
-      <div class="imagen-ejercicio-wrap">
-        <div class="imagen-ejercicio-placeholder" aria-hidden="true">
-          <i data-lucide="dumbbell"></i>
-        </div>
-      </div>
-      <div class="info-ejercicio-cabecera">
-        <!-- BACKEND: Input para búsqueda de ejercicio: GET /exercises?query={valor} -->
-        <input
-          type="text"
-          class="nombre-ejercicio"
-          style="background:none;border:none;border-bottom:1px solid var(--borde);outline:none;
-                 font-size:15px;font-weight:600;color:var(--texto);width:100%;padding:2px 0;
-                 font-family:'DM Sans',sans-serif;"
-          placeholder="Nombre del ejercicio"
-          value=""
-          aria-label="Nombre del ejercicio"
-        />
-        <span class="grupo-muscular-badge">—</span>
-      </div>
-      <div class="controles-ejercicio-edicion">
-        <button class="boton-eliminar-ejercicio" aria-label="Eliminar ejercicio" data-ejercicio-id="${ejId}">
-          <i data-lucide="trash-2"></i>
-        </button>
-      </div>
-      <div class="indicador-completado-ejercicio" aria-hidden="true"><i data-lucide="check-circle"></i></div>
-    </div>
+async function cargarRutinas() {
+  try {
+    // Verificar disponibilidad de ApexAuth
+    if (!window.ApexAuth) {
+      console.error('[APEX] ApexAuth no disponible');
+      const lista = document.getElementById('lista-mis-rutinas');
+      if (lista) lista.innerHTML = '<div class="rutina-error">Sistema no disponible</div>';
+      return;
+    }
+    
+    const user = await window.ApexAuth.getUser();
+    if (!user) {
+      const lista = document.getElementById('lista-mis-rutinas');
+      if (lista) lista.innerHTML = '<div class="rutina-vacia">Por favor, inicia sesión</div>';
+      return;
+    }
 
-    <div class="contenedor-nota">
-      <p class="nota-ejercicio-lectura oculto-si-vacio oculto" data-campo="nota">—</p>
-      <textarea class="nota-ejercicio-input campo-edicion" placeholder="Añadir nota al ejercicio..." rows="2" aria-label="Nota del ejercicio"></textarea>
-    </div>
+    const db = getDb();
+    if (!db) {
+      const lista = document.getElementById('lista-mis-rutinas');
+      if (lista) lista.innerHTML = '<div class="rutina-error">Error de BD</div>';
+      return;
+    }
+    
+    const { data, error } = await db
+      .from('routines')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
 
-    <div class="fila-descanso-edicion campo-edicion">
-      <label class="etiqueta-campo"><i data-lucide="timer"></i> Descanso entre series</label>
-      <div class="selector-descanso">
-        <button class="btn-descanso-dec" aria-label="Reducir descanso">−</button>
-        <input type="number" class="input-descanso" value="60" min="0" max="600" step="5" aria-label="Segundos de descanso" />
-        <span class="unidad-descanso">seg</span>
-        <button class="btn-descanso-inc" aria-label="Aumentar descanso">+</button>
+    if (error) throw error;
+
+    renderizarListaRutinas(data);
+  } catch (err) {
+    console.error('[APEX] Error al cargar rutinas:', err);
+    const lista = document.getElementById('lista-mis-rutinas');
+    if (lista) lista.innerHTML = '<div class="rutina-error">Error al cargar rutinas</div>';
+  }
+}
+
+function renderizarListaRutinas(rutinas) {
+  const lista = document.getElementById('lista-mis-rutinas');
+  const badge = document.getElementById('badge-total-rutinas');
+  if (!lista) return;
+
+  if (badge) badge.textContent = rutinas.length;
+
+  if (rutinas.length === 0) {
+    lista.innerHTML = '<div class="rutina-vacia">No tienes rutinas creadas todavía.</div>';
+    return;
+  }
+
+  lista.innerHTML = rutinas.map(r => `
+    <li class="tarjeta-rutina" data-rutina-id="${r.id}" tabindex="0" role="button" aria-label="Abrir rutina ${r.name}">
+      <div class="tarjeta-rutina-info" onclick="abrirRutina('${r.id}')">
+        <h3 class="tarjeta-rutina-nombre">${r.name}</h3>
+        ${r.description ? `<p class="tarjeta-rutina-ejercicios">${r.description}</p>` : ''}
       </div>
-    </div>
+      <button class="boton-opciones-rutina" aria-label="Opciones de la rutina ${r.name}" aria-haspopup="true">
+        <i data-lucide="more-horizontal"></i>
+      </button>
+    </li>
+  `).join('');
 
-    <div class="contenedor-tabla-series">
-      <table class="tabla-series" aria-label="Series del ejercicio">
-        <thead>
-          <tr>
-            <th class="col-set">SET</th>
-            <th class="col-tipo">TIPO</th>
-            <th class="col-kg">KG</th>
-            <th class="col-reps">REPS</th>
-            <th class="col-check modo-entrenamiento-col oculto">✓</th>
-            <th class="col-eliminar-serie modo-edicion-col" aria-label="Eliminar"></th>
-          </tr>
-        </thead>
-        <tbody class="cuerpo-series" id="series-${ejId}">
-          ${plantillaSerie(ejId, 1, 'normal')}
-        </tbody>
-      </table>
-    </div>
-
-    <button class="boton-anadir-serie campo-edicion" data-ejercicio-id="${ejId}" aria-label="Añadir serie">
-      <i data-lucide="plus"></i> Añadir serie
-    </button>
-  </article>`;
+  // Recrear iconos después de renderizar
+  if (typeof lucide !== 'undefined') {
+    try {
+      lucide.createIcons();
+      console.log('[APEX] Iconos lucide creados');
+    } catch (e) {
+      console.warn('[APEX] No se pudieron crear los iconos:', e.message);
+    }
+  } else {
+    console.warn('[APEX] lucide no está disponible');
+  }
 }
 
 /**
- * Añade un nuevo ejercicio vacío a la lista.
- * BACKEND: En producción, primero buscar ejercicio en GET /exercises
- *          y luego POST /routines/{routineId}/exercises
+ * Carga los ejercicios de una rutina específica desde la base de datos.
  */
-function anadirEjercicio() {
-  Estado.contadorEjercicio++;
-  const ejId = `ej-nuevo-${Estado.contadorEjercicio}`;
+async function cargarEjerciciosRutina(rutinaId) {
+  try {
+    const db = getDb();
+    const { data, error } = await db
+      .from('routine_exercises')
+      .select(`
+        *,
+        exercises (*)
+      `)
+      .eq('routine_id', rutinaId)
+      .order('order', { ascending: true });
+
+    if (error) throw error;
+
+    Estado.ejerciciosEnRutina = data.map(re => {
+      let parsedReps = '10';
+      let parsedSetsData = [];
+      try {
+        if (re.target_reps && re.target_reps.startsWith('[')) {
+          parsedSetsData = JSON.parse(re.target_reps);
+          parsedReps = parsedSetsData[0]?.reps || '10';
+        } else {
+          parsedReps = re.target_reps || '10';
+          const count = re.target_sets || 3;
+          for(let i=0; i<count; i++) {
+             parsedSetsData.push({ reps: parsedReps, kg: '', tipo: 'normal' });
+          }
+        }
+      } catch (e) {
+        parsedReps = re.target_reps || '10';
+        const count = re.target_sets || 3;
+        for(let i=0; i<count; i++) {
+            parsedSetsData.push({ reps: parsedReps, kg: '', tipo: 'normal' });
+        }
+      }
+
+      return {
+        id: re.id,
+        exercise_id: re.exercise_id,
+        nombre: re.exercises.name,
+        musculo: re.exercises.muscle_group,
+        sets: re.target_sets || 3,
+        reps: parsedReps,
+        setsData: parsedSetsData,
+        rest: re.rest_time_seconds || 60,
+        order: re.order
+      };
+    });
+
+    renderizarEjerciciosRutina(Estado.ejerciciosEnRutina);
+  } catch (err) {
+    console.error('[APEX] Error al cargar ejercicios de rutina:', err);
+    mostrarToast('Error al cargar ejercicios');
+  }
+}
+
+function renderizarEjerciciosRutina(ejercicios) {
   const lista = document.getElementById('lista-ejercicios-rutina');
   if (!lista) return;
 
-  const html = plantillaEjercicio(ejId);
-  lista.insertAdjacentHTML('beforeend', html);
-  lucide.createIcons(); // Re-inicializar íconos para los nuevos elementos
+  if (ejercicios.length === 0) {
+    lista.innerHTML = '<div class="rutina-vacia-detalle">Esta rutina no tiene ejercicios. Añade uno desde la biblioteca.</div>';
+    return;
+  }
 
-  // Scroll al nuevo ejercicio
-  const nuevo = lista.querySelector(`[data-ejercicio-id="${ejId}"]`);
-  nuevo?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
+  lista.innerHTML = ejercicios.map((ej, index) => plantillaEjercicio(ej, index + 1)).join('');
+  
+  // Recrear iconos después de renderizar
+  if (typeof lucide !== 'undefined') {
+    try {
+      lucide.createIcons();
+    } catch (e) {
+      console.warn('[APEX] Error recreando iconos:', e.message);
+    }
+  }
+  
   actualizarStatsPanel();
-  mostrarToast('Ejercicio añadido');
+  actualizarIndicadoresProgreso();
 }
 
 /**
- * Elimina un ejercicio del DOM.
- * BACKEND: DELETE /routines/{routineId}/exercises/{exerciseId}
+ * Elimina un ejercicio de la rutina actual.
  * @param {string} ejId - ID del ejercicio a eliminar
  */
 function eliminarEjercicio(ejId) {
@@ -629,73 +898,252 @@ function eliminarEjercicio(ejId) {
   if (!tarjeta) return;
 
   // Animación de salida
-  tarjeta.style.transition = 'opacity 0.22s ease, transform 0.22s ease';
-  tarjeta.style.opacity    = '0';
-  tarjeta.style.transform  = 'scale(0.97)';
-
+  tarjeta.style.transition = 'opacity 0.2s ease';
+  tarjeta.style.opacity = '0';
+  
   setTimeout(() => {
     tarjeta.remove();
+    
+    // Actualizar Estado
+    Estado.ejerciciosEnRutina = Estado.ejerciciosEnRutina.filter(ej => ej.id !== ejId);
+    
+    // Actualizar UI
     actualizarStatsPanel();
-    actualizarProgreso();
     actualizarIndicadoresProgreso();
-  }, 230);
+    
+    mostrarToast('Ejercicio eliminado');
+  }, 200);
 }
 
+function plantillaEjercicio(ej, num) {
+  let seriesHtml = '';
+  
+  if (ej.setsData && ej.setsData.length > 0) {
+    ej.setsData.forEach((setData, idx) => {
+      seriesHtml += plantillaSerie(ej.id, idx + 1, setData.reps, setData.tipo, setData.kg);
+    });
+  } else {
+    const sets = parseInt(ej.sets) || 3;
+    for (let i = 1; i <= sets; i++) {
+      seriesHtml += plantillaSerie(ej.id, i, ej.reps, 'normal', '');
+    }
+  }
 
-/* ══════════════════════════════════════════════════════════
-   5. CRUD LOCAL — SERIES
-══════════════════════════════════════════════════════════ */
+  return `
+  <article class="tarjeta-ejercicio" data-ejercicio-id="${ej.id}" data-real-exercise-id="${ej.exercise_id}" data-nombre="${ej.nombre}" role="listitem">
+    <div class="cabecera-ejercicio">
+      <div class="imagen-ejercicio-wrap">
+        <div class="imagen-ejercicio-placeholder" aria-hidden="true">
+          <i data-lucide="dumbbell"></i>
+        </div>
+      </div>
+      <div class="info-ejercicio-cabecera">
+        <h2 class="nombre-ejercicio">${ej.nombre}</h2>
+        <span class="grupo-muscular-badge">${ej.musculo}</span>
+      </div>
+      <div class="controles-ejercicio-edicion oculto">
+        <button class="boton-eliminar-ejercicio" aria-label="Eliminar ejercicio" onclick="eliminarEjercicio('${ej.id}')">
+          <i data-lucide="trash-2"></i>
+        </button>
+      </div>
+      <div class="indicador-completado-ejercicio" aria-hidden="true"><i data-lucide="check-circle"></i></div>
+    </div>
 
-/**
- * Genera el HTML de una nueva fila de serie.
- * @param {string} ejId    - ID del ejercicio padre
- * @param {number} numero  - Número de la serie (visual)
- * @param {string} tipo    - 'normal' | 'warmup' | 'dropset' | 'failure'
- */
-function plantillaSerie(ejId, numero, tipo = 'normal') {
-  Estado.contadorSerie++;
-  const serieId = `serie-nueva-${Estado.contadorSerie}`;
-  const badges  = { normal: 'N', warmup: 'W', dropset: 'D', failure: 'F' };
-  const badgeClase = { normal: 'badge-tipo-normal', warmup: 'badge-tipo-warmup', dropset: 'badge-tipo-dropset', failure: 'badge-tipo-failure' };
+    <div class="fila-descanso-edicion campo-edicion oculto">
+      <label class="etiqueta-campo"><i data-lucide="timer"></i> Descanso entre series</label>
+      <div class="selector-descanso">
+        <button class="btn-descanso-dec" onclick="manejarDescanso(this)">−</button>
+        <input type="number" class="input-descanso" value="${ej.rest}" min="0" max="600" step="5" aria-label="Descanso en segundos" />
+        <span class="unidad-descanso">seg</span>
+        <button class="btn-descanso-inc" onclick="manejarDescanso(this)">+</button>
+      </div>
+    </div>
+
+    <div class="contenedor-tabla-series">
+      <table class="tabla-series">
+        <thead>
+          <tr>
+            <th class="col-set">SET</th>
+            <th class="col-tipo">TIPO</th>
+            <th class="col-kg">KG</th>
+            <th class="col-reps">REPS</th>
+            <th class="col-check modo-entrenamiento-col">✓</th>
+            <th class="col-eliminar-serie modo-edicion-col oculto"></th>
+          </tr>
+        </thead>
+        <tbody class="cuerpo-series" id="series-${ej.id}">
+          ${seriesHtml}
+        </tbody>
+      </table>
+    </div>
+
+    <button class="boton-anadir-serie campo-edicion oculto" onclick="anadirSerie('${ej.id}')">
+      <i data-lucide="plus"></i> Añadir serie
+    </button>
+  </article>`;
+}
+
+function plantillaSerie(ejId, num, repsDefault = '10', tipo = 'normal', kgDefault = '') {
+  const serieId = `serie-${ejId}-${num}-${Date.now()}`;
+  
+  const mapaClase  = { normal: 'badge-tipo-normal', warmup: 'badge-tipo-warmup', dropset: 'badge-tipo-dropset', failure: 'badge-tipo-failure' };
+  const mapaLetra  = { normal: 'Normal', warmup: 'Warmup', dropset: 'Dropset', failure: 'Fallo' };
+  const badgeClase = mapaClase[tipo] || 'badge-tipo-normal';
+  const badgeTexto = mapaLetra[tipo] || 'Normal';
 
   return `
   <tr class="fila-serie" data-serie-id="${serieId}" data-tipo="${tipo}">
-    <td class="celda-set"><span class="numero-set">${numero}</span></td>
+    <td class="celda-set"><span class="numero-set">${num}</span></td>
     <td class="celda-tipo">
-      <span class="badge-tipo ${badgeClase[tipo]} modo-lectura-tipo oculto">${badges[tipo]}</span>
-      <select class="selector-tipo-serie campo-edicion" aria-label="Tipo de serie">
-        <option value="warmup"  ${tipo === 'warmup'  ? 'selected' : ''}>Warm-up</option>
-        <option value="normal"  ${tipo === 'normal'  ? 'selected' : ''}>Normal</option>
-        <option value="dropset" ${tipo === 'dropset' ? 'selected' : ''}>Drop Set</option>
-        <option value="failure" ${tipo === 'failure' ? 'selected' : ''}>Failure</option>
+      <span class="badge-tipo ${badgeClase} modo-lectura-tipo">${badgeTexto}</span>
+      <select class="selector-tipo-serie campo-edicion oculto" onchange="actualizarTipoBadge(this)">
+        <option value="warmup" ${tipo === 'warmup' ? 'selected' : ''}>Warmup</option>
+        <option value="normal" ${tipo === 'normal' ? 'selected' : ''}>Normal</option>
+        <option value="dropset" ${tipo === 'dropset' ? 'selected' : ''}>Dropset</option>
+        <option value="failure" ${tipo === 'failure' ? 'selected' : ''}>Fallo</option>
       </select>
     </td>
     <td class="celda-kg">
-      <span class="valor-lectura oculto">—</span>
-      <input type="number" class="input-serie campo-edicion" value="" min="0" step="0.5" placeholder="kg" aria-label="Peso en kilogramos" />
+      <span class="valor-lectura">${kgDefault || '—'}</span>
+      <input type="number" class="input-serie campo-edicion oculto" value="${kgDefault}" placeholder="kg" />
     </td>
     <td class="celda-reps">
-      <span class="valor-lectura oculto">—</span>
-      <input type="number" class="input-serie campo-edicion" value="" min="1" step="1" placeholder="reps" aria-label="Repeticiones" />
+      <span class="valor-lectura">${repsDefault}</span>
+      <input type="number" class="input-serie campo-edicion oculto" value="${repsDefault}" placeholder="reps" />
     </td>
-    <td class="celda-check modo-entrenamiento-col oculto">
-      <button class="boton-check-serie" aria-label="Marcar serie como completada" aria-pressed="false">
+    <td class="celda-check modo-entrenamiento-col">
+      <button class="boton-check-serie" onclick="toggleCheckSerie(this)">
         <i data-lucide="check"></i>
       </button>
     </td>
-    <td class="celda-eliminar-serie modo-edicion-col">
-      <button class="boton-eliminar-serie" aria-label="Eliminar serie">
+    <td class="celda-eliminar-serie modo-edicion-col oculto">
+      <button class="boton-eliminar-serie" onclick="eliminarSerie(this)">
         <i data-lucide="x"></i>
       </button>
     </td>
   </tr>`;
 }
 
-/**
- * Añade una serie al ejercicio especificado.
- * BACKEND: POST /exercises/{exerciseId}/sets
- * @param {string} ejId - ID del ejercicio
- */
+/* ══════════════════════════════════════════════════════════
+   5. BIBLIOTECA DE EJERCICIOS (Drawer)
+══════════════════════════════════════════════════════════ */
+
+async function abrirBiblioteca() {
+  const drawer = document.getElementById('drawer-biblioteca');
+  const overlay = document.getElementById('overlay-biblioteca');
+  if (!drawer || !overlay) return;
+
+  drawer.classList.add('activo');
+  overlay.classList.add('activo');
+  Estado.bibliotecaAbierta = true;
+
+  if (Estado.ejerciciosBiblioteca.length === 0) {
+    await cargarBiblioteca();
+  } else {
+    filtrarBiblioteca();
+  }
+}
+
+function cerrarBiblioteca() {
+  const drawer = document.getElementById('drawer-biblioteca');
+  const overlay = document.getElementById('overlay-biblioteca');
+  if (!drawer || !overlay) return;
+
+  drawer.classList.remove('activo');
+  overlay.classList.remove('activo');
+  Estado.bibliotecaAbierta = false;
+}
+
+async function cargarBiblioteca() {
+  try {
+    const db = getDb();
+    const { data, error } = await db
+      .from('exercises')
+      .select('*')
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+
+    Estado.ejerciciosBiblioteca = data;
+    filtrarBiblioteca();
+  } catch (err) {
+    console.error('[APEX] Error al cargar biblioteca:', err);
+    mostrarToast('Error al cargar la biblioteca');
+  }
+}
+
+function filtrarBiblioteca() {
+  const lista = document.getElementById('lista-ejercicios-biblioteca');
+  if (!lista) return;
+
+  const query = Estado.queryBusqueda.toLowerCase();
+  const musculo = Estado.musculoFiltro;
+
+  const filtrados = Estado.ejerciciosBiblioteca.filter(ej => {
+    const matchQuery = ej.name.toLowerCase().includes(query);
+    const matchMusculo = musculo === 'todos' || ej.muscle_group === musculo;
+    return matchQuery && matchMusculo;
+  });
+
+  if (filtrados.length === 0) {
+    lista.innerHTML = '<div class="biblioteca-vacio">No se encontraron ejercicios.</div>';
+    return;
+  }
+
+  lista.innerHTML = filtrados.map(ej => `
+    <li class="item-ejercicio-biblioteca" onclick="seleccionarEjercicioDeBiblioteca('${ej.id}')">
+      <div class="item-ejercicio-img">
+        <i data-lucide="dumbbell"></i>
+      </div>
+      <div class="item-ejercicio-info">
+        <span class="item-ejercicio-nombre">${ej.name}</span>
+        <span class="item-ejercicio-musculo">${ej.muscle_group}</span>
+      </div>
+      <div class="item-ejercicio-anadir">
+        <i data-lucide="plus"></i>
+      </div>
+    </li>
+  `).join('');
+
+  if (typeof lucide !== 'undefined') {
+    try {
+      lucide.createIcons();
+    } catch (e) {
+      console.warn('[APEX] Error en iconos biblioteca:', e.message);
+    }
+  }
+}
+
+function seleccionarEjercicioDeBiblioteca(ejId) {
+  const ejBase = Estado.ejerciciosBiblioteca.find(e => e.id === ejId);
+  if (!ejBase) return;
+
+  const nuevoEj = {
+    id: `temp-${Date.now()}`,
+    exercise_id: ejBase.id,
+    nombre: ejBase.name,
+    musculo: ejBase.muscle_group,
+    sets: 3,
+    reps: '10',
+    setsData: [
+      { reps: '10', kg: '', tipo: 'normal' },
+      { reps: '10', kg: '', tipo: 'normal' },
+      { reps: '10', kg: '', tipo: 'normal' }
+    ],
+    rest: 60,
+    order: Estado.ejerciciosEnRutina.length + 1
+  };
+
+  Estado.ejerciciosEnRutina.push(nuevoEj);
+  renderizarEjerciciosRutina(Estado.ejerciciosEnRutina);
+  cerrarBiblioteca();
+  mostrarToast(`${ejBase.name} añadido`);
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   5. MANEJADORES DE SERIES Y EJERCICIOS
+══════════════════════════════════════════════════════════ */
 function anadirSerie(ejId) {
   const tbody = document.getElementById(`series-${ejId}`);
   if (!tbody) return;
@@ -703,8 +1151,16 @@ function anadirSerie(ejId) {
   const filas  = tbody.querySelectorAll('.fila-serie');
   const numero = filas.length + 1;
 
-  tbody.insertAdjacentHTML('beforeend', plantillaSerie(ejId, numero, 'normal'));
-  lucide.createIcons();
+  tbody.insertAdjacentHTML('beforeend', plantillaSerie(ejId, numero, '10', 'normal'));
+  
+  if (typeof lucide !== 'undefined') {
+    try {
+      lucide.createIcons();
+    } catch (e) {
+      console.warn('[APEX] Error serie lucide:', e.message);
+    }
+  }
+  
   actualizarStatsPanel();
 }
 
@@ -748,7 +1204,7 @@ function actualizarTipoBadge(select) {
   badge.classList.remove(...clases);
 
   const mapaClase  = { normal: 'badge-tipo-normal', warmup: 'badge-tipo-warmup', dropset: 'badge-tipo-dropset', failure: 'badge-tipo-failure' };
-  const mapaLetra  = { normal: 'N', warmup: 'W', dropset: 'D', failure: 'F' };
+  const mapaLetra  = { normal: 'Normal', warmup: 'Warmup', dropset: 'Dropset', failure: 'Fallo' };
   badge.classList.add(mapaClase[tipo]);
   badge.textContent = mapaLetra[tipo];
   fila.dataset.tipo = tipo;
@@ -904,16 +1360,18 @@ function recopilarDatosRutina() {
   const ejercicios   = [];
 
   document.querySelectorAll('.tarjeta-ejercicio').forEach((tarjeta, ejIdx) => {
-    // BACKEND: Mapear el data-ejercicio-id al ID real de la DB
+    // ID del ejercicio (puede ser un UUID válido o temporal)
     const ejId       = tarjeta.dataset.ejercicioId;
-    const nombre     = tarjeta.dataset.nombre || tarjeta.querySelector('.nombre-ejercicio')?.value || '';
+    const exerciseId = tarjeta.dataset.realExerciseId; // El ID real del ejercicio en la tabla exercises
+    const nombre     = tarjeta.dataset.nombre || '';
+    const musculo    = tarjeta.querySelector('.grupo-muscular-badge')?.textContent || '';
     const nota       = tarjeta.querySelector('.nota-ejercicio-input')?.value || '';
     const descansoEl = tarjeta.querySelector('.input-descanso');
     const descanso   = descansoEl ? parseInt(descansoEl.value, 10) : 60;
     const series     = [];
 
     tarjeta.querySelectorAll('.fila-serie').forEach((fila, sIdx) => {
-      // BACKEND: Mapear el data-serie-id al ID real de la DB
+      // ID de la serie (puede ser temporal)
       const serieId  = fila.dataset.serieId;
       const tipoSel  = fila.querySelector('.selector-tipo-serie');
       const tipo     = tipoSel ? tipoSel.value : (fila.dataset.tipo || 'normal');
@@ -922,7 +1380,7 @@ function recopilarDatosRutina() {
       const reps     = inputs[1] ? parseInt(inputs[1].value, 10) || null : null;
 
       series.push({
-        id:           serieId,   // BACKEND: ID de la DB o null si es nueva
+        id:           serieId,   // ID de la DB o null si es nueva
         orden:        sIdx + 1,
         tipo,                    // 'normal' | 'warmup' | 'dropset' | 'failure'
         peso_kg:      kg,
@@ -931,17 +1389,18 @@ function recopilarDatosRutina() {
     });
 
     ejercicios.push({
-      id:                ejId,    // BACKEND: ID real del ejercicio en la DB
-      orden:             ejIdx + 1,
-      nombre,                     // BACKEND: Se reemplaza por exercise_id en producción
+      id:                ejId,    // ID temporal del ejercicio en esta edición
+      exercise_id:       exerciseId, // ID real de la tabla exercises
+      nombre,
+      musculo,
       nota,
+      orden:             ejIdx + 1,
       descanso_segundos: descanso,
       series,
     });
   });
 
   const payload = {
-    // BACKEND: rutina_id viene de Estado.rutinaCargada
     rutina_id:  Estado.rutinaCargada,
     nombre:     rutinaNombre,
     ejercicios,
@@ -972,6 +1431,9 @@ async function guardarCambios() {
   }
 
   try {
+    const db = getDb();
+    if (!db) throw new Error('Database no disponible');
+    
     // 1. Guardar/Actualizar la rutina
     let routineId = payload.rutina_id;
     
@@ -983,7 +1445,7 @@ async function guardarCambios() {
           user_id: user.id,
           name: payload.nombre,
           description: '', // Se podría añadir al UI después
-          is_public: false
+          difficulty_level: 'Intermedio'
         })
         .select()
         .single();
@@ -1005,34 +1467,42 @@ async function guardarCambios() {
       if (updateError) throw updateError;
       
       // Eliminar ejercicios viejos para reemplazar con los nuevos
-      await db
+      const { error: deleteError } = await db
         .from('routine_exercises')
         .delete()
         .eq('routine_id', routineId);
+      
+      if (deleteError) console.warn('Aviso al eliminar ejercicios viejos:', deleteError.message);
     }
 
-    // 2. Insertar los ejercicios y sus series
+    // 2. Insertar los nuevos ejercicios y sus series
     if (payload.ejercicios && payload.ejercicios.length > 0) {
-      for (const ej of payload.ejercicios) {
-        // En una app real esto vendría del selector, pero ahora usamos un dummy si no es un UUID válido
-        // Si ej.id no es un UUID válido, fallará. Idealmente seleccionaríamos el ID de la tabla exercises.
-        // Como no tenemos el selector 100% conectado con la DB yet, haremos un try-catch por si acaso.
-        try {
-          const { error: ejError } = await db
-            .from('routine_exercises')
-            .insert({
-              routine_id: routineId,
-              exercise_id: ej.id, // Debe ser UUID válido
-              order: ej.orden,
-              target_sets: ej.series.length,
-              target_reps_per_set: ej.series[0]?.repeticiones || 10,
-              rest_time_seconds: ej.descanso_segundos || 60,
-              notes: ej.nota || null
-            });
-            
-          if (ejError) console.error('Error insertando ejercicio:', ejError.message);
-        } catch(e) {
-          console.warn('Omitiendo ejercicio por posible UUID inválido:', ej.id);
+      for (let ejIdx = 0; ejIdx < payload.ejercicios.length; ejIdx++) {
+        const ej = payload.ejercicios[ejIdx];
+        
+        // El exercise_id debe ser un UUID valido — check
+        if (!ej.exercise_id || typeof ej.exercise_id !== 'string' || !isValidUUID(ej.exercise_id)) {
+          console.warn(`Omitiendo ejercicio ${ej.nombre} por ID inválido`);
+          continue;
+        }
+
+        // Insertar relación routine_exercise
+        const { data: reData, error: reError } = await db
+          .from('routine_exercises')
+          .insert({
+            routine_id: routineId,
+            exercise_id: ej.exercise_id,
+            order: ej.orden,
+            target_sets: ej.series.length,
+            target_reps: (ej.series[0]?.repeticiones || 10).toString(),
+            rest_time_seconds: ej.descanso_segundos || 60
+          })
+          .select()
+          .single();
+
+        if (reError) {
+          console.error(`Error insertando exercise_routine para ${ej.nombre}:`, reError.message);
+          continue;
         }
       }
     }
@@ -1049,6 +1519,16 @@ async function guardarCambios() {
 
   mostrarToast('Cambios guardados correctamente');
   desactivarModoEdicion();
+}
+
+/**
+ * Valida si una cadena es un UUID válido.
+ * @param {string} uuid
+ * @returns {boolean}
+ */
+function isValidUUID(uuid) {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
 }
 
 /**
@@ -1205,24 +1685,53 @@ function inicializarEventosFeed() {
 ══════════════════════════════════════════════════════════ */
 
 function inicializarApp() {
-  inicializarIconos();
-  inicializarNavegacion();
-  inicializarToggleModo();
-  inicializarEventosFeed();
-  inicializarAcordeon();
-  inicializarMenusRutina();
-  inicializarReordenamientoRutinas();
-  actualizarStatsPanel();
-  actualizarProgreso();
-  actualizarIndicadoresProgreso();
+  try {
+    inicializarIconos();
+    inicializarNavegacion();
+    inicializarToggleModo();
+    inicializarAcordeon();
+    inicializarMenusRutina();
+    
+    // Cargar rutinas con delay
+    setTimeout(() => {
+      cargarRutinas().catch(err => {
+        console.error('[APEX] Error cargando rutinas:', err);
+      });
+    }, 300);
 
-  console.log('[APEX] Módulo de rutinas inicializado.');
+    console.log('[APEX] Módulo de rutinas inicializado.');
+  } catch (err) {
+    console.error('[APEX] Error inicializarApp:', err);
+    mostrarToast('Error al inicializar');
+  }
 }
 
 /* Arranque inmediato */
-document.addEventListener('DOMContentLoaded', () => {
-  inicializarTema();
-  inicializarCursor();
-  inicializarIconos();
-  inicializarApp();
-});
+async function arrancarAplicacion() {
+  try {
+    inicializarTema();
+    inicializarCursor();
+    
+    // Esperar a que Supabase esté listo
+    let intentos = 0;
+    while (!window.supabaseClient && intentos < 50) {
+      await new Promise(r => setTimeout(r, 100));
+      intentos++;
+    }
+    
+    if (!window.supabaseClient) {
+      console.error('[APEX] Supabase no disponible');
+      mostrarToast('Error de conexión');
+      return;
+    }
+    
+    console.log('[APEX] Supabase listo');
+    inicializarIconos();
+    await inicializarApp();
+  } catch (err) {
+    console.error('[APEX] Error arranque:', err);
+    mostrarToast('Error al inicializar');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', arrancarAplicacion);
