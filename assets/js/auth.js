@@ -6,6 +6,25 @@
 /* ─── SUPABASE — INICIALIZACIÓN ────────────────────────── */
 const db = window.supabaseClient;
 
+/* ── ESTADÍSTICAS REALES EN LOGIN ── */
+async function cargarStatsLogin() {
+  const elAtletas = document.getElementById('stat-atletas');
+  const elEntrenadores = document.getElementById('stat-entrenadores');
+  if (!elAtletas || !elEntrenadores) return;
+
+  try {
+    const { count: atletas } = await db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'user');
+    const { count: trainers } = await db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'trainer');
+
+    if (atletas !== null) elAtletas.textContent = atletas > 999 ? (atletas / 1000).toFixed(1) + 'K+' : atletas;
+    if (trainers !== null) elEntrenadores.textContent = trainers;
+  } catch (e) {
+    console.error('Error cargando stats login:', e);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', cargarStatsLogin);
+
 const ROL_ID = { entrenador: 2, monitor: 2, alumno: 1 };
 
 // Redirigir si ya está logueado
