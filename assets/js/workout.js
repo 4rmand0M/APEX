@@ -143,7 +143,11 @@ function inicializarDropdown() {
 ══════════════════════════════════════════════════════════ */
 function abrirDrawer() {
   Estado.drawerAbierto = true;
-  document.getElementById('drawer-nuevo')?.classList.add('abierto');
+  const drawer = document.getElementById('drawer-nuevo');
+  if (drawer) {
+    drawer.classList.remove('oculto');
+    requestAnimationFrame(() => drawer.classList.add('abierto'));
+  }
   document.getElementById('overlay-global')?.classList.remove('oculto');
   const hoy = new Date();
   const el  = document.getElementById('drawer-fecha-texto');
@@ -153,7 +157,14 @@ function abrirDrawer() {
 
 function cerrarDrawer() {
   Estado.drawerAbierto = false;
-  document.getElementById('drawer-nuevo')?.classList.remove('abierto');
+  const drawer = document.getElementById('drawer-nuevo');
+  if (drawer) {
+    drawer.classList.remove('abierto');
+    setTimeout(() => {
+      if (!Estado.drawerAbierto) drawer.classList.add('oculto');
+    }, 300); // Coincidir con la transición CSS
+  }
+  
   if (!Estado.sheetAbierto && !Estado.corporalAbierto) {
     document.getElementById('overlay-global')?.classList.add('oculto');
   }
@@ -230,6 +241,7 @@ async function guardarEntreno() {
   mostrarToast('Entreno guardado ✓');
   Estado.ejerciciosEntreno = [];
   renderizarListaDrawer();
+  await renderizarHistorialReciente();
   cerrarDrawer();
 }
 
@@ -238,14 +250,24 @@ async function guardarEntreno() {
 ══════════════════════════════════════════════════════════ */
 function abrirSheet() {
   Estado.sheetAbierto = true;
-  document.getElementById('sheet-ejercicios')?.classList.add('abierto');
+  const sheet = document.getElementById('sheet-ejercicios');
+  if (sheet) {
+    sheet.classList.remove('oculto');
+    requestAnimationFrame(() => sheet.classList.add('abierto'));
+  }
   document.getElementById('overlay-global')?.classList.remove('oculto');
   document.getElementById('sheet-search')?.focus();
 }
 
 function cerrarSheet() {
   Estado.sheetAbierto = false;
-  document.getElementById('sheet-ejercicios')?.classList.remove('abierto');
+  const sheet = document.getElementById('sheet-ejercicios');
+  if (sheet) {
+    sheet.classList.remove('abierto');
+    setTimeout(() => {
+      if (!Estado.sheetAbierto) sheet.classList.add('oculto');
+    }, 300);
+  }
   if (!Estado.drawerAbierto && !Estado.corporalAbierto) {
     document.getElementById('overlay-global')?.classList.add('oculto');
   }
@@ -254,33 +276,105 @@ function cerrarSheet() {
 function inicializarSheet() {
   document.getElementById('sheet-cerrar')?.addEventListener('click', cerrarSheet);
 
-  document.querySelectorAll('.sheet-grupo-row').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const expandido = btn.getAttribute('aria-expanded') === 'true';
-      const lista     = document.getElementById(btn.getAttribute('aria-controls'));
-      btn.setAttribute('aria-expanded', String(!expandido));
-      lista?.classList.toggle('oculto', expandido);
-    });
-  });
-
   document.getElementById('sheet-grupos')?.addEventListener('click', e => {
-    const btn = e.target.closest('.sg-ej-btn');
-    if (!btn) return;
-    const item = btn.closest('.sg-ej-item');
-    if (!item) return;
-    agregarEjercicioAlEntreno(
-      item.dataset.ejId,
-      item.querySelector('.sg-ej-nombre')?.textContent || '',
-      item.dataset.ejMusculo || '',
-      item.dataset.ejColor   || '#888'
-    );
-    cerrarSheet();
+    // 1. Expandir/Colapsar grupo
+    const btnGrupo = e.target.closest('.sheet-grupo-row');
+    if (btnGrupo) {
+      const expandido = btnGrupo.getAttribute('aria-expanded') === 'true';
+      const listaId = btnGrupo.getAttribute('aria-controls');
+      const lista = document.getElementById(listaId);
+      btnGrupo.setAttribute('aria-expanded', String(!expandido));
+      lista?.classList.toggle('oculto', expandido);
+      return;
+    }
+
+    // 2. Seleccionar ejercicio
+    const btnEj = e.target.closest('.sg-ej-btn');
+    if (btnEj) {
+      const item = btnEj.closest('.sg-ej-item');
+      if (!item) return;
+      agregarEjercicioAlEntreno(
+        item.dataset.ejId,
+        item.querySelector('.sg-ej-nombre')?.textContent || '',
+        item.dataset.ejMusculo || '',
+        item.dataset.ejColor   || '#888'
+      );
+      cerrarSheet();
+    }
   });
 
   document.getElementById('sheet-search')?.addEventListener('input', e => {
     buscarEnSheet(e.target.value.trim().toLowerCase());
   });
+
+  cargarEjerciciosBibliotecaSheet();
 }
+
+async function cargarEjerciciosBibliotecaSheet() {
+  const user = await window.ApexAuth.getUser();
+  if (!user) return;
+
+  const { data: exercises, error } = await db
+    .from('exercises')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('name', { ascending: true });
+
+  if (error || !exercises) {
+    console.error('Error cargando ejercicios:', error);
+    return;
+  }
+
+  // Agrupar por músculo
+  const grupos = {};
+  exercises.forEach(ex => {
+    const m = ex.muscle_group || 'Otros';
+    if (!grupos[m]) grupos[m] = [];
+    grupos[m].push(ex);
+  });
+
+  const contenedor = document.getElementById('sheet-grupos');
+  if (!contenedor) return;
+
+  // Limpiar antes de renderizar, manteniendo solo el elemento "Sin resultados"
+  const sinRes = contenedor.querySelector('#sheet-sin-res');
+  contenedor.innerHTML = '';
+  if (sinRes) contenedor.appendChild(sinRes);
+
+  let html = '';
+  Object.keys(grupos).sort().forEach((musculo, index) => {
+    const idGrupo = `sg-${index}`;
+    const color = obtenerColorMusculo(musculo);
+    const ejs = grupos[musculo];
+
+    let lis = ejs.map(ej => `
+      <li class="sg-ej-item" data-ej-id="${ej.id}" data-ej-musculo="${musculo}" data-ej-color="${color}">
+        <button class="sg-ej-btn" aria-label="Añadir ${ej.name}">
+          <span class="sg-ej-nombre">${ej.name}</span>
+          <i data-lucide="plus" class="sg-ej-plus"></i>
+        </button>
+      </li>
+    `).join('');
+
+    html += `
+      <li class="sheet-grupo-item" data-grupo-id="${idGrupo}" data-color="${color}">
+        <button class="sheet-grupo-row" aria-expanded="false" aria-controls="${idGrupo}-lista">
+          <span class="sg-dot" style="background:${color}"></span>
+          <span class="sg-nombre">${musculo}</span>
+          <i data-lucide="chevron-right" class="sg-chevron"></i>
+        </button>
+        <ul class="sg-ejercicios oculto" id="${idGrupo}-lista" role="list">
+          ${lis}
+        </ul>
+      </li>
+    `;
+  });
+
+  // Insertar html antes de "Sin resultados"
+  contenedor.insertAdjacentHTML('afterbegin', html);
+  lucide.createIcons();
+}
+
 
 function buscarEnSheet(query) {
   const grupos = document.querySelectorAll('.sheet-grupo-item');
@@ -631,8 +725,14 @@ function inicializarSeguiderCorporal() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   8. ANÁLISIS (abrir drawer existente)
+   8. ANÁLISIS — Lógica 100% funcional con Supabase
 ══════════════════════════════════════════════════════════ */
+
+let graficaFrecuencia = null;
+let graficaProgresion = null;
+let graficaPeso       = null;
+let ejercicioSeleccionado = null; // { id, nombre, color }
+
 function abrirAnalisis() {
   const drawer = document.getElementById('drawer-analisis');
   if (!drawer) return;
@@ -640,7 +740,476 @@ function abrirAnalisis() {
   requestAnimationFrame(() => drawer.classList.add('abierto'));
   document.getElementById('overlay-global')?.classList.remove('oculto');
   lucide.createIcons();
+  cargarAnalisis();
 }
+
+function cerrarAnalisis() {
+  const drawer = document.getElementById('drawer-analisis');
+  if (drawer) {
+    drawer.classList.remove('abierto');
+    setTimeout(() => drawer.classList.add('oculto'), 300);
+  }
+  document.getElementById('overlay-global')?.classList.add('oculto');
+}
+
+async function cargarAnalisis() {
+  const user = await window.ApexAuth.getUser();
+  if (!user) return;
+
+  // Ejecutar todas las cargas en paralelo
+  await Promise.all([
+    cargarKPIs(user.id),
+    cargarGraficaFrecuencia(user.id),
+    cargarVolumenPorMusculo(user.id),
+    cargarSelectorEjercicios(user.id),
+    cargarGraficaPeso(user.id),
+    cargarPRsRecientes(user.id),
+    cargarRachas(user.id),
+  ]);
+}
+
+/* ── KPIs ── */
+async function cargarKPIs(userId) {
+  const { data: sesiones } = await db
+    .from('workout_sessions')
+    .select('id, start_time, end_time')
+    .eq('user_id', userId);
+
+  const { data: logs } = await db
+    .from('workout_logs')
+    .select('id, weight_used, reps_completed, is_pr, session_id, workout_sessions!inner(user_id)')
+    .eq('workout_sessions.user_id', userId);
+
+  if (!sesiones) return;
+
+  const totalSesiones = sesiones.length;
+  const totalSeries   = logs?.length || 0;
+  const totalVolumen  = logs?.reduce((s, l) => s + (l.weight_used || 0) * (l.reps_completed || 0), 0) || 0;
+  const totalPRs      = logs?.filter(l => l.is_pr).length || 0;
+
+  // Tiempo promedio en minutos
+  let tiempoTotal = 0;
+  sesiones.forEach(s => {
+    if (s.start_time && s.end_time) {
+      tiempoTotal += (new Date(s.end_time) - new Date(s.start_time)) / 60000;
+    }
+  });
+  const tiempoPromedio = totalSesiones > 0 ? Math.round(tiempoTotal / totalSesiones) : 0;
+
+  document.getElementById('da-kpi-sesiones').textContent = totalSesiones;
+  document.getElementById('da-kpi-series').textContent   = totalSeries;
+  document.getElementById('da-kpi-volumen').textContent  = totalVolumen > 1000
+    ? `${(totalVolumen / 1000).toFixed(1)}t`
+    : `${Math.round(totalVolumen)}kg`;
+  document.getElementById('da-kpi-prs').textContent     = totalPRs;
+  document.getElementById('da-kpi-tiempo').textContent  = tiempoPromedio ? `${tiempoPromedio}min` : '—';
+}
+
+/* ── GRÁFICA FRECUENCIA (últimas 12 semanas) ── */
+async function cargarGraficaFrecuencia(userId) {
+  const { data: sesiones } = await db
+    .from('workout_sessions')
+    .select('start_time')
+    .eq('user_id', userId)
+    .order('start_time', { ascending: false })
+    .limit(200);
+
+  if (!sesiones || sesiones.length === 0) return;
+
+  // Agrupar por semana (últimas 12)
+  const semanas = {};
+  sesiones.forEach(s => {
+    const d = new Date(s.start_time);
+    const inicio = new Date(d);
+    inicio.setDate(d.getDate() - d.getDay()); // Domingo de la semana
+    const clave = inicio.toISOString().slice(0, 10);
+    semanas[clave] = (semanas[clave] || 0) + 1;
+  });
+
+  const claves = Object.keys(semanas).sort().slice(-12);
+  const labels = claves.map(c => {
+    const d = new Date(c);
+    return `${d.getDate()} ${MESES[d.getMonth()].slice(0, 3)}`;
+  });
+  const valores = claves.map(c => semanas[c]);
+  const promedio = valores.length > 0 ? (valores.reduce((a, b) => a + b, 0) / valores.length).toFixed(1) : 0;
+  document.getElementById('da-meta-freq').textContent = `${promedio} días/sem`;
+
+  const ctx = document.getElementById('da-grafico-frecuencia');
+  if (!ctx) return;
+  graficaFrecuencia?.destroy();
+  graficaFrecuencia = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: valores,
+        backgroundColor: 'rgba(126,184,164,0.55)',
+        borderColor: '#7EB8A4',
+        borderWidth: 2,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#aaa', font: { size: 10 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.07)' }, ticks: { color: '#aaa', stepSize: 1 }, beginAtZero: true }
+      },
+      responsive: true, maintainAspectRatio: true,
+    }
+  });
+}
+
+/* ── VOLUMEN POR MÚSCULO ── */
+async function cargarVolumenPorMusculo(userId) {
+  const { data: logs } = await db
+    .from('workout_logs')
+    .select('weight_used, reps_completed, exercises(muscle_group), workout_sessions!inner(user_id)')
+    .eq('workout_sessions.user_id', userId);
+
+  if (!logs || logs.length === 0) {
+    document.getElementById('da-barras-lista').innerHTML = '<p style="color:var(--texto-secundario)">Sin datos</p>';
+    return;
+  }
+
+  const volPorMusculo = {};
+  logs.forEach(l => {
+    const m = l.exercises?.muscle_group || 'Otros';
+    volPorMusculo[m] = (volPorMusculo[m] || 0) + (l.weight_used || 0) * (l.reps_completed || 0);
+  });
+
+  const max = Math.max(...Object.values(volPorMusculo));
+  const sorted = Object.entries(volPorMusculo).sort((a, b) => b[1] - a[1]);
+
+  document.getElementById('da-barras-lista').innerHTML = sorted.map(([musculo, vol]) => {
+    const pct = max > 0 ? (vol / max) * 100 : 0;
+    const color = obtenerColorMusculo(musculo);
+    return `
+      <div class="da-barra-fila">
+        <span class="da-barra-nombre">${musculo}</span>
+        <div class="da-barra-track">
+          <div class="da-barra-fill" style="width:${pct.toFixed(1)}%;background:${color}"></div>
+        </div>
+        <span class="da-barra-val">${Math.round(vol)}kg</span>
+      </div>`;
+  }).join('');
+}
+
+/* ── SELECTOR EJERCICIOS Y GRÁFICA PROGRESIÓN ── */
+async function cargarSelectorEjercicios(userId) {
+  const { data: exercises } = await db
+    .from('exercises')
+    .select('id, name, muscle_group')
+    .eq('user_id', userId)
+    .order('name');
+
+  if (!exercises || exercises.length === 0) return;
+
+  const dropdown = document.getElementById('da-sel-dropdown');
+  if (!dropdown) return;
+
+  dropdown.innerHTML = exercises.map((ex, i) => {
+    const color = obtenerColorMusculo(ex.muscle_group);
+    return `
+      <li role="option" class="da-sel-opcion ${i === 0 ? 'activa' : ''}"
+          data-ej-id="${ex.id}" data-color="${color}" data-nombre="${ex.name}">
+        <span class="da-sel-opt-dot" style="background:${color}"></span>${ex.name}
+      </li>`;
+  }).join('');
+
+  // Seleccionar el primero por defecto
+  const primero = exercises[0];
+  ejercicioSeleccionado = { id: primero.id, nombre: primero.name, color: obtenerColorMusculo(primero.muscle_group) };
+  document.getElementById('da-sel-nombre').textContent = primero.name;
+  document.getElementById('da-sel-dot').style.background = ejercicioSeleccionado.color;
+  cargarGraficaProgresion(userId, ejercicioSeleccionado.id);
+
+  // Toggle dropdown
+  document.getElementById('da-selector-btn')?.addEventListener('click', () => {
+    const dd = document.getElementById('da-sel-dropdown');
+    const open = !dd.classList.contains('oculto');
+    dd.classList.toggle('oculto', open);
+    document.getElementById('da-selector-btn').setAttribute('aria-expanded', String(!open));
+  });
+
+  // Selección
+  dropdown.addEventListener('click', async e => {
+    const op = e.target.closest('.da-sel-opcion');
+    if (!op) return;
+    dropdown.querySelectorAll('.da-sel-opcion').forEach(o => o.classList.remove('activa'));
+    op.classList.add('activa');
+    ejercicioSeleccionado = { id: op.dataset.ejId, nombre: op.dataset.nombre, color: op.dataset.color };
+    document.getElementById('da-sel-nombre').textContent = ejercicioSeleccionado.nombre;
+    document.getElementById('da-sel-dot').style.background = ejercicioSeleccionado.color;
+    document.getElementById('da-sel-dropdown').classList.add('oculto');
+    document.getElementById('da-selector-btn').setAttribute('aria-expanded', 'false');
+    const user = await window.ApexAuth.getUser();
+    if (user) cargarGraficaProgresion(user.id, ejercicioSeleccionado.id);
+  });
+}
+
+async function cargarGraficaProgresion(userId, exerciseId) {
+  const { data: logs } = await db
+    .from('workout_logs')
+    .select('weight_used, reps_completed, is_pr, workout_sessions!inner(user_id, start_time)')
+    .eq('exercise_id', exerciseId)
+    .eq('workout_sessions.user_id', userId)
+    .order('workout_sessions(start_time)', { ascending: true });
+
+  const badge = document.getElementById('da-pr-badge');
+  const ctx   = document.getElementById('da-grafico-progresion');
+  if (!ctx) return;
+
+  if (!logs || logs.length === 0) {
+    badge.textContent = 'Sin datos';
+    graficaProgresion?.destroy();
+    return;
+  }
+
+  // Un punto por sesión = max weight x reps (1RM estimado: w × (1 + r/30))
+  const porSesion = {};
+  logs.forEach(l => {
+    const fecha = l.workout_sessions?.start_time?.slice(0, 10) || '';
+    const orm   = (l.weight_used || 0) * (1 + (l.reps_completed || 0) / 30);
+    if (!porSesion[fecha] || orm > porSesion[fecha]) porSesion[fecha] = orm;
+  });
+
+  const claves  = Object.keys(porSesion).sort();
+  const labels  = claves.map(c => { const d = new Date(c); return `${d.getDate()} ${MESES[d.getMonth()].slice(0, 3)}`; });
+  const valores = claves.map(c => +porSesion[c].toFixed(1));
+
+  const prMax = Math.max(...logs.map(l => l.weight_used || 0));
+  badge.textContent = prMax > 0 ? `PR — ${prMax}kg` : '';
+
+  const color = ejercicioSeleccionado?.color || '#7EB8A4';
+  graficaProgresion?.destroy();
+  graficaProgresion = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: valores,
+        borderColor: color,
+        backgroundColor: color + '22',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: color,
+        fill: true,
+        tension: 0.35,
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#aaa', font: { size: 10 }, maxTicksLimit: 8 } },
+        y: { grid: { color: 'rgba(255,255,255,0.07)' }, ticks: { color: '#aaa' } }
+      },
+      responsive: true, maintainAspectRatio: true,
+    }
+  });
+}
+
+/* ── PESO CORPORAL ── */
+async function cargarGraficaPeso(userId) {
+  const { data: registros } = await db
+    .from('body_tracking')
+    .select('weight, body_fat, muscle_mass, created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: true })
+    .limit(60);
+
+  const meta = document.getElementById('da-meta-peso');
+  if (!registros || registros.length === 0) {
+    if (meta) meta.textContent = 'Sin registros';
+    return;
+  }
+
+  if (meta) meta.textContent = `${registros.length} registros`;
+
+  const labels  = registros.map(r => { const d = new Date(r.created_at); return `${d.getDate()} ${MESES[d.getMonth()].slice(0, 3)}`; });
+  const pesos   = registros.map(r => r.weight || null);
+  const grasas  = registros.map(r => r.body_fat || null);
+  const musculos= registros.map(r => r.muscle_mass || null);
+
+  const ctx = document.getElementById('da-grafico-peso');
+  if (!ctx) return;
+  graficaPeso?.destroy();
+  graficaPeso = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Peso (lbs)',
+          data: pesos,
+          borderColor: '#7EB8A4', backgroundColor: '#7EB8A422',
+          borderWidth: 2, pointRadius: 2.5, fill: true, tension: 0.35,
+        },
+        {
+          label: '% Grasa',
+          data: grasas,
+          borderColor: '#E67E22', backgroundColor: 'transparent',
+          borderWidth: 1.5, pointRadius: 2, fill: false, tension: 0.35,
+          borderDash: [4, 4],
+        },
+        {
+          label: 'Músculo',
+          data: musculos,
+          borderColor: '#5B9BD5', backgroundColor: 'transparent',
+          borderWidth: 1.5, pointRadius: 2, fill: false, tension: 0.35,
+          borderDash: [4, 4],
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 2.8,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: { color: '#aaa', font: { size: 10 }, boxWidth: 10, padding: 8 }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#aaa', font: { size: 9 }, maxTicksLimit: 6 } },
+        y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#aaa', font: { size: 9 } } }
+      },
+    }
+  });
+
+  // Stats resumen
+  const ultimo = registros[registros.length - 1];
+  const primero = registros[0];
+  const difPeso = ultimo.weight && primero.weight ? (ultimo.weight - primero.weight).toFixed(1) : null;
+  const statsEl = document.getElementById('da-peso-stats');
+  if (statsEl && difPeso !== null) {
+    const signo = difPeso > 0 ? '+' : '';
+    const cls = difPeso < 0 ? 'baja' : difPeso > 0 ? 'sube' : 'igual';
+    statsEl.innerHTML = `
+      <div class="da-peso-stat-item">
+        <span class="da-peso-stat-label">Peso actual</span>
+        <span class="da-peso-stat-val">${ultimo.weight} lbs</span>
+      </div>
+      <div class="da-peso-stat-item">
+        <span class="da-peso-stat-label">Cambio total</span>
+        <span class="da-peso-stat-val corporal-hist-delta ${cls}">${signo}${difPeso} lbs</span>
+      </div>
+      ${ultimo.body_fat ? `
+      <div class="da-peso-stat-item">
+        <span class="da-peso-stat-label">% Grasa actual</span>
+        <span class="da-peso-stat-val">${ultimo.body_fat}%</span>
+      </div>` : ''}
+      ${ultimo.muscle_mass ? `
+      <div class="da-peso-stat-item">
+        <span class="da-peso-stat-label">Masa muscular</span>
+        <span class="da-peso-stat-val">${ultimo.muscle_mass} lbs</span>
+      </div>` : ''}`;
+  }
+}
+
+/* ── PRs RECIENTES ── */
+async function cargarPRsRecientes(userId) {
+  const { data: prs } = await db
+    .from('workout_logs')
+    .select('weight_used, reps_completed, exercises(name, muscle_group), workout_sessions!inner(user_id, start_time)')
+    .eq('is_pr', true)
+    .eq('workout_sessions.user_id', userId)
+    .order('workout_sessions(start_time)', { ascending: false })
+    .limit(10);
+
+  const lista = document.getElementById('da-pr-lista');
+  if (!lista) return;
+
+  if (!prs || prs.length === 0) {
+    lista.innerHTML = '<li style="color:var(--texto-secundario);padding:0.5rem 0">Sin récords aún</li>';
+    return;
+  }
+
+  lista.innerHTML = prs.map(pr => {
+    const ex    = pr.exercises;
+    const fecha = new Date(pr.workout_sessions?.start_time || Date.now());
+    const color = obtenerColorMusculo(ex?.muscle_group || '');
+    return `
+      <li class="da-pr-item">
+        <span class="da-pr-dot" style="--c:${color}"></span>
+        <div class="da-pr-info">
+          <span class="da-pr-ejercicio">${ex?.name || '—'}</span>
+          <span class="da-pr-musculo" style="color:${color}">${ex?.muscle_group || '—'}</span>
+        </div>
+        <div class="da-pr-nums">
+          <span class="da-pr-peso">${pr.weight_used || 0}kg</span>
+          <span class="da-pr-reps">× ${pr.reps_completed || 0}</span>
+          <span class="da-pr-fecha">${fecha.getDate()} ${MESES[fecha.getMonth()].slice(0, 3)}</span>
+        </div>
+      </li>`;
+  }).join('');
+}
+
+/* ── RACHAS ── */
+async function cargarRachas(userId) {
+  const { data: sesiones } = await db
+    .from('workout_sessions')
+    .select('start_time')
+    .eq('user_id', userId)
+    .order('start_time', { ascending: false });
+
+  if (!sesiones || sesiones.length === 0) return;
+
+  // Días únicos ordenados DESC
+  const diasUnicos = [...new Set(sesiones.map(s => s.start_time.slice(0, 10)))].sort().reverse();
+
+  // Racha actual
+  let rachaActual = 0;
+  const hoy = new Date().toISOString().slice(0, 10);
+  let diaEsp = hoy;
+  for (const dia of diasUnicos) {
+    if (dia === diaEsp) {
+      rachaActual++;
+      const d = new Date(diaEsp);
+      d.setDate(d.getDate() - 1);
+      diaEsp = d.toISOString().slice(0, 10);
+    } else break;
+  }
+
+  // Mejor racha histórica
+  let mejorRacha = 0, contador = 1;
+  for (let i = 1; i < diasUnicos.length; i++) {
+    const prev = new Date(diasUnicos[i - 1]);
+    const curr = new Date(diasUnicos[i]);
+    const diff = (prev - curr) / 86400000;
+    if (Math.round(diff) === 1) {
+      contador++;
+      mejorRacha = Math.max(mejorRacha, contador);
+    } else {
+      contador = 1;
+    }
+  }
+  mejorRacha = Math.max(mejorRacha, rachaActual);
+
+  // Semanas activas en últimas 8
+  const semanas = new Set();
+  const hace8 = new Date(); hace8.setDate(hace8.getDate() - 56);
+  sesiones.forEach(s => {
+    const d = new Date(s.start_time);
+    if (d >= hace8) {
+      const inicio = new Date(d); inicio.setDate(d.getDate() - d.getDay());
+      semanas.add(inicio.toISOString().slice(0, 10));
+    }
+  });
+
+  document.getElementById('da-racha-actual').textContent  = rachaActual;
+  document.getElementById('da-racha-mejor').textContent   = mejorRacha;
+  document.getElementById('da-racha-semanas').textContent = `${semanas.size}/8`;
+  document.getElementById('da-kpi-racha').textContent     = rachaActual;
+}
+
+// Bind cerrarAnalisis to the close button when DOM loads
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('da-cerrar')?.addEventListener('click', cerrarAnalisis);
+});
 
 /* ══════════════════════════════════════════════════════════
    9. COMPARTIR
@@ -829,13 +1398,20 @@ async function renderizarHistorialReciente() {
     const diaNom = DIAS[fecha.getDay()];
     const mesNom = MESES[fecha.getMonth()];
     
-    // Agrupar logs por ejercicio para mostrar resumen
-    const ejerciciosUnicos = [];
+    // Agrupar logs por ejercicio
+    const logsPorEj = {};
     s.workout_logs.forEach(log => {
-      if (!ejerciciosUnicos.find(e => e.id === log.exercise_id)) {
-        ejerciciosUnicos.push(log.exercises);
+      if (!log.exercises) return;
+      if (!logsPorEj[log.exercise_id]) {
+        logsPorEj[log.exercise_id] = {
+          ejercicio: log.exercises,
+          series: []
+        };
       }
+      logsPorEj[log.exercise_id].series.push(log);
     });
+
+    const ejerciciosUnicos = Object.values(logsPorEj);
 
     return `
       <article class="entreno-card">
@@ -850,7 +1426,7 @@ async function renderizarHistorialReciente() {
             </div>
             <div class="entreno-musculo-dots">
               ${ejerciciosUnicos.slice(0, 4).map(e => `
-                <span class="musculo-dot" style="--c:${obtenerColorMusculo(e.muscle_group)}" title="${e.muscle_group}"></span>
+                <span class="musculo-dot" style="--c:${obtenerColorMusculo(e.ejercicio.muscle_group)}" title="${e.ejercicio.muscle_group}"></span>
               `).join('')}
             </div>
           </header>
@@ -858,9 +1434,18 @@ async function renderizarHistorialReciente() {
             ${ejerciciosUnicos.slice(0, 3).map(e => `
               <li class="ejercicio-bloque">
                 <div class="ejercicio-titulo-fila">
-                  <span class="ejercicio-dot" style="--c:${obtenerColorMusculo(e.muscle_group)}"></span>
-                  <span class="ejercicio-nombre">${e.name}</span>
+                  <span class="ejercicio-dot" style="--c:${obtenerColorMusculo(e.ejercicio.muscle_group)}"></span>
+                  <span class="ejercicio-nombre">${e.ejercicio.name}</span>
                 </div>
+                <ul class="series-lista">
+                  ${e.series.sort((a,b) => a.set_number - b.set_number).map(serie => `
+                    <li class="serie-fila ${serie.is_pr ? 'serie-pr' : ''}">
+                      ${serie.is_pr ? '<i data-lucide="trophy" class="icono-trofeo"></i>' : ''}
+                      <span class="serie-peso">${serie.weight_used || 0} kg</span>
+                      <span class="serie-reps">${serie.reps_completed || 0} reps</span>
+                    </li>
+                  `).join('')}
+                </ul>
               </li>
             `).join('')}
             ${ejerciciosUnicos.length > 3 ? `<li class="ejercicio-mas">y ${ejerciciosUnicos.length - 3} más...</li>` : ''}
@@ -869,6 +1454,7 @@ async function renderizarHistorialReciente() {
       </article>
     `;
   }).join('');
+  lucide.createIcons();
 }
 
 /* ══════════════════════════════════════════════════════════

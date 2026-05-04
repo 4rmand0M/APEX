@@ -265,6 +265,16 @@
 }
 
 .da-grafico-wrap-tall { height: 190px; }
+.da-grafico-wrap-sm   { height: 110px; }
+.da-grafico-wrap-col  { height: 130px; }
+
+/* ── DOS COLUMNAS ── */
+.da-dos-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
 
 .da-grafico-wrap canvas {
   width: 100% !important;
@@ -625,3 +635,97 @@
 }
 
 .da-racha-sub { font-size: 0.58rem; color: var(--texto-atenuado); }
+
+/* ── BARRAS VOLUMEN (nuevas) ── */
+.da-barra-fila {
+  display: grid;
+  grid-template-columns: 90px 1fr 52px;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.da-barra-nombre {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--texto);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.da-barra-track {
+  height: 6px;
+  background: var(--borde);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.da-barra-fill {
+  height: 100%;
+  border-radius: 999px;
+  animation: daCrecer 0.65s cubic-bezier(0.16,1,0.3,1) both;
+  min-width: 2px;
+}
+
+.da-barra-val {
+  font-size: 0.62rem;
+  color: var(--texto-atenuado);
+  text-align: right;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ── PESO CORPORAL STATS ── */
+.da-grafico-peso-box {
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.da-grafico-peso-box canvas {
+  display: block;
+  width: 100% !important;
+}
+
+.da-peso-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.4rem;
+}
+
+@media (min-width: 480px) {
+  .da-peso-stats { grid-template-columns: repeat(4, 1fr); }
+}
+
+.da-peso-stat-item {
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.da-peso-stat-label {
+  font-size: 0.56rem;
+  color: var(--texto-atenuado);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.da-peso-stat-val {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.05rem;
+  color: var(--texto);
+  line-height: 1;
+}
+
+/* delta colors */
+.corporal-hist-delta.baja  { color: #5CB85C; }
+.corporal-hist-delta.sube  { color: #e74c3c; }
+.corporal-hist-delta.igual { color: var(--texto-atenuado); }

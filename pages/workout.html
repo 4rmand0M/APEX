@@ -125,216 +125,8 @@
 
         <!-- ════════════════════════════════════════
            SCROLL FEED — cards apiladas verticalmente
-           BACKEND: GET /sessions?user_id={userId}&date={fecha}
       ════════════════════════════════════════ -->
         <div class="workout-feed" id="workout-feed" role="feed" aria-label="Historial de entrenos">
-
-          <!-- ── ENTRENO CARD ── -->
-          <!-- BACKEND: Iterar sesiones. data-session-id="{{sesion.id}}" -->
-          <article class="entreno-card" data-session-id="ses-001">
-            <div class="entreno-card-inner">
-
-              <header class="entreno-card-cabecera">
-                <div class="entreno-fecha-bloque">
-                  <time class="entreno-dia-num" datetime="2026-03-20">20</time>
-                  <div>
-                    <span class="entreno-dia-nombre">Viernes</span>
-                    <span class="entreno-mes">Marzo 2026</span>
-                  </div>
-                </div>
-                <!-- puntos de músculo trabajado (colores de la BD) -->
-                <div class="entreno-musculo-dots">
-                  <!-- BACKEND: por cada musculo único de la sesión -->
-                  <span class="musculo-dot" style="--c:#7EB8A4" title="Espalda"></span>
-                  <span class="musculo-dot" style="--c:#5CB85C" title="Bíceps"></span>
-                  <span class="musculo-dot" style="--c:#5CB85C" title="Trapecios"></span>
-                  <span class="musculo-dot" style="--c:#5B9BD5" title="Antebrazos"></span>
-                </div>
-                <!-- Solo compartir, sin likes ni comentarios -->
-                <button class="btn-compartir" aria-label="Compartir entreno">
-                  <i data-lucide="share-2"></i>
-                </button>
-              </header>
-
-              <!-- Lista de ejercicios -->
-              <ul class="entreno-ejercicios" aria-label="Ejercicios realizados">
-
-                <!-- BACKEND: Iterar ejercicios de la sesión -->
-                <li class="ejercicio-bloque">
-                  <div class="ejercicio-titulo-fila">
-                    <!-- BACKEND: color del músculo desde la BD -->
-                    <span class="ejercicio-dot" style="--c:#7EB8A4"></span>
-                    <span class="ejercicio-nombre">Jalón Al Pecho Neutro</span>
-                  </div>
-                  <!-- BACKEND: Iterar series del ejercicio -->
-                  <ul class="series-lista">
-                    <li class="serie-fila serie-pr">
-                      <i data-lucide="trophy" class="icono-trofeo" aria-label="Récord personal"></i>
-                      <span class="serie-peso">120.0 lbs</span>
-                      <span class="serie-reps">10 reps</span>
-                    </li>
-                    <li class="serie-fila">
-                      <span class="serie-peso">120.0 lbs</span>
-                      <span class="serie-reps">7 reps</span>
-                    </li>
-                    <li class="serie-fila">
-                      <span class="serie-peso">105.0 lbs</span>
-                      <span class="serie-reps">10 reps</span>
-                    </li>
-                  </ul>
-                </li>
-
-                <li class="ejercicio-bloque">
-                  <div class="ejercicio-titulo-fila">
-                    <span class="ejercicio-dot" style="--c:#7EB8A4"></span>
-                    <span class="ejercicio-nombre">Remo Cerrado En Polea</span>
-                  </div>
-                  <ul class="series-lista">
-                    <li class="serie-fila serie-pr">
-                      <i data-lucide="trophy" class="icono-trofeo"></i>
-                      <span class="serie-peso">111.0 lbs</span>
-                      <span class="serie-reps">15 reps</span>
-                    </li>
-                    <li class="serie-fila serie-pr">
-                      <i data-lucide="trophy" class="icono-trofeo"></i>
-                      <span class="serie-peso">133.0 lbs</span>
-                      <span class="serie-reps">10 reps</span>
-                    </li>
-                    <li class="serie-fila">
-                      <span class="serie-peso">133.0 lbs</span>
-                      <span class="serie-reps">10 reps</span>
-                    </li>
-                  </ul>
-                </li>
-
-                <li class="ejercicio-bloque">
-                  <div class="ejercicio-titulo-fila">
-                    <span class="ejercicio-dot" style="--c:#5CB85C"></span>
-                    <span class="ejercicio-nombre">Curl Bíceps Mancuerna</span>
-                  </div>
-                  <ul class="series-lista">
-                    <li class="serie-fila serie-pr">
-                      <i data-lucide="trophy" class="icono-trofeo"></i>
-                      <span class="serie-peso">22.0 lbs</span>
-                      <span class="serie-reps">12 reps</span>
-                    </li>
-                    <li class="serie-fila">
-                      <span class="serie-peso">22.0 lbs</span>
-                      <span class="serie-reps">10 reps</span>
-                    </li>
-                    <li class="serie-fila">
-                      <span class="serie-peso">22.0 lbs</span>
-                      <span class="serie-reps">10 reps</span>
-                    </li>
-                  </ul>
-                </li>
-
-                <li class="ejercicio-bloque">
-                  <div class="ejercicio-titulo-fila">
-                    <span class="ejercicio-dot" style="--c:#7EB8A4"></span>
-                    <span class="ejercicio-nombre">Jalón Unilateral Con Polea</span>
-                  </div>
-                  <ul class="series-lista">
-                    <li class="serie-fila serie-pr">
-                      <i data-lucide="trophy" class="icono-trofeo"></i>
-                      <span class="serie-peso">45.0 lbs</span>
-                      <span class="serie-reps">12 reps</span>
-                    </li>
-                    <li class="serie-fila">
-                      <span class="serie-peso">45.0 lbs</span>
-                      <span class="serie-reps">12 reps</span>
-                    </li>
-                    <li class="serie-fila">
-                      <span class="serie-peso">45.0 lbs</span>
-                      <span class="serie-reps">12 reps</span>
-                    </li>
-                  </ul>
-                </li>
-
-              </ul>
-
-              <!-- Footer: etiquetas musculares -->
-              <!-- BACKEND: {{sesion.musculos_unicos}} array -->
-              <footer class="entreno-card-footer">
-                <span class="etiqueta-musculo" style="--c:#7EB8A4">ESPALDA</span>
-                <span class="etiqueta-musculo" style="--c:#5CB85C">BÍCEPS</span>
-                <span class="etiqueta-musculo" style="--c:#5CB85C">TRAPECIOS</span>
-                <span class="etiqueta-musculo" style="--c:#5B9BD5">ANTEBRAZOS</span>
-              </footer>
-
-            </div>
-          </article>
-          <!-- /ENTRENO CARD 1 -->
-
-          <!-- Segunda card de ejemplo -->
-          <article class="entreno-card" data-session-id="ses-002">
-            <div class="entreno-card-inner">
-              <header class="entreno-card-cabecera">
-                <div class="entreno-fecha-bloque">
-                  <time class="entreno-dia-num" datetime="2026-03-19">19</time>
-                  <div>
-                    <span class="entreno-dia-nombre">Jueves</span>
-                    <span class="entreno-mes">Marzo 2026</span>
-                  </div>
-                </div>
-                <div class="entreno-musculo-dots">
-                  <span class="musculo-dot" style="--c:#5CB85C" title="Pecho"></span>
-                  <span class="musculo-dot" style="--c:#5B9BD5" title="Hombro"></span>
-                  <span class="musculo-dot" style="--c:#9B59B6" title="Tríceps"></span>
-                </div>
-                <button class="btn-compartir" aria-label="Compartir entreno">
-                  <i data-lucide="share-2"></i>
-                </button>
-              </header>
-              <ul class="entreno-ejercicios">
-                <li class="ejercicio-bloque">
-                  <div class="ejercicio-titulo-fila">
-                    <span class="ejercicio-dot" style="--c:#5CB85C"></span>
-                    <span class="ejercicio-nombre">Press Inclinado Mancuerna</span>
-                  </div>
-                  <ul class="series-lista">
-                    <li class="serie-fila serie-pr"><i data-lucide="trophy" class="icono-trofeo"></i><span
-                        class="serie-peso">45.0 lbs</span><span class="serie-reps">9 reps</span></li>
-                    <li class="serie-fila"><span class="serie-peso">40.0 lbs</span><span class="serie-reps">9
-                        reps</span></li>
-                    <li class="serie-fila serie-pr"><i data-lucide="trophy" class="icono-trofeo"></i><span
-                        class="serie-peso">40.0 lbs</span><span class="serie-reps">10 reps</span></li>
-                  </ul>
-                </li>
-                <li class="ejercicio-bloque">
-                  <div class="ejercicio-titulo-fila">
-                    <span class="ejercicio-dot" style="--c:#5CB85C"></span>
-                    <span class="ejercicio-nombre">Apertura De Pecho Maquina</span>
-                  </div>
-                  <ul class="series-lista">
-                    <li class="serie-fila"><span class="serie-peso">90.0 lbs</span><span class="serie-reps">10
-                        reps</span></li>
-                    <li class="serie-fila"><span class="serie-peso">90.0 lbs</span><span class="serie-reps">10
-                        reps</span></li>
-                    <li class="serie-fila serie-pr"><i data-lucide="trophy" class="icono-trofeo"></i><span
-                        class="serie-peso">110.0 lbs</span><span class="serie-reps">10 reps</span></li>
-                  </ul>
-                </li>
-                <li class="ejercicio-bloque">
-                  <div class="ejercicio-titulo-fila">
-                    <span class="ejercicio-dot" style="--c:#5B9BD5"></span>
-                    <span class="ejercicio-nombre">Elevaciones Laterales</span>
-                  </div>
-                  <ul class="series-lista">
-                    <li class="serie-fila serie-pr"><i data-lucide="trophy" class="icono-trofeo"></i><span
-                        class="serie-peso">11.0 lbs</span><span class="serie-reps">20 reps</span></li>
-                    <li class="serie-fila"><span class="serie-peso">11.0 lbs</span><span class="serie-reps">20
-                        reps</span></li>
-                  </ul>
-                </li>
-              </ul>
-              <footer class="entreno-card-footer">
-                <span class="etiqueta-musculo" style="--c:#5CB85C">PECHO</span>
-                <span class="etiqueta-musculo" style="--c:#5B9BD5">HOMBRO</span>
-                <span class="etiqueta-musculo" style="--c:#9B59B6">TRÍCEPS</span>
-              </footer>
-            </div>
-          </article>
 
           <!-- SECCIÓN: SELECCIONAR RUTINA -->
           <section class="journal-section">
@@ -488,162 +280,11 @@
 
     <!-- BACKEND: GET /exercise-categories → lista de grupos con color y ejercicios -->
     <ul class="sheet-grupos" id="sheet-grupos" role="list" aria-label="Grupos musculares">
-
-      <!-- Cada grupo se puede expandir para ver sus ejercicios -->
-      <!-- BACKEND: data-grupo-id="{{grupo.id}}" data-color="{{grupo.color}}" -->
-      <li class="sheet-grupo-item" data-grupo-id="g-espalda" data-color="#7EB8A4">
-        <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-espalda">
-          <span class="sg-dot" style="background:#7EB8A4"></span>
-          <span class="sg-nombre">Espalda</span>
-          <i data-lucide="chevron-right" class="sg-chevron"></i>
-        </button>
-        <ul class="sg-ejercicios oculto" id="sg-espalda" role="list">
-          <!-- BACKEND: Iterar {{grupo.ejercicios}} -->
-          <li class="sg-ej-item" data-ej-id="ej-001" data-ej-musculo="Espalda" data-ej-color="#7EB8A4">
-            <button class="sg-ej-btn" aria-label="Añadir Jalón Al Pecho Neutro">
-              <span class="sg-ej-nombre">Jalón Al Pecho Neutro</span>
-              <i data-lucide="plus" class="sg-ej-plus"></i>
-            </button>
-          </li>
-          <li class="sg-ej-item" data-ej-id="ej-002" data-ej-musculo="Espalda" data-ej-color="#7EB8A4">
-            <button class="sg-ej-btn" aria-label="Añadir Remo Cerrado En Polea">
-              <span class="sg-ej-nombre">Remo Cerrado En Polea</span>
-              <i data-lucide="plus" class="sg-ej-plus"></i>
-            </button>
-          </li>
-          <li class="sg-ej-item" data-ej-id="ej-003" data-ej-musculo="Espalda" data-ej-color="#7EB8A4">
-            <button class="sg-ej-btn" aria-label="Añadir Jalón Unilateral Con Polea">
-              <span class="sg-ej-nombre">Jalón Unilateral Con Polea</span>
-              <i data-lucide="plus" class="sg-ej-plus"></i>
-            </button>
-          </li>
-        </ul>
-      </li>
-
-      <li class="sheet-grupo-item" data-grupo-id="g-biceps" data-color="#5CB85C">
-        <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-biceps">
-          <span class="sg-dot" style="background:#5CB85C"></span>
-          <span class="sg-nombre">Bíceps</span>
-          <i data-lucide="chevron-right" class="sg-chevron"></i>
-        </button>
-        <ul class="sg-ejercicios oculto" id="sg-biceps" role="list">
-          <li class="sg-ej-item" data-ej-id="ej-004" data-ej-musculo="Bíceps" data-ej-color="#5CB85C">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Curl Bíceps Mancuerna</span><i data-lucide="plus"
-                class="sg-ej-plus"></i></button>
-          </li>
-          <li class="sg-ej-item" data-ej-id="ej-005" data-ej-musculo="Bíceps" data-ej-color="#5CB85C">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Curl Bíceps Predicador + Martillo</span><i
-                data-lucide="plus" class="sg-ej-plus"></i></button>
-          </li>
-        </ul>
-      </li>
-
-      <li class="sheet-grupo-item" data-grupo-id="g-pecho" data-color="#5CB85C">
-        <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-pecho">
-          <span class="sg-dot" style="background:#5CB85C"></span>
-          <span class="sg-nombre">Pecho</span>
-          <i data-lucide="chevron-right" class="sg-chevron"></i>
-        </button>
-        <ul class="sg-ejercicios oculto" id="sg-pecho" role="list">
-          <li class="sg-ej-item" data-ej-id="ej-006" data-ej-musculo="Pecho" data-ej-color="#5CB85C">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Press Inclinado Mancuerna</span><i data-lucide="plus"
-                class="sg-ej-plus"></i></button>
-          </li>
-          <li class="sg-ej-item" data-ej-id="ej-007" data-ej-musculo="Pecho" data-ej-color="#5CB85C">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Apertura De Pecho Maquina</span><i data-lucide="plus"
-                class="sg-ej-plus"></i></button>
-          </li>
-          <li class="sg-ej-item" data-ej-id="ej-008" data-ej-musculo="Pecho" data-ej-color="#5CB85C">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Pecho Medio Polea</span><i data-lucide="plus"
-                class="sg-ej-plus"></i></button>
-          </li>
-          <li class="sg-ej-item" data-ej-id="ej-009" data-ej-musculo="Pecho" data-ej-color="#5CB85C">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Pecho Bajo Polea</span><i data-lucide="plus"
-                class="sg-ej-plus"></i></button>
-          </li>
-        </ul>
-      </li>
-
-      <li class="sheet-grupo-item" data-grupo-id="g-hombro" data-color="#5B9BD5">
-        <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-hombro">
-          <span class="sg-dot" style="background:#5B9BD5"></span>
-          <span class="sg-nombre">Hombro</span>
-          <i data-lucide="chevron-right" class="sg-chevron"></i>
-        </button>
-        <ul class="sg-ejercicios oculto" id="sg-hombro" role="list">
-          <li class="sg-ej-item" data-ej-id="ej-010" data-ej-musculo="Hombro" data-ej-color="#5B9BD5">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Elevaciones Laterales</span><i data-lucide="plus"
-                class="sg-ej-plus"></i></button>
-          </li>
-        </ul>
-      </li>
-
-      <li class="sheet-grupo-item" data-grupo-id="g-triceps" data-color="#9B59B6">
-        <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-triceps">
-          <span class="sg-dot" style="background:#9B59B6"></span>
-          <span class="sg-nombre">Tríceps</span>
-          <i data-lucide="chevron-right" class="sg-chevron"></i>
-        </button>
-        <ul class="sg-ejercicios oculto" id="sg-triceps" role="list">
-          <li class="sg-ej-item" data-ej-id="ej-011" data-ej-musculo="Tríceps" data-ej-color="#9B59B6">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Extensión De Tríceps Cuerda</span><i data-lucide="plus"
-                class="sg-ej-plus"></i></button>
-          </li>
-        </ul>
-      </li>
-
-      <li class="sheet-grupo-item" data-grupo-id="g-piernas" data-color="#48C9B0">
-        <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-piernas">
-          <span class="sg-dot" style="background:#48C9B0"></span>
-          <span class="sg-nombre">Piernas</span>
-          <i data-lucide="chevron-right" class="sg-chevron"></i>
-        </button>
-        <ul class="sg-ejercicios oculto" id="sg-piernas" role="list">
-          <li class="sg-ej-item" data-ej-id="ej-012" data-ej-musculo="Piernas" data-ej-color="#48C9B0">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Sentadilla Barra</span><i data-lucide="plus"
-                class="sg-ej-plus"></i></button>
-          </li>
-          <li class="sg-ej-item" data-ej-id="ej-013" data-ej-musculo="Piernas" data-ej-color="#48C9B0">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Prensa De Piernas</span><i data-lucide="plus"
-                class="sg-ej-plus"></i></button>
-          </li>
-        </ul>
-      </li>
-
-      <li class="sheet-grupo-item" data-grupo-id="g-trapecios" data-color="#5CB85C">
-        <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-trapecios">
-          <span class="sg-dot" style="background:#5CB85C"></span>
-          <span class="sg-nombre">Trapecios</span>
-          <i data-lucide="chevron-right" class="sg-chevron"></i>
-        </button>
-        <ul class="sg-ejercicios oculto" id="sg-trapecios" role="list">
-          <li class="sg-ej-item" data-ej-id="ej-014" data-ej-musculo="Trapecios" data-ej-color="#5CB85C">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Encogida En Hombros</span><i data-lucide="plus"
-                class="sg-ej-plus"></i></button>
-          </li>
-        </ul>
-      </li>
-
-      <li class="sheet-grupo-item" data-grupo-id="g-antebrazos" data-color="#5B9BD5">
-        <button class="sheet-grupo-row" aria-expanded="false" aria-controls="sg-antebrazos">
-          <span class="sg-dot" style="background:#5B9BD5"></span>
-          <span class="sg-nombre">Antebrazos</span>
-          <i data-lucide="chevron-right" class="sg-chevron"></i>
-        </button>
-        <ul class="sg-ejercicios oculto" id="sg-antebrazos" role="list">
-          <li class="sg-ej-item" data-ej-id="ej-015" data-ej-musculo="Antebrazos" data-ej-color="#5B9BD5">
-            <button class="sg-ej-btn"><span class="sg-ej-nombre">Curl De Muñeca Barra</span><i data-lucide="plus"
-                class="sg-ej-plus"></i></button>
-          </li>
-        </ul>
-      </li>
-
       <!-- Sin resultados de búsqueda -->
       <li class="sheet-sin-res oculto" id="sheet-sin-res">
         <i data-lucide="search-x"></i>
         <span>Sin resultados</span>
       </li>
-
     </ul>
   </div>
 
@@ -671,22 +312,12 @@
       </button>
     </div>
 
-    <!-- FILTROS DE PERÍODO -->
-    <!-- BACKEND: parámetro ?period= en todas las llamadas de análisis -->
-    <div class="da-filtros" role="tablist" aria-label="Período de análisis">
-      <button class="da-filtro activo" role="tab" aria-selected="true" data-periodo="7d">7D</button>
-      <button class="da-filtro" role="tab" aria-selected="false" data-periodo="30d">30D</button>
-      <button class="da-filtro" role="tab" aria-selected="false" data-periodo="3m">3M</button>
-      <button class="da-filtro" role="tab" aria-selected="false" data-periodo="6m">6M</button>
-      <button class="da-filtro" role="tab" aria-selected="false" data-periodo="1y">1A</button>
-      <button class="da-filtro" role="tab" aria-selected="false" data-periodo="all">Todo</button>
-    </div>
 
     <!-- SCROLL BODY -->
     <div class="da-body" id="da-body">
 
       <!-- ── KPIs ── -->
-      <!-- BACKEND: GET /analytics/summary?user_id={userId}&period={periodo} -->
+      <!-- ── KPIs ── -->
       <section class="da-seccion" aria-labelledby="da-titulo-kpis">
         <h3 class="da-seccion-titulo" id="da-titulo-kpis">
           <i data-lucide="zap"></i> Resumen
@@ -696,210 +327,78 @@
             <span class="da-kpi-icono" style="--kc:#7EB8A4"><i data-lucide="dumbbell"></i></span>
             <span class="da-kpi-valor" id="da-kpi-sesiones">—</span>
             <span class="da-kpi-label">Sesiones</span>
-            <span class="da-kpi-delta" id="da-delta-sesiones"></span>
           </div>
           <div class="da-kpi">
             <span class="da-kpi-icono" style="--kc:#5B9BD5"><i data-lucide="layers"></i></span>
             <span class="da-kpi-valor" id="da-kpi-series">—</span>
             <span class="da-kpi-label">Series</span>
-            <span class="da-kpi-delta" id="da-delta-series"></span>
           </div>
           <div class="da-kpi">
             <span class="da-kpi-icono" style="--kc:#E67E22"><i data-lucide="weight"></i></span>
             <span class="da-kpi-valor" id="da-kpi-volumen">—</span>
             <span class="da-kpi-label">Volumen</span>
-            <span class="da-kpi-delta" id="da-delta-volumen"></span>
           </div>
           <div class="da-kpi">
             <span class="da-kpi-icono" style="--kc:#F1C40F"><i data-lucide="trophy"></i></span>
             <span class="da-kpi-valor" id="da-kpi-prs">—</span>
             <span class="da-kpi-label">PRs</span>
-            <span class="da-kpi-delta" id="da-delta-prs"></span>
           </div>
           <div class="da-kpi">
             <span class="da-kpi-icono" style="--kc:#48C9B0"><i data-lucide="flame"></i></span>
             <span class="da-kpi-valor" id="da-kpi-racha">—</span>
             <span class="da-kpi-label">Racha</span>
-            <span class="da-kpi-delta" id="da-delta-racha"></span>
           </div>
           <div class="da-kpi">
             <span class="da-kpi-icono" style="--kc:#9B59B6"><i data-lucide="clock"></i></span>
             <span class="da-kpi-valor" id="da-kpi-tiempo">—</span>
             <span class="da-kpi-label">Tiempo</span>
-            <span class="da-kpi-delta" id="da-delta-tiempo"></span>
           </div>
         </div>
       </section>
 
-      <!-- ── FRECUENCIA ── -->
-      <!-- BACKEND: GET /analytics/frequency?user_id={userId}&period={periodo} -->
-      <section class="da-seccion" aria-labelledby="da-titulo-freq">
-        <div class="da-seccion-header">
-          <h3 class="da-seccion-titulo" id="da-titulo-freq">
-            <i data-lucide="calendar-days"></i> Frecuencia
+      <!-- ── DOS COLUMNAS: FRECUENCIA + VOLUMEN ── -->
+      <div class="da-dos-col">
+        <!-- Frecuencia -->
+        <section class="da-seccion" aria-labelledby="da-titulo-freq">
+          <div class="da-seccion-header">
+            <h3 class="da-seccion-titulo" id="da-titulo-freq">
+              <i data-lucide="calendar-days"></i> Frecuencia
+            </h3>
+            <span class="da-seccion-meta" id="da-meta-freq">— días/sem</span>
+          </div>
+          <div class="da-grafico-wrap da-grafico-wrap-col">
+            <canvas id="da-grafico-frecuencia" aria-label="Frecuencia semanal" role="img"></canvas>
+          </div>
+        </section>
+
+        <!-- Volumen por músculo -->
+        <section class="da-seccion" aria-labelledby="da-titulo-musculos">
+          <h3 class="da-seccion-titulo" id="da-titulo-musculos">
+            <i data-lucide="activity"></i> Volumen
           </h3>
-          <span class="da-seccion-meta" id="da-meta-freq">— días/sem</span>
-        </div>
-        <div class="da-grafico-wrap">
-          <canvas id="da-grafico-frecuencia" aria-label="Frecuencia semanal" role="img"></canvas>
-        </div>
-      </section>
+          <div class="da-barras-lista" id="da-barras-lista">
+            <!-- JS inserta filas .da-barra-fila -->
+          </div>
+        </section>
+      </div>
 
-      <!-- ── VOLUMEN POR MÚSCULO ── -->
-      <!-- BACKEND: GET /analytics/volume-by-muscle?user_id={userId}&period={periodo} -->
-      <section class="da-seccion" aria-labelledby="da-titulo-musculos">
-        <h3 class="da-seccion-titulo" id="da-titulo-musculos">
-          <i data-lucide="activity"></i> Volumen por músculo
-        </h3>
-        <div class="da-barras-lista" id="da-barras-lista">
-          <!-- JS inserta filas .da-barra-fila -->
-        </div>
-      </section>
-
-      <!-- ── PROGRESIÓN ── -->
-      <!-- BACKEND: GET /analytics/exercise-progress?user_id={userId}&exercise_id={id}&period={periodo} -->
-      <section class="da-seccion" aria-labelledby="da-titulo-prog">
+      <!-- ── PESO CORPORAL ── -->
+      <section class="da-seccion" aria-labelledby="da-titulo-peso">
         <div class="da-seccion-header">
-          <h3 class="da-seccion-titulo" id="da-titulo-prog">
-            <i data-lucide="trending-up"></i> Progresión
+          <h3 class="da-seccion-titulo" id="da-titulo-peso">
+            <i data-lucide="scale"></i> Peso Corporal
           </h3>
-          <span class="da-pr-badge" id="da-pr-badge">PR — lbs</span>
+          <span class="da-seccion-meta" id="da-meta-peso">— registros</span>
         </div>
-
-        <!-- Selector ejercicio -->
-        <div class="da-selector-wrap">
-          <button class="da-selector-btn" id="da-selector-btn" aria-haspopup="listbox" aria-expanded="false">
-            <span class="da-sel-dot" id="da-sel-dot" style="background:#7EB8A4"></span>
-            <span class="da-sel-nombre" id="da-sel-nombre">Jalón Al Pecho Neutro</span>
-            <i data-lucide="chevron-down" class="da-sel-chevron" id="da-sel-chevron"></i>
-          </button>
-          <!-- BACKEND: lista de ejercicios del usuario -->
-          <ul class="da-sel-dropdown oculto" id="da-sel-dropdown" role="listbox" aria-label="Seleccionar ejercicio">
-            <li role="option" class="da-sel-opcion activa" data-ej-id="ej-001" data-color="#7EB8A4">
-              <span class="da-sel-opt-dot" style="background:#7EB8A4"></span>Jalón Al Pecho Neutro
-            </li>
-            <li role="option" class="da-sel-opcion" data-ej-id="ej-002" data-color="#7EB8A4">
-              <span class="da-sel-opt-dot" style="background:#7EB8A4"></span>Remo Cerrado En Polea
-            </li>
-            <li role="option" class="da-sel-opcion" data-ej-id="ej-003" data-color="#7EB8A4">
-              <span class="da-sel-opt-dot" style="background:#7EB8A4"></span>Jalón Unilateral Con Polea
-            </li>
-            <li role="option" class="da-sel-opcion" data-ej-id="ej-004" data-color="#5CB85C">
-              <span class="da-sel-opt-dot" style="background:#5CB85C"></span>Curl Bíceps Mancuerna
-            </li>
-            <li role="option" class="da-sel-opcion" data-ej-id="ej-006" data-color="#5CB85C">
-              <span class="da-sel-opt-dot" style="background:#5CB85C"></span>Press Inclinado Mancuerna
-            </li>
-            <li role="option" class="da-sel-opcion" data-ej-id="ej-007" data-color="#5CB85C">
-              <span class="da-sel-opt-dot" style="background:#5CB85C"></span>Apertura De Pecho Maquina
-            </li>
-            <li role="option" class="da-sel-opcion" data-ej-id="ej-010" data-color="#5B9BD5">
-              <span class="da-sel-opt-dot" style="background:#5B9BD5"></span>Elevaciones Laterales
-            </li>
-          </ul>
+        <div class="da-grafico-peso-box">
+          <canvas id="da-grafico-peso" aria-label="Evolución del peso corporal" role="img"></canvas>
         </div>
-
-        <div class="da-grafico-wrap da-grafico-wrap-tall">
-          <canvas id="da-grafico-progresion" aria-label="Progresión del ejercicio seleccionado" role="img"></canvas>
-        </div>
-      </section>
-
-      <!-- ── PRs RECIENTES ── -->
-      <!-- BACKEND: GET /analytics/personal-records?user_id={userId}&limit=8 -->
-      <section class="da-seccion" aria-labelledby="da-titulo-prs">
-        <h3 class="da-seccion-titulo" id="da-titulo-prs">
-          <i data-lucide="trophy"></i> Récords Personales
-        </h3>
-        <ul class="da-pr-lista" id="da-pr-lista" aria-label="Récords personales recientes">
-          <!-- BACKEND: Iterar PRs ordenados por fecha DESC -->
-          <li class="da-pr-item">
-            <span class="da-pr-dot" style="--c:#7EB8A4"></span>
-            <div class="da-pr-info">
-              <span class="da-pr-ejercicio">Jalón Al Pecho Neutro</span>
-              <span class="da-pr-musculo" style="color:#7EB8A4">Espalda</span>
-            </div>
-            <div class="da-pr-nums">
-              <span class="da-pr-peso">120.0 lbs</span>
-              <span class="da-pr-reps">× 10</span>
-              <span class="da-pr-fecha">20 Mar</span>
-            </div>
-          </li>
-          <li class="da-pr-item">
-            <span class="da-pr-dot" style="--c:#7EB8A4"></span>
-            <div class="da-pr-info">
-              <span class="da-pr-ejercicio">Remo Cerrado En Polea</span>
-              <span class="da-pr-musculo" style="color:#7EB8A4">Espalda</span>
-            </div>
-            <div class="da-pr-nums">
-              <span class="da-pr-peso">133.0 lbs</span>
-              <span class="da-pr-reps">× 10</span>
-              <span class="da-pr-fecha">20 Mar</span>
-            </div>
-          </li>
-          <li class="da-pr-item">
-            <span class="da-pr-dot" style="--c:#5CB85C"></span>
-            <div class="da-pr-info">
-              <span class="da-pr-ejercicio">Apertura De Pecho Maquina</span>
-              <span class="da-pr-musculo" style="color:#5CB85C">Pecho</span>
-            </div>
-            <div class="da-pr-nums">
-              <span class="da-pr-peso">110.0 lbs</span>
-              <span class="da-pr-reps">× 10</span>
-              <span class="da-pr-fecha">19 Mar</span>
-            </div>
-          </li>
-          <li class="da-pr-item">
-            <span class="da-pr-dot" style="--c:#5CB85C"></span>
-            <div class="da-pr-info">
-              <span class="da-pr-ejercicio">Curl Bíceps Mancuerna</span>
-              <span class="da-pr-musculo" style="color:#5CB85C">Bíceps</span>
-            </div>
-            <div class="da-pr-nums">
-              <span class="da-pr-peso">22.0 lbs</span>
-              <span class="da-pr-reps">× 12</span>
-              <span class="da-pr-fecha">20 Mar</span>
-            </div>
-          </li>
-          <li class="da-pr-item">
-            <span class="da-pr-dot" style="--c:#5B9BD5"></span>
-            <div class="da-pr-info">
-              <span class="da-pr-ejercicio">Elevaciones Laterales</span>
-              <span class="da-pr-musculo" style="color:#5B9BD5">Hombro</span>
-            </div>
-            <div class="da-pr-nums">
-              <span class="da-pr-peso">11.0 lbs</span>
-              <span class="da-pr-reps">× 20</span>
-              <span class="da-pr-fecha">19 Mar</span>
-            </div>
-          </li>
-        </ul>
-      </section>
-
-      <!-- ── CONSISTENCIA (HEATMAP) ── -->
-      <!-- BACKEND: GET /analytics/heatmap?user_id={userId}&year={año} -->
-      <section class="da-seccion" aria-labelledby="da-titulo-heatmap">
-        <div class="da-seccion-header">
-          <h3 class="da-seccion-titulo" id="da-titulo-heatmap">
-            <i data-lucide="grid"></i> Consistencia
-          </h3>
-          <span class="da-seccion-meta" id="da-meta-heatmap">— días</span>
-        </div>
-        <div class="da-heatmap-wrap" id="da-heatmap-wrap" aria-label="Mapa de calor anual"></div>
-        <div class="da-heatmap-leyenda">
-          <span class="da-hm-label">Menos</span>
-          <span class="da-hm-escala">
-            <span class="da-hm-celda" data-nivel="0"></span>
-            <span class="da-hm-celda" data-nivel="1"></span>
-            <span class="da-hm-celda" data-nivel="2"></span>
-            <span class="da-hm-celda" data-nivel="3"></span>
-            <span class="da-hm-celda" data-nivel="4"></span>
-          </span>
-          <span class="da-hm-label">Más</span>
+        <div class="da-peso-stats" id="da-peso-stats">
+          <!-- JS inserta stats -->
         </div>
       </section>
 
       <!-- ── RACHAS ── -->
-      <!-- BACKEND: GET /analytics/streaks?user_id={userId} -->
       <section class="da-seccion" aria-labelledby="da-titulo-rachas">
         <h3 class="da-seccion-titulo" id="da-titulo-rachas">
           <i data-lucide="flame"></i> Rachas
@@ -907,19 +406,19 @@
         <div class="da-rachas-grid">
           <div class="da-racha-card">
             <i data-lucide="flame" style="color:#E67E22"></i>
-            <span class="da-racha-val" id="da-racha-actual">7</span>
+            <span class="da-racha-val" id="da-racha-actual">—</span>
             <span class="da-racha-lbl">Racha actual</span>
             <span class="da-racha-sub">días seguidos</span>
           </div>
           <div class="da-racha-card">
             <i data-lucide="award" style="color:#F1C40F"></i>
-            <span class="da-racha-val" id="da-racha-mejor">14</span>
+            <span class="da-racha-val" id="da-racha-mejor">—</span>
             <span class="da-racha-lbl">Mejor racha</span>
             <span class="da-racha-sub">días seguidos</span>
           </div>
           <div class="da-racha-card">
             <i data-lucide="calendar-check" style="color:#5CB85C"></i>
-            <span class="da-racha-val" id="da-racha-semanas">6/8</span>
+            <span class="da-racha-val" id="da-racha-semanas">—</span>
             <span class="da-racha-lbl">Semanas activas</span>
             <span class="da-racha-sub">últimas 8 semanas</span>
           </div>
