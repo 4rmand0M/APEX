@@ -191,7 +191,6 @@ html {
     opacity: 0;
     transform: translateY(6px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -417,35 +416,19 @@ html {
   border-color: var(--texto);
 }
 
-/* Grid de métricas rápidas */
-.grid-metricas {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+/* Repositioned Chips Musculo */
+.chips-musculo-wrap {
+  margin-bottom: 0 !important;
+  padding: 4px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.chips-musculo-wrap::-webkit-scrollbar { display: none; }
 
-.tarjeta-metrica {
-  background: var(--superficie);
-  border: 1px solid var(--borde);
-  border-radius: 12px;
-  padding: 14px 16px;
+.chips-musculo {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  transition: border-color 0.2s ease, transform 0.18s ease;
-}
-
-.tarjeta-metrica:hover {
-  border-color: var(--borde-hover);
-  transform: translateY(-1px);
-}
-
-.metrica-etiqueta {
-  font-size: 10.5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.7px;
-  color: var(--texto-atenuado);
+  gap: 8px;
+  padding: 0 4px;
 }
 
 .metrica-valor {
@@ -460,19 +443,67 @@ html {
 .grafica-wrap {
   background: var(--superficie);
   border: 1px solid var(--borde);
-  border-radius: 14px;
-  padding: 18px;
+  border-radius: 16px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  flex: 1;
+  min-height: 360px; /* Reducido para mejor ajuste en laptops */
 }
 
 .grafica-top {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
+  padding-bottom: 4px;
+}
+
+.grafica-controles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .grafica-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .btn-anadir-dato {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.btn-anadir-dato {
+  background: var(--acento);
+  color: var(--texto-boton);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-anadir-dato:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.btn-anadir-dato i {
+  width: 16px;
+  height: 16px;
 }
 
 .grafica-titulo {
@@ -1276,6 +1307,13 @@ canvas {
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  flex: 1;
+}
+
+@media (max-width: 820px) {
+  .item-info {
+    padding-right: 38px; /* Espacio para el botón de opciones en móvil */
+  }
 }
 
 .item-nombre {
@@ -1732,7 +1770,7 @@ canvas {
   }
 
   .detalle-contenido {
-    height: calc(100dvh - 130px);
+    height: calc(100dvh - 70px); /* Ajustado para que no sobre espacio */
   }
 
   /* 130px ≈ cabecera */
@@ -1811,20 +1849,27 @@ canvas {
   animation: fadeIn 0.2s ease;
 }
 
-.modal-ejercicio {
-  background: var(--superficie);
-  border: 1px solid var(--borde);
-  border-radius: 20px;
-  width: 100%;
-  max-width: 450px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-  overflow: hidden;
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+.modal-pequeno {
+  max-width: 440px;
+  max-height: none;
+  overflow: visible;
 }
 
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+@keyframes fadeInModal {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-ejercicio, .modal-contenido {
+  background: var(--superficie);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90dvh;
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  overflow-y: auto;
+  animation: fadeInModal 0.2s ease-out;
 }
 
 .modal-header {
@@ -1903,10 +1948,23 @@ canvas {
   gap: 16px;
 }
 
+@media (max-width: 480px) {
+  .modal-fila-doble {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
 .modal-footer {
   display: flex;
   gap: 12px;
-  margin-top: 10px;
+  margin-top: 20px;
+}
+
+@media (max-width: 480px) {
+  .modal-footer {
+    flex-direction: column-reverse;
+  }
 }
 
 .modal-footer button {

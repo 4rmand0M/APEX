@@ -26,7 +26,15 @@ const CONFIG = {
   DEBOUNCE_MS: 350,
 };
 
-const db = window.supabaseClient;
+// Helper para obtener el cliente de Supabase de forma segura
+function getDb() {
+  const db = window.supabaseClient;
+  if (!db) {
+    console.error('[APEX] Supabase client no inicializado');
+    mostrarToast('Error de conexión');
+  }
+  return db;
+}
 
 /* Estado global */
 const Estado = {
@@ -105,6 +113,12 @@ const EJERCICIOS_MOCK = {
    BACKEND: Reemplazar con fetch real. */
 async function obtenerDatosEjercicio(ejercicioId) {
   try {
+    const user = await window.ApexAuth.getUser();
+    const userId = user?.id;
+
+    const db = getDb();
+    if (!db) return;
+
     const { data: ej, error } = await db
       .from('exercises')
       .select('*, created_by')
@@ -112,28 +126,74 @@ async function obtenerDatosEjercicio(ejercicioId) {
       .single();
 
     if (error) throw error;
+
+    let stats = { mejorPeso: '—', maxReps: '—' };
+    let datos_grafica = { 
+      peso: { labels: [], data: [] }, 
+      reps: { labels: [], data: [] } 
+    };
+
+    if (userId) {
+      // Obtener logs de sesiones de entrenamiento
+      const { data: sessionLogs } = await db
+        .from('workout_logs')
+        .select('weight_used, reps_completed, created_at, workout_sessions!inner(user_id)')
+        .eq('exercise_id', ejercicioId)
+        .eq('workout_sessions.user_id', userId);
+
+      // Obtener logs de progreso personal (manuales)
+      const { data: personalLogs } = await db
+        .from('personal_progress')
+        .select('weight_used, reps_completed, created_at')
+        .eq('exercise_id', ejercicioId)
+        .eq('user_id', userId);
+
+      // Combinar y ordenar por fecha
+      const logs = [...(sessionLogs || []), ...(personalLogs || [])].sort((a, b) => 
+        new Date(a.created_at) - new Date(b.created_at)
+      );
+
+      if (logs && logs.length > 0) {
+        // Calcular mejor peso y max reps
+        const pesos = logs.map(l => parseFloat(l.weight_used));
+        const reps = logs.map(l => l.reps_completed);
+        
+        stats.mejorPeso = `${Math.max(...pesos)} kg`;
+        stats.maxReps = `${Math.max(...reps)}`;
+
+        // Preparar datos para la gráfica (agrupando por fecha)
+        const history = {};
+        logs.forEach(l => {
+          const date = new Date(l.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+          if (!history[date]) history[date] = { peso: 0, reps: 0 };
+          history[date].peso = Math.max(history[date].peso, parseFloat(l.weight_used));
+          history[date].reps = Math.max(history[date].reps, l.reps_completed);
+        });
+
+        datos_grafica.peso.labels = Object.keys(history);
+        datos_grafica.peso.data = Object.values(history).map(v => v.peso);
+        datos_grafica.reps.labels = Object.keys(history);
+        datos_grafica.reps.data = Object.values(history).map(v => v.reps);
+      }
+    }
     
-    // Mapear al formato esperado por el frontend
     return {
       id: ej.id,
       nombre: ej.name,
       equipo: ej.equipment || '—',
       musculo_primario: ej.muscle_group || '—',
-      musculos_primarios: [ej.muscle_group],
-      musculos_secundarios: [],
       descripcion: ej.description || '',
       created_by: ej.created_by,
-      // Usamos el mock de estadísticas ya que aún no hay tabla para eso
-      stats: EJERCICIOS_MOCK['ej-001']?.stats || { mejorPeso: '—', rm1: '—', volumen: '—', sesiones: '0' },
-      datos_grafica: EJERCICIOS_MOCK['ej-001']?.datos_grafica || { peso: { labels: [], data: [] }, reps: { labels: [], data: [] }, '1rm': { labels: [], data: [] }, volumen: { labels: [], data: [] } },
+      stats,
+      datos_grafica
     };
   } catch (err) {
-    console.warn('[APEX] Usando mock fallback para ejercicio', ejercicioId);
-    return EJERCICIOS_MOCK[ejercicioId] || {
-      id: ejercicioId, nombre: 'Ejercicio', equipo: '—', musculo_primario: '—',
-      musculos_primarios: [], musculos_secundarios: [],
-      stats: { mejorPeso: '—', rm1: '—', volumen: '—', sesiones: '0' },
-      datos_grafica: { peso: { labels: [], data: [] }, reps: { labels: [], data: [] }, '1rm': { labels: [], data: [] }, volumen: { labels: [], data: [] } },
+    console.error('[APEX] Error al obtener datos del ejercicio:', err);
+    return {
+      id: ejercicioId,
+      nombre: 'Error al cargar',
+      stats: { mejorPeso: '—', maxReps: '—' },
+      datos_grafica: { peso: { labels: [], data: [] }, reps: { labels: [], data: [] } }
     };
   }
 }
@@ -333,20 +393,6 @@ async function poblarDetalle(datos) {
     }
   }
 
-  // Estadísticas rápidas
-  const s = datos.stats || {};
-  const elMejorPeso = document.getElementById('stat-mejor-peso');
-  const el1rm = document.getElementById('stat-1rm');
-  const elVolumen = document.getElementById('stat-volumen');
-  const elSesiones = document.getElementById('stat-sesiones');
-  if (elMejorPeso) elMejorPeso.textContent = s.mejorPeso || '—';
-  if (el1rm) el1rm.textContent = s.rm1 || '—';
-  if (elVolumen) elVolumen.textContent = s.volumen || '—';
-  if (elSesiones) elSesiones.textContent = s.sesiones || '0';
-
-  // Músculos
-  poblarListaMusculos('musculos-primarios', datos.musculos_primarios || [], 'primario');
-  poblarListaMusculos('musculos-secundarios', datos.musculos_secundarios || [], 'secundario');
 
   // Gráfica
   Estado.metricaActiva = 'peso';
@@ -363,36 +409,24 @@ async function poblarDetalle(datos) {
   lucide.createIcons();
 }
 
-function poblarListaMusculos(idEl, lista, tipo) {
-  const ul = document.getElementById(idEl);
-  if (!ul) return;
-  ul.innerHTML = lista.map(m => `<li class="item-musculo ${tipo}">${m}</li>`).join('');
-}
+
 
 
 /* ══════════════════════════════════════════════════════════
    5. PESTAÑAS DEL DETALLE
 ══════════════════════════════════════════════════════════ */
 
-function inicializarPestanas() {
-  document.querySelector('.pestanas-detalle')?.addEventListener('click', e => {
-    const btn = e.target.closest('.pestana-btn');
-    if (!btn) return;
-    cambiarPestana(btn.dataset.pestana);
-  });
-}
+
 
 function cambiarPestana(pestana) {
-  // Actualizar botones
+  // Solo queda la pestaña de estadísticas
   document.querySelectorAll('.pestana-btn').forEach(b => {
-    const activa = b.dataset.pestana === pestana;
-    b.classList.toggle('activa', activa);
-    b.setAttribute('aria-selected', String(activa));
+    b.classList.add('activa');
+    b.setAttribute('aria-selected', 'true');
   });
 
-  // Mostrar/ocultar paneles
   document.querySelectorAll('.panel-pestana').forEach(p => {
-    p.classList.toggle('oculto', p.id !== `panel-${pestana}`);
+    p.classList.remove('oculto');
   });
 }
 
@@ -498,7 +532,7 @@ function renderizarGrafica(datosGrafica, metrica) {
 }
 
 function etiquetaMetrica(metrica) {
-  const m = { peso: 'Peso máximo', reps: 'Repeticiones máximas', '1rm': '1RM estimado', volumen: 'Volumen total' };
+  const m = { peso: 'Peso máximo', reps: 'Repeticiones máximas' };
   return m[metrica] || metrica;
 }
 
@@ -525,7 +559,7 @@ function actualizarBotoneMetrica(metrica) {
     b.classList.toggle('activo', activo);
     b.setAttribute('aria-pressed', String(activo));
   });
-  const titulos = { peso: 'Peso máximo por sesión', reps: 'Reps máximas por sesión', '1rm': '1RM estimado por sesión', volumen: 'Volumen total por sesión' };
+  const titulos = { peso: 'Peso máximo por sesión', reps: 'Reps máximas por sesión' };
   const elTit = document.getElementById('grafica-titulo-texto');
   if (elTit) elTit.textContent = titulos[metrica] || metrica;
 }
@@ -544,17 +578,7 @@ function inicializarSelectorMetrica() {
   });
 }
 
-function inicializarSelectorRango() {
-  document.getElementById('selector-rango')?.addEventListener('change', e => {
-    if (!Estado.ejercicioActivo) return;
-    Estado.rangoActivo = e.target.value;
 
-    // BACKEND: fetch(`${CONFIG.BASE_URL}/metrics/exercise/${Estado.ejercicioActivo}?metric=${Estado.metricaActiva}&range=${Estado.rangoActivo}`)
-    // Por ahora re-usa los mismos datos mock
-    const datos = Estado.datosGraficaActivos?.[Estado.metricaActiva] || { labels: [], data: [] };
-    renderizarGrafica(datos, Estado.metricaActiva);
-  });
-}
 
 
 /* ══════════════════════════════════════════════════════════
@@ -656,34 +680,40 @@ function mostrarToast(mensaje, ms = 3000) {
  * @param {string} query   - Texto de búsqueda
  */
 async function cargarEjerciciosBackend(musculo = 'todos', query = '') {
-  let req = db.from('exercises').select('*').limit(50);
-  
-  if (musculo !== 'todos') {
-    // Convertimos el id del chip a formato de texto para comparar con muscle_group
-    req = req.ilike('muscle_group', `%${musculo}%`);
-  }
-  
-  if (query) {
-    req = req.ilike('name', `%${query}%`);
-  }
+  try {
+    const db = getDb();
+    if (!db) return;
 
-  const { data, error } = await req;
-  
-  if (error) {
-    console.error('Error cargando ejercicios:', error);
-    return;
+    let req = db.from('exercises').select('*').limit(100);
+    
+    if (musculo !== 'todos') {
+      req = req.ilike('muscle_group', `%${musculo}%`);
+    }
+    
+    if (query) {
+      req = req.ilike('name', `%${query}%`);
+    }
+
+    const { data, error } = await req;
+    
+    if (error) throw error;
+    
+    // Transformar al formato del frontend
+    const exercisesFormatted = data.map(ej => ({
+      id: ej.id,
+      nombre: ej.name,
+      musculo_primario: ej.muscle_group,
+      thumbnail_url: ej.media_url
+    }));
+    
+    renderListaEjercicios(exercisesFormatted);
+    actualizarContadorResultados(exercisesFormatted.length);
+
+  } catch (err) {
+    console.error('[APEX] Error cargando ejercicios:', err);
+    mostrarToast('Error al conectar con la base de datos');
+    renderListaEjercicios([]); // Mostrar estado vacío
   }
-  
-  // Transformar al formato del frontend
-  const exercisesFormatted = data.map(ej => ({
-    id: ej.id,
-    nombre: ej.name,
-    musculo_primario: ej.muscle_group,
-    thumbnail_url: ej.media_url
-  }));
-  
-  renderListaEjercicios(exercisesFormatted);
-  actualizarContadorResultados(exercisesFormatted.length);
 }
 
 /**
@@ -833,6 +863,9 @@ async function guardarEjercicio() {
   btn.textContent = 'Guardando...';
 
   try {
+    const db = getDb();
+    if (!db) return;
+
     let error;
     if (editId) {
       // Update
@@ -876,6 +909,9 @@ async function eliminarEjercicio(id) {
   if (!confirm('¿Estás seguro de eliminar este ejercicio permanentemente?')) return;
 
   try {
+    const db = getDb();
+    if (!db) return;
+
     const { error } = await db
       .from('exercises')
       .delete()
@@ -910,12 +946,11 @@ async function inicializarApp() {
   inicializarChipsMusculo();
   inicializarBuscador();
   inicializarSeleccionEjercicio();
-  inicializarPestanas();
   inicializarSelectorMetrica();
-  inicializarSelectorRango();
   inicializarDropdownRutinas();
   inicializarOtrosEventos();
 
+  inicializarModalProgreso();
   await cargarEjerciciosBackend();
   // Seleccionar el primer ejercicio automáticamente (como Hevy)
   setTimeout(() => {
@@ -962,3 +997,76 @@ document.addEventListener('click', (e) => {
     });
   }
 });
+
+/* ══════════════════════════════════════════════════════════
+   9. MODAL DE PROGRESO PERSONAL
+══════════════════════════════════════════════════════════ */
+
+function inicializarModalProgreso() {
+  const overlay = document.getElementById('modal-progreso-overlay');
+  const btnAbrir = document.getElementById('btn-abrir-modal-progreso');
+  const btnCerrar = document.getElementById('btn-cerrar-modal-progreso');
+  const btnCancelar = document.getElementById('btn-cancelar-progreso');
+  const form = document.getElementById('form-progreso-personal');
+
+  if (!overlay || !btnAbrir) return;
+
+  const abrir = () => {
+    if (!Estado.ejercicioActivo) {
+      mostrarToast('Selecciona un ejercicio primero');
+      return;
+    }
+    overlay.classList.remove('oculto');
+    form.reset();
+  };
+
+  const cerrar = () => overlay.classList.add('oculto');
+
+  btnAbrir.addEventListener('click', abrir);
+  btnCerrar.addEventListener('click', cerrar);
+  btnCancelar.addEventListener('click', cerrar);
+  overlay.addEventListener('click', e => { if (e.target === overlay) cerrar(); });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const user = await window.ApexAuth.getUser();
+    if (!user) return;
+
+    const peso = parseFloat(document.getElementById('progreso-peso').value);
+    const reps = parseInt(document.getElementById('progreso-reps').value);
+
+    const btn = document.getElementById('btn-guardar-progreso');
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+
+    try {
+      const db = getDb();
+      if (!db) return;
+
+      const { error } = await db
+        .from('personal_progress')
+        .insert({
+          user_id: user.id,
+          exercise_id: Estado.ejercicioActivo,
+          weight_used: peso,
+          reps_completed: reps
+        });
+
+      if (error) throw error;
+
+      mostrarToast('Progreso guardado ✓');
+      cerrar();
+
+      // Recargar datos del ejercicio para actualizar la gráfica
+      const datos = await obtenerDatosEjercicio(Estado.ejercicioActivo);
+      poblarDetalle(datos);
+
+    } catch (err) {
+      console.error('[APEX] Error al guardar progreso:', err);
+      mostrarToast('Error al guardar progreso');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Guardar Dato';
+    }
+  });
+}

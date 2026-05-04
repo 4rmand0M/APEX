@@ -50,7 +50,7 @@
           <li><a href="perfil.html" class="enlace-nav" data-pagina="perfil"><i data-lucide="user"></i><span>Perfil</span></a></li>
           <li><a href="entrenadores.html" class="enlace-nav"><i data-lucide="users"></i><span>Entrenadores</span></a></li>
           <li><a href="gyms.html" class="enlace-nav"><i data-lucide="map-pin"></i><span>Gimnasios</span></a></li>
-          <li><a href="comunity.html" class="enlace-nav"><i data-lucide="globe"></i><span>Comunidad</span></a></li>
+
           <li><a href="calculadora-imc.html" class="enlace-nav"><i data-lucide="calculator"></i><span>Calculadora IMC</span></a></li>
         </ul>
       </nav>
@@ -148,76 +148,25 @@
                 </button>
               </div>
 
-              <!-- Pestañas -->
-              <nav class="pestanas-detalle" aria-label="Secciones" role="tablist">
-                <button class="pestana-btn activa" data-pestana="estadisticas" role="tab" aria-selected="true"
-                  aria-controls="panel-estadisticas">Estadísticas</button>
-                <button class="pestana-btn" data-pestana="historial" role="tab" aria-selected="false"
-                  aria-controls="panel-historial">Historial</button>
-                <button class="pestana-btn" data-pestana="como-hacerlo" role="tab" aria-selected="false"
-                  aria-controls="panel-como-hacerlo">Cómo hacerlo</button>
-                <button class="pestana-btn" data-pestana="musculos" role="tab" aria-selected="false"
-                  aria-controls="panel-musculos">Músculos</button>
-              </nav>
+
             </header>
 
-            <!-- ── TAB: ESTADÍSTICAS ── -->
-            <!-- BACKEND: GET /metrics/exercise/{exerciseId}?user_id={userId}&range={range} -->
+
             <section class="panel-pestana" id="panel-estadisticas" role="tabpanel">
-
-              <div class="fila-rango">
-                <select class="selector-rango" id="selector-rango" aria-label="Periodo de tiempo">
-                  <option value="4w">Últimas 4 semanas</option>
-                  <option value="12w" selected>Últimas 12 semanas</option>
-                  <option value="6m">Últimos 6 meses</option>
-                  <option value="1y">Último año</option>
-                  <option value="all">Todo el tiempo</option>
-                </select>
-              </div>
-
-              <!-- Métricas rápidas -->
-              <!-- BACKEND: Calcular desde historial de sessions filtrado por exercise_id -->
-              <div class="grid-metricas" role="list">
-                <div class="tarjeta-metrica" role="listitem">
-                  <span class="metrica-etiqueta">Mejor peso</span>
-                  <span class="metrica-valor" id="stat-mejor-peso">85 kg</span>
-                </div>
-                <div class="tarjeta-metrica" role="listitem">
-                  <span class="metrica-etiqueta">1RM estimado</span>
-                  <span class="metrica-valor" id="stat-1rm">102 kg</span>
-                </div>
-                <div class="tarjeta-metrica" role="listitem">
-                  <span class="metrica-etiqueta">Volumen total</span>
-                  <span class="metrica-valor" id="stat-volumen">12,400 kg</span>
-                </div>
-                <div class="tarjeta-metrica" role="listitem">
-                  <span class="metrica-etiqueta">Sesiones</span>
-                  <span class="metrica-valor" id="stat-sesiones">18</span>
-                </div>
-              </div>
 
               <!-- Gráfica Chart.js -->
               <div class="grafica-wrap">
                 <div class="grafica-top">
                   <h3 class="grafica-titulo" id="grafica-titulo-texto">Peso máximo por sesión</h3>
-                  <div class="selector-metrica" role="group" aria-label="Métrica">
-                    <button class="btn-metrica activo" data-metrica="peso" aria-pressed="true">Peso</button>
-                    <button class="btn-metrica" data-metrica="reps" aria-pressed="false">Reps</button>
-                    <button class="btn-metrica" data-metrica="1rm" aria-pressed="false">1RM</button>
-                    <button class="btn-metrica" data-metrica="volumen" aria-pressed="false">Volumen</button>
-                  </div>
-                  <div class="dropdown-wrap" style="margin-left: 8px;">
-                    <button class="btn-opciones" aria-label="Opciones de gráfica" aria-haspopup="true" aria-expanded="false">
-                      <i data-lucide="more-vertical"></i>
-                    </button>
-                    <div class="dropdown-menu oculto" role="menu">
-                      <button class="dropdown-item" role="menuitem"><i data-lucide="line-chart"></i> Puntos de la Gráfica</button>
-                      <button class="dropdown-item" role="menuitem"><i data-lucide="trending-up"></i> Línea de Tendencia</button>
-                      <button class="dropdown-item" role="menuitem"><i data-lucide="crosshair"></i> Eje Y desde 0</button>
-                      <div class="dropdown-separator" role="separator"></div>
-                      <button class="dropdown-item" role="menuitem"><i data-lucide="calendar"></i> Fecha Personalizada</button>
-                      <button class="dropdown-item" role="menuitem"><i data-lucide="calculator"></i> Calculadoras</button>
+                  <div class="grafica-controles">
+                    <div class="selector-metrica" role="group" aria-label="Métrica">
+                      <button class="btn-metrica activo" data-metrica="peso" aria-pressed="true">Peso</button>
+                      <button class="btn-metrica" data-metrica="reps" aria-pressed="false">Reps</button>
                     </div>
+                    <button class="btn-anadir-dato" id="btn-abrir-modal-progreso" aria-label="Añadir dato de progreso">
+                      <i data-lucide="plus"></i>
+                      <span>Añadir dato</span>
+                    </button>
                   </div>
                 </div>
                 <div class="canvas-wrap">
@@ -226,217 +175,6 @@
                   <div class="grafica-sin-datos oculto" id="grafica-sin-datos" aria-live="polite">
                     <i data-lucide="bar-chart-2"></i>
                     <span>Sin datos para este periodo</span>
-                  </div>
-                </div>
-              </div>
-
-            </section>
-
-            <!-- ── TAB: HISTORIAL ── -->
-            <!-- BACKEND: GET /sessions?exercise_id={id}&user_id={userId}&limit=20&page=1 -->
-            <section class="panel-pestana oculto" id="panel-historial" role="tabpanel">
-              <ul class="historial-lista" id="historial-lista" role="list" aria-label="Historial de sesiones">
-
-                <li class="historial-item" role="listitem">
-                  <div class="historial-cabecera">
-                    <!-- BACKEND: {{sesion.fecha}} formateada -->
-                    <time class="historial-fecha" datetime="2025-06-21">21 Jun 2025</time>
-                    <!-- BACKEND: {{sesion.rutina.nombre}} -->
-                    <span class="historial-rutina">Lunes · Pecho</span>
-                  </div>
-                  <ul class="historial-series" aria-label="Series">
-                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-warmup">W</span><span>60 kg ×
-                        12</span></li>
-                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>80 kg ×
-                        8</span></li>
-                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>80 kg ×
-                        8</span></li>
-                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-failure">F</span><span>85 kg ×
-                        —</span></li>
-                  </ul>
-                  <div class="historial-footer">
-                    <span>Volumen: 1,980 kg</span>
-                    <span class="historial-mejor">Mejor: 85 kg</span>
-                  </div>
-                </li>
-
-                <li class="historial-item" role="listitem">
-                  <div class="historial-cabecera">
-                    <time class="historial-fecha" datetime="2025-06-14">14 Jun 2025</time>
-                    <span class="historial-rutina">Lunes · Pecho</span>
-                  </div>
-                  <ul class="historial-series" aria-label="Series">
-                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-warmup">W</span><span>60 kg ×
-                        12</span></li>
-                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>77.5 kg ×
-                        8</span></li>
-                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>77.5 kg ×
-                        8</span></li>
-                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-dropset">D</span><span>60 kg ×
-                        12</span></li>
-                  </ul>
-                  <div class="historial-footer">
-                    <span>Volumen: 1,740 kg</span>
-                    <span class="historial-mejor">Mejor: 77.5 kg</span>
-                  </div>
-                </li>
-
-                <li class="historial-item" role="listitem">
-                  <div class="historial-cabecera">
-                    <time class="historial-fecha" datetime="2025-06-07">7 Jun 2025</time>
-                    <span class="historial-rutina">Lunes · Pecho</span>
-                  </div>
-                  <ul class="historial-series" aria-label="Series">
-                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-warmup">W</span><span>60 kg ×
-                        12</span></li>
-                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>75 kg ×
-                        8</span></li>
-                    <li class="historial-serie"><span class="badge-h-tipo badge-tipo-normal">N</span><span>75 kg ×
-                        8</span></li>
-                  </ul>
-                  <div class="historial-footer">
-                    <span>Volumen: 1,320 kg</span>
-                    <span class="historial-mejor">Mejor: 75 kg</span>
-                  </div>
-                </li>
-
-              </ul>
-              <!-- BACKEND: GET /sessions?...&page=2 al hacer clic -->
-              <button class="boton-cargar-mas" id="boton-cargar-mas" aria-label="Cargar más sesiones">
-                Ver más sesiones
-              </button>
-            </section>
-
-            <!-- ── TAB: CÓMO HACERLO ── -->
-            <!-- BACKEND: GET /exercises/{exerciseId}/instructions -->
-            <section class="panel-pestana oculto" id="panel-como-hacerlo" role="tabpanel">
-
-              <!--
-                BACKEND — Animación del ejercicio
-                ──────────────────────────────────
-                Este div es el contenedor preparado para la animación.
-                Cuando integres la BD:
-                  1. Endpoint:  GET /exercises/{exerciseId}/media
-                  2. Campo BD:  exercises.animation_url  (string, URL al GIF o MP4)
-                  3. Reemplaza el .animacion-placeholder por:
-                     <img src="{{ejercicio.animation_url}}" alt="{{ejercicio.nombre}} — animación" class="animacion-img" />
-                     o bien un <video autoplay loop muted playsinline> si es MP4.
-              -->
-              <div class="animacion-wrap" id="animacion-ejercicio">
-                <div class="animacion-placeholder" aria-label="Animación pendiente de integración con BD">
-                  <button class="animacion-cerrar-btn" id="animacion-cerrar" aria-label="Cerrar animación">
-                    <i data-lucide="x"></i>
-                  </button>
-                  <div class="animacion-icono-wrap" aria-hidden="true">
-                    <i data-lucide="play-circle"></i>
-                  </div>
-                  <p class="animacion-label">
-                    Animación · <code>exercises.animation_url</code>
-                  </p>
-                </div>
-              </div>
-
-              <!-- Pasos -->
-              <!-- BACKEND: Iterar {{ejercicio.instrucciones}} (array de { titulo, descripcion }) -->
-              <ol class="lista-pasos" id="lista-pasos">
-                <li class="paso">
-                  <span class="paso-num">01</span>
-                  <div class="paso-cuerpo">
-                    <h4 class="paso-titulo">Posición inicial</h4>
-                    <p class="paso-desc">Acuéstate en el banco con los pies planos en el suelo. Agarra la barra con un
-                      agarre ligeramente más amplio que el ancho de los hombros; los pulgares rodean la barra (agarre
-                      cerrado).</p>
-                  </div>
-                </li>
-                <li class="paso">
-                  <span class="paso-num">02</span>
-                  <div class="paso-cuerpo">
-                    <h4 class="paso-titulo">Descenso controlado</h4>
-                    <p class="paso-desc">Baja la barra lentamente hacia el pecho, sobre el esternón inferior. Los codos
-                      deben formar un ángulo de 45–75° con el torso; evita abrirlos en exceso para proteger los hombros.
-                    </p>
-                  </div>
-                </li>
-                <li class="paso">
-                  <span class="paso-num">03</span>
-                  <div class="paso-cuerpo">
-                    <h4 class="paso-titulo">Empuje explosivo</h4>
-                    <p class="paso-desc">Empuja la barra hacia arriba y ligeramente hacia atrás hasta la extensión
-                      completa de los brazos. Aprieta el pecho en la parte superior del movimiento para maximizar la
-                      contracción.</p>
-                  </div>
-                </li>
-                <li class="paso">
-                  <span class="paso-num">04</span>
-                  <div class="paso-cuerpo">
-                    <h4 class="paso-titulo">Respiración y postura</h4>
-                    <p class="paso-desc">Inhala durante el descenso, exhala durante el empuje. Mantén la espalda baja
-                      ligeramente arqueada y los omóplatos retraídos y deprimidos a lo largo de todo el movimiento.</p>
-                  </div>
-                </li>
-              </ol>
-
-              <!-- Consejos -->
-              <!-- BACKEND: {{ejercicio.consejos}} array de strings -->
-              <div class="bloque-consejos">
-                <h3 class="consejos-titulo"><i data-lucide="lightbulb"></i> Consejos clave</h3>
-                <ul class="lista-consejos" id="lista-consejos">
-                  <li>Mantén los omóplatos retraídos durante todo el movimiento para proteger los hombros.</li>
-                  <li>No reboces la barra en el pecho; el descenso debe ser siempre controlado.</li>
-                  <li>Usa agarre cerrado (pulgar rodeando la barra) para mayor seguridad.</li>
-                </ul>
-              </div>
-
-            </section>
-
-            <!-- ── TAB: MÚSCULOS ── -->
-            <!-- BACKEND: GET /exercises/{exerciseId}/muscles -->
-            <section class="panel-pestana oculto" id="panel-musculos" role="tabpanel">
-              <div class="musculos-layout">
-
-                <!--
-                  BACKEND — Mapa visual del cuerpo
-                  ─────────────────────────────────
-                  Este div es el contenedor preparado para el mapa muscular.
-                  Cuando integres la BD:
-                    1. Endpoint:  GET /exercises/{exerciseId}/muscle-map
-                    2. Campo BD:  exercises.muscle_map_url (SVG o imagen PNG del cuerpo)
-                    3. Los músculos primarios se pintan en --acento
-                       Los secundarios en rgba(var(--acento-rgb), 0.35)
-                    4. Reemplaza .visual-musculos-placeholder por el SVG o
-                       <img src="{{ejercicio.muscle_map_url}}" alt="Mapa muscular" />
-                -->
-                <div class="visual-musculos-wrap" id="visual-musculos">
-                  <div class="visual-musculos-placeholder" aria-label="Mapa muscular pendiente de BD">
-                    <i data-lucide="user"></i>
-                    <span>Mapa muscular<br /><code>exercises.muscle_map_url</code></span>
-                  </div>
-                </div>
-
-                <!-- Listas de músculos -->
-                <div class="musculos-listas">
-                  <div class="musculo-grupo">
-                    <h3 class="musculo-grupo-titulo">
-                      <span class="dot-primario" aria-hidden="true"></span>
-                      Primarios
-                    </h3>
-                    <!-- BACKEND: {{ejercicio.musculos_primarios}} array de strings -->
-                    <ul class="lista-musculos-detalle" id="musculos-primarios">
-                      <li class="item-musculo primario">Pectoral mayor</li>
-                      <li class="item-musculo primario">Pectoral menor</li>
-                    </ul>
-                  </div>
-                  <div class="musculo-grupo">
-                    <h3 class="musculo-grupo-titulo">
-                      <span class="dot-secundario" aria-hidden="true"></span>
-                      Secundarios
-                    </h3>
-                    <!-- BACKEND: {{ejercicio.musculos_secundarios}} array de strings -->
-                    <ul class="lista-musculos-detalle" id="musculos-secundarios">
-                      <li class="item-musculo secundario">Deltoides anterior</li>
-                      <li class="item-musculo secundario">Tríceps braquial</li>
-                      <li class="item-musculo secundario">Serrato anterior</li>
-                    </ul>
                   </div>
                 </div>
 
@@ -504,381 +242,6 @@
           <!-- BACKEND: Renderizar dinámicamente con renderListaEjercicios(data) -->
           <ul class="lista-biblioteca" id="lista-biblioteca" role="list" aria-label="Ejercicios">
 
-            <!-- Cada <li> tiene data-musculo para filtrado client-side mientras no hay backend -->
-            <!-- BACKEND: data-ejercicio-id="{{ejercicio.id}}" data-musculo="{{ejercicio.musculo_primario}}" -->
-            <li class="item-biblioteca activo" data-ejercicio-id="ej-001" data-musculo="pecho">
-              <button class="boton-item" aria-label="Ver Bench Press (Barbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info">
-                  <span class="item-nombre">Bench Press (Barbell)</span>
-                  <span class="item-musculo">Pecho</span>
-                </div>
-              </button>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-002" data-musculo="hombros">
-              <button class="boton-item" aria-label="Ver Arnold Press (Dumbbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Arnold Press (Dumbbell)</span><span
-                    class="item-musculo">Hombros</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-003" data-musculo="espalda">
-              <button class="boton-item" aria-label="Ver Bent Over Row (Barbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Bent Over Row (Barbell)</span><span
-                    class="item-musculo">Espalda</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-004" data-musculo="biceps">
-              <button class="boton-item" aria-label="Ver Bicep Curl (Barbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Bicep Curl (Barbell)</span><span
-                    class="item-musculo">Bíceps</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-005" data-musculo="cuadriceps">
-              <button class="boton-item" aria-label="Ver Squat (Barbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Squat (Barbell)</span><span
-                    class="item-musculo">Cuádriceps</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-006" data-musculo="pecho">
-              <button class="boton-item" aria-label="Ver Incline Bench Press (Dumbbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Incline Bench Press (Dumbbell)</span><span
-                    class="item-musculo">Pecho</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-007" data-musculo="espalda">
-              <button class="boton-item" aria-label="Ver Pull Up">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Pull Up</span><span class="item-musculo">Espalda</span>
-                </div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-008" data-musculo="hombros">
-              <button class="boton-item" aria-label="Ver Lateral Raise (Dumbbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Lateral Raise (Dumbbell)</span><span
-                    class="item-musculo">Hombros</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-009" data-musculo="triceps">
-              <button class="boton-item" aria-label="Ver Tricep Pushdown (Cable)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Tricep Pushdown (Cable)</span><span
-                    class="item-musculo">Tríceps</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-010" data-musculo="isquiotibiales">
-              <button class="boton-item" aria-label="Ver Romanian Deadlift">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Romanian Deadlift</span><span
-                    class="item-musculo">Isquiotibiales</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-011" data-musculo="gluteos">
-              <button class="boton-item" aria-label="Ver Hip Thrust (Barbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Hip Thrust (Barbell)</span><span
-                    class="item-musculo">Glúteos</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-012" data-musculo="abdominales">
-              <button class="boton-item" aria-label="Ver Hanging Leg Raise">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Hanging Leg Raise</span><span
-                    class="item-musculo">Abdominales</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-013" data-musculo="cuadriceps">
-              <button class="boton-item" aria-label="Ver Leg Press (Machine)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Leg Press (Machine)</span><span
-                    class="item-musculo">Cuádriceps</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-014" data-musculo="espalda-baja">
-              <button class="boton-item" aria-label="Ver Deadlift (Barbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Deadlift (Barbell)</span><span
-                    class="item-musculo">Espalda baja</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-015" data-musculo="gemelos">
-              <button class="boton-item" aria-label="Ver Standing Calf Raise">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Standing Calf Raise</span><span
-                    class="item-musculo">Gemelos</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-016" data-musculo="antebrazos">
-              <button class="boton-item" aria-label="Ver Wrist Curl (Barbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Wrist Curl (Barbell)</span><span
-                    class="item-musculo">Antebrazos</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-017" data-musculo="cardio">
-              <button class="boton-item" aria-label="Ver Air Bike">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Air Bike</span><span class="item-musculo">Cardio</span>
-                </div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-018" data-musculo="hombros">
-              <button class="boton-item" aria-label="Ver Face Pull (Cable)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Face Pull (Cable)</span><span
-                    class="item-musculo">Hombros</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-019" data-musculo="triceps">
-              <button class="boton-item" aria-label="Ver Skull Crusher (Barbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Skull Crusher (Barbell)</span><span
-                    class="item-musculo">Tríceps</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-            <li class="item-biblioteca" style="position: relative;" data-ejercicio-id="ej-020" data-musculo="biceps">
-              <button class="boton-item" aria-label="Ver Hammer Curl (Dumbbell)">
-                <div class="item-img-wrap">
-                  <div class="item-img-placeholder" aria-hidden="true"><i data-lucide="dumbbell"></i></div>
-                </div>
-                <div class="item-info"><span class="item-nombre">Hammer Curl (Dumbbell)</span><span
-                    class="item-musculo">Bíceps</span></div>
-              </button>
-            
-              <div class="dropdown-wrap" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);">
-                <button class="btn-opciones" aria-label="Opciones de ejercicio" aria-haspopup="true" aria-expanded="false" >
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="dropdown-menu oculto" role="menu">
-                  <button class="dropdown-item" role="menuitem"><i data-lucide="edit-2"></i> Editar</button>
-                  <button class="dropdown-item" role="menuitem" style="color: #ff5252;"><i data-lucide="trash-2" style="color: #ff5252;"></i> Eliminar</button>
-                </div>
-              </div>
-            </li>
-
             <!-- Estado sin resultados (búsqueda/filtro vacío) -->
             <li class="sin-resultados oculto" id="sin-resultados" aria-live="polite">
               <div class="sin-resultados-contenido">
@@ -921,9 +284,7 @@
       <a href="gyms.html" class="enlace-nav-movil" aria-label="Gimnasios">
         <i data-lucide="map-pin"></i><span>Gimnasios</span>
       </a>
-      <a href="comunity.html" class="enlace-nav-movil" aria-label="Comunidad">
-        <i data-lucide="globe"></i><span>Comunidad</span>
-      </a>
+
       <a href="calculadora-imc.html" class="enlace-nav-movil" aria-label="Calculadora IMC">
         <i data-lucide="calculator"></i><span>IMC</span>
       </a>
@@ -1003,6 +364,30 @@
         <div class="modal-footer">
           <button type="button" class="btn-secundario" id="btn-modal-cancelar">Cancelar</button>
           <button type="submit" class="btn-primario" id="btn-modal-guardar">Guardar Ejercicio</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para Añadir Progreso Personal -->
+  <div class="modal-overlay oculto" id="modal-progreso-overlay">
+    <div class="modal-contenido modal-pequeno">
+      <div class="modal-header">
+        <h2 class="modal-titulo">Añadir Progreso</h2>
+        <button class="modal-cerrar" id="btn-cerrar-modal-progreso"><i data-lucide="x"></i></button>
+      </div>
+      <form class="modal-form" id="form-progreso-personal">
+        <div class="modal-campo">
+          <label for="progreso-peso">Peso (kg)</label>
+          <input type="number" id="progreso-peso" step="0.5" placeholder="0" required>
+        </div>
+        <div class="modal-campo">
+          <label for="progreso-reps">Repeticiones</label>
+          <input type="number" id="progreso-reps" placeholder="0" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secundario" id="btn-cancelar-progreso">Cancelar</button>
+          <button type="submit" class="btn-primario" id="btn-guardar-progreso">Guardar Dato</button>
         </div>
       </form>
     </div>

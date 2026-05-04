@@ -276,3 +276,27 @@ INSERT INTO public.exercises (name, description, muscle_group, equipment) VALUES
 ('Dominadas', 'Excelente para el desarrollo de la amplitud de la espalda.', 'Espalda', 'Peso Corporal'),
 ('Curl de Bíceps', 'Aislamiento de los flexores del codo.', 'Brazos', 'Mancuernas')
 ON CONFLICT DO NOTHING;
+
+/* ══════════════════════════════════════════════════════════
+   PERSONAL PROGRESS TABLE
+   Para guardar datos de progreso manuales de cada usuario
+   Uso: Solo el dueño puede ver y gestionar sus propios datos.
+══════════════════════════════════════════════════════════ */
+
+CREATE TABLE IF NOT EXISTS public.personal_progress (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    exercise_id UUID REFERENCES public.exercises(id) ON DELETE CASCADE NOT NULL,
+    weight_used DECIMAL(10,2) NOT NULL,
+    reps_completed INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.personal_progress ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can manage their own personal progress" ON public.personal_progress;
+CREATE POLICY "Users can manage their own personal progress" 
+ON public.personal_progress 
+FOR ALL 
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
