@@ -1,11 +1,7 @@
 /* ══════════════════════════════════════════════
    SUPABASE — Inicialización
 ══════════════════════════════════════════════ */
-const _cfg = window.__APEX_CONFIG || {};
-const SUPABASE_URL = _cfg.SUPABASE_URL;
-const SUPABASE_ANON = _cfg.SUPABASE_ANON;
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+const db = window.supabaseClient;
 
 /* ══════════════════════════════════════════════
    ESTADO GLOBAL
@@ -82,14 +78,11 @@ function calcularIMC() {
 
   // Guardar estado para persistencia posterior
   ultimoCalculo = {
-    peso_kg: peso,
-    altura_cm: altura,
-    categoria_imc: categoria, // El trigger de la DB lo recalcula, pero lo enviamos igual
-    porcentaje_grasa: parseFloat(document.getElementById('grasa').value) || null,
-    cintura_cm: parseFloat(document.getElementById('cintura').value) || null,
-    notas: document.getElementById('notas').value.trim() || null,
-    fecha_medicion: new Date().toISOString().split('T')[0],
-    usuario_id: usuarioActual?.id ? null : null // se rellena en guardarMetrica()
+    weight: peso,
+    body_fat_percentage: parseFloat(document.getElementById('grasa').value) || null,
+    imc: imcRedondeado,
+    recorded_at: new Date().toISOString(),
+    user_id: usuarioActual?.id ? null : null // se rellena en guardarMetrica()
   };
 }
 
@@ -122,36 +115,24 @@ async function guardarMetrica() {
   btn.disabled = true;
   btn.textContent = 'Guardando...';
 
-  // Obtener el ID interno del usuario (tabla usuarios, no auth.users)
-  // La relación es: auth.users.id == usuarios.uuid
-  const { data: usuarioDb, error: errorUser } = await db
-    .from('usuarios')
-    .select('id')
-    .eq('uuid', usuarioActual.id)
-    .single();
-
-  if (errorUser || !usuarioDb) {
-    mostrarError('No se encontró tu perfil en la base de datos.');
-    btn.disabled = false;
-    btn.textContent = 'Guardar en historial';
-    return;
-  }
-
-  // Construir payload — NO incluir `imc` porque es GENERATED ALWAYS
+  // Construir payload
   const payload = {
-    usuario_id: usuarioDb.id,
-    fecha_medicion: ultimoCalculo.fecha_medicion,
-    peso_kg: ultimoCalculo.peso_kg,
-    altura_cm: ultimoCalculo.altura_cm,
-    // categoria_imc: el trigger fn_actualizar_categoria_imc la pone automáticamente
-    porcentaje_grasa: ultimoCalculo.porcentaje_grasa,
-    cintura_cm: ultimoCalculo.cintura_cm,
-    notas: ultimoCalculo.notas
+    user_id: usuarioActual.id,
+    recorded_at: ultimoCalculo.recorded_at,
+    weight: ultimoCalculo.weight,
+    body_fat_percentage: ultimoCalculo.body_fat_percentage,
+    imc: ultimoCalculo.imc
   };
 
   const { error } = await db
-    .from('metricas_fisicas')
+    .from('user_measurements')
     .insert(payload);
+
+  // Guardar la altura en profiles
+  await db
+    .from('profiles')
+    .update({ height: parseFloat(document.getElementById('altura').value) })
+    .eq('id', usuarioActual.id);
 
   btn.textContent = 'Guardar en historial';
   btn.disabled = false;
@@ -179,25 +160,12 @@ async function cargarHistorial() {
   document.getElementById('historial-vacio').style.display = 'none';
   document.getElementById('historial-error').classList.remove('visible');
 
-  // Obtener id interno del usuario
-  const { data: usuarioDb, error: errorUser } = await db
-    .from('usuarios')
-    .select('id')
-    .eq('uuid', usuarioActual.id)
-    .single();
-
-  if (errorUser || !usuarioDb) {
-    document.getElementById('historial-cargando').style.display = 'none';
-    document.getElementById('historial-error').classList.add('visible');
-    return;
-  }
-
   // Consulta principal: historial completo ordenado por fecha
   const { data: metricas, error } = await db
-    .from('metricas_fisicas')
-    .select('fecha_medicion, peso_kg, altura_cm, imc, categoria_imc, porcentaje_grasa, cintura_cm, notas')
-    .eq('usuario_id', usuarioDb.id)
-    .order('fecha_medicion', { ascending: false })
+    .from('user_measurements')
+    .select('recorded_at, weight, body_fat_percentage, imc')
+    .eq('user_id', usuarioActual.id)
+    .order('recorded_at', { ascending: false })
     .limit(50); // Máximo 50 registros en el historial
 
   document.getElementById('historial-cargando').style.display = 'none';
@@ -225,19 +193,22 @@ function renderizarHistorial(metricas) {
   tbody.innerHTML = '';
 
   metricas.forEach(m => {
-    const fecha = new Date(m.fecha_medicion + 'T00:00:00').toLocaleDateString('es-DO', { day: '2-digit', month: 'short', year: 'numeric' });
-    const categoria = m.categoria_imc || '—';
+    const fecha = new Date(m.recorded_at).toLocaleDateString('es-DO', { day: '2-digit', month: 'short', year: 'numeric' });
+    
+    // Calcular categoría de nuevo porque ya no está en la DB
+    const cat = m.imc ? obtenerCategoria(m.imc) : { categoria: '—', color: '#888' };
+    const categoria = cat.categoria;
     const badgeClass = 'badge-' + categoria;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${fecha}</td>
-      <td><strong style="color:var(--texto)">${m.peso_kg ?? '—'}</strong></td>
-      <td>${m.altura_cm ?? '—'}</td>
+      <td><strong style="color:var(--texto)">${m.weight ?? '—'}</strong></td>
+      <td>—</td>
       <td><strong style="color:var(--texto)">${m.imc ? parseFloat(m.imc).toFixed(1) : '—'}</strong></td>
       <td><span class="badge-categoria ${badgeClass}">${categoria.replace(/_/g, ' ')}</span></td>
-      <td>${m.porcentaje_grasa ? m.porcentaje_grasa + '%' : '—'}</td>
-      <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.notas ?? '—'}</td>
+      <td>${m.body_fat_percentage ? m.body_fat_percentage + '%' : '—'}</td>
+      <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</td>
     `;
     tbody.appendChild(tr);
   });

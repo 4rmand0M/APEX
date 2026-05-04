@@ -26,6 +26,8 @@ const CONFIG = {
   DEBOUNCE_MS: 350,
 };
 
+const db = window.supabaseClient;
+
 /* Estado global */
 const Estado = {
   ejercicioActivo: null,   // ID del ejercicio actualmente seleccionado
@@ -102,20 +104,36 @@ const EJERCICIOS_MOCK = {
 /* Función para obtener datos de un ejercicio.
    BACKEND: Reemplazar con fetch real. */
 async function obtenerDatosEjercicio(ejercicioId) {
-  // BACKEND:
-  // const res  = await fetch(`${CONFIG.BASE_URL}/exercises/${ejercicioId}`, {
-  //   headers: { 'Authorization': `Bearer ${localStorage.getItem(CONFIG.JWT_KEY)}` }
-  // });
-  // if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  // return await res.json();
+  try {
+    const { data: ej, error } = await db
+      .from('exercises')
+      .select('*')
+      .eq('id', ejercicioId)
+      .single();
 
-  // Fallback mock: busca en EJERCICIOS_MOCK o construye un objeto genérico.
-  return EJERCICIOS_MOCK[ejercicioId] || {
-    id: ejercicioId, nombre: 'Ejercicio', equipo: '—', musculo_primario: '—',
-    musculos_primarios: [], musculos_secundarios: [],
-    stats: { mejorPeso: '—', rm1: '—', volumen: '—', sesiones: '0' },
-    datos_grafica: { peso: { labels: [], data: [] }, reps: { labels: [], data: [] }, '1rm': { labels: [], data: [] }, volumen: { labels: [], data: [] } },
-  };
+    if (error) throw error;
+    
+    // Mapear al formato esperado por el frontend
+    return {
+      id: ej.id,
+      nombre: ej.name,
+      equipo: ej.equipment || '—',
+      musculo_primario: ej.muscle_group || '—',
+      musculos_primarios: [ej.muscle_group],
+      musculos_secundarios: [],
+      // Usamos el mock de estadísticas ya que aún no hay tabla para eso
+      stats: EJERCICIOS_MOCK['ej-001']?.stats || { mejorPeso: '—', rm1: '—', volumen: '—', sesiones: '0' },
+      datos_grafica: EJERCICIOS_MOCK['ej-001']?.datos_grafica || { peso: { labels: [], data: [] }, reps: { labels: [], data: [] }, '1rm': { labels: [], data: [] }, volumen: { labels: [], data: [] } },
+    };
+  } catch (err) {
+    console.warn('[APEX] Usando mock fallback para ejercicio', ejercicioId);
+    return EJERCICIOS_MOCK[ejercicioId] || {
+      id: ejercicioId, nombre: 'Ejercicio', equipo: '—', musculo_primario: '—',
+      musculos_primarios: [], musculos_secundarios: [],
+      stats: { mejorPeso: '—', rm1: '—', volumen: '—', sesiones: '0' },
+      datos_grafica: { peso: { labels: [], data: [] }, reps: { labels: [], data: [] }, '1rm': { labels: [], data: [] }, volumen: { labels: [], data: [] } },
+    };
+  }
 }
 
 
@@ -226,30 +244,7 @@ function inicializarBuscador() {
  * BACKEND: Eliminar esta función y reemplazar con fetch real.
  */
 function filtrarListaClienteSide() {
-  const items = document.querySelectorAll('#lista-biblioteca .item-biblioteca:not(.sin-resultados)');
-  const sinRes = document.getElementById('sin-resultados');
-  let visibles = 0;
-
-  items.forEach(item => {
-    const musculo = item.dataset.musculo || '';
-    const nombre = item.querySelector('.item-nombre')?.textContent.toLowerCase() || '';
-
-    const coincideMusculo = Estado.musculoFiltro === 'todos' || musculo === Estado.musculoFiltro;
-    const coincideBusqueda = !Estado.queryBusqueda || nombre.includes(Estado.queryBusqueda);
-
-    if (coincideMusculo && coincideBusqueda) {
-      item.style.display = '';
-      visibles++;
-    } else {
-      item.style.display = 'none';
-    }
-  });
-
-  // Mostrar estado vacío si no hay resultados
-  if (sinRes) sinRes.classList.toggle('oculto', visibles > 0);
-
-  // Actualizar contador
-  actualizarContadorResultados(visibles);
+  cargarEjerciciosBackend(Estado.musculoFiltro, Estado.queryBusqueda);
 }
 
 function actualizarContadorResultados(num) {
@@ -639,17 +634,34 @@ function mostrarToast(mensaje, ms = 3000) {
  * @param {string} query   - Texto de búsqueda
  */
 async function cargarEjerciciosBackend(musculo = 'todos', query = '') {
-  // const params = new URLSearchParams();
-  // if (musculo !== 'todos') params.set('muscle', musculo);
-  // if (query)               params.set('query',  query);
-  // params.set('limit', '50');
-  //
-  // const res  = await fetch(`${CONFIG.BASE_URL}/exercises?${params}`, {
-  //   headers: { 'Authorization': `Bearer ${localStorage.getItem(CONFIG.JWT_KEY)}` }
-  // });
-  // const data = await res.json();
-  // renderListaEjercicios(data.items);
-  // actualizarContadorResultados(data.items.length);
+  let req = db.from('exercises').select('*').limit(50);
+  
+  if (musculo !== 'todos') {
+    // Convertimos el id del chip a formato de texto para comparar con muscle_group
+    req = req.ilike('muscle_group', `%${musculo}%`);
+  }
+  
+  if (query) {
+    req = req.ilike('name', `%${query}%`);
+  }
+
+  const { data, error } = await req;
+  
+  if (error) {
+    console.error('Error cargando ejercicios:', error);
+    return;
+  }
+  
+  // Transformar al formato del frontend
+  const exercisesFormatted = data.map(ej => ({
+    id: ej.id,
+    nombre: ej.name,
+    musculo_primario: ej.muscle_group,
+    thumbnail_url: ej.media_url
+  }));
+  
+  renderListaEjercicios(exercisesFormatted);
+  actualizarContadorResultados(exercisesFormatted.length);
 }
 
 /**
@@ -727,7 +739,7 @@ function inicializarOtrosEventos() {
    INICIALIZACIÓN PRINCIPAL
 ══════════════════════════════════════════════════════════ */
 
-function inicializarApp() {
+async function inicializarApp() {
   inicializarChipsMusculo();
   inicializarBuscador();
   inicializarSeleccionEjercicio();
@@ -737,11 +749,14 @@ function inicializarApp() {
   inicializarDropdownRutinas();
   inicializarOtrosEventos();
 
+  await cargarEjerciciosBackend();
   // Seleccionar el primer ejercicio automáticamente (como Hevy)
-  const primerItem = document.querySelector('#lista-biblioteca .item-biblioteca');
-  if (primerItem) {
-    primerItem.querySelector('.boton-item')?.click();
-  }
+  setTimeout(() => {
+    const primerItem = document.querySelector('#lista-biblioteca .item-biblioteca');
+    if (primerItem) {
+      primerItem.querySelector('.boton-item')?.click();
+    }
+  }, 500);
 
   console.log('[APEX] Módulo de ejercicios inicializado.');
 }

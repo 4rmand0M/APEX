@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <link rel="stylesheet" href="../assets/css/variables.css" />
   <link rel="stylesheet" href="../assets/css/base.css" />
@@ -74,11 +75,11 @@
 
       <!-- ═══ HERO ═══ -->
       <section class="perfil-hero">
-        <div class="perfil-avatar">JI</div>
+        <div class="perfil-avatar" id="perfil-avatar-iniciales">JI</div>
         <div class="perfil-info-col">
-          <h1 class="perfil-nombre">JEREMY INFANTE</h1>
-          <span class="perfil-handle">@jeremyinfante</span>
-          <p class="perfil-bio">Atleta dedicado a la mejora continua. Enfocado en fuerza e hipertrofia. 💪</p>
+          <h1 class="perfil-nombre" id="perfil-nombre">Cargando...</h1>
+          <span class="perfil-handle" id="perfil-handle">@usuario</span>
+          <p class="perfil-bio" id="perfil-bio">...</p>
         </div>
 
         <div class="perfil-stats">
@@ -121,23 +122,23 @@
         <div class="perfil-seccion-body">
           <div class="perfil-fila">
             <span class="perfil-fila-label">Nombre completo</span>
-            <span class="perfil-fila-valor">Jeremy Infante</span>
+            <span class="perfil-fila-valor" id="info-nombre">Cargando...</span>
           </div>
           <div class="perfil-fila">
             <span class="perfil-fila-label">Email</span>
-            <span class="perfil-fila-valor">jeremy@apex.fit</span>
+            <span class="perfil-fila-valor" id="info-email">Cargando...</span>
           </div>
           <div class="perfil-fila">
             <span class="perfil-fila-label">Teléfono</span>
-            <span class="perfil-fila-valor">+1 (809) 555-0123</span>
+            <span class="perfil-fila-valor" id="info-telefono">—</span>
           </div>
           <div class="perfil-fila">
             <span class="perfil-fila-label">Fecha de nacimiento</span>
-            <span class="perfil-fila-valor">15 Mar 2003</span>
+            <span class="perfil-fila-valor" id="info-nacimiento">—</span>
           </div>
           <div class="perfil-fila">
             <span class="perfil-fila-label">Ubicación</span>
-            <span class="perfil-fila-valor">Santo Domingo, RD</span>
+            <span class="perfil-fila-valor" id="info-ubicacion">—</span>
           </div>
         </div>
       </section>
@@ -151,19 +152,19 @@
         <div class="perfil-seccion-body">
           <div class="perfil-fila">
             <span class="perfil-fila-label">Peso</span>
-            <span class="perfil-fila-valor">175 lbs</span>
+            <span class="perfil-fila-valor" id="medida-peso">—</span>
           </div>
           <div class="perfil-fila">
             <span class="perfil-fila-label">Altura</span>
-            <span class="perfil-fila-valor">5' 11"</span>
+            <span class="perfil-fila-valor" id="medida-altura">—</span>
           </div>
           <div class="perfil-fila">
             <span class="perfil-fila-label">IMC</span>
-            <span class="perfil-fila-valor">24.4</span>
+            <span class="perfil-fila-valor" id="medida-imc">—</span>
           </div>
           <div class="perfil-fila">
             <span class="perfil-fila-label">% Grasa corporal</span>
-            <span class="perfil-fila-valor">14.2%</span>
+            <span class="perfil-fila-valor" id="medida-grasa">—</span>
           </div>
         </div>
       </section>
@@ -266,7 +267,7 @@
 
       <!-- ═══ CERRAR SESIÓN ═══ -->
       <section class="perfil-seccion perfil-seccion-danger">
-        <button class="btn-perfil-danger">
+        <button class="btn-perfil-danger" id="btn-logout">
           <i data-lucide="log-out"></i>
           Cerrar Sesión
         </button>
@@ -310,6 +311,8 @@
 
 </div>
 
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/supabase-client.js"></script>
 <script src="../assets/js/perfil.js"></script>
 </body>
 </html>

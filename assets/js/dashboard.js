@@ -1,33 +1,35 @@
 /* ══════════════════════════════════════════════
    SUPABASE — Inicialización
 ══════════════════════════════════════════════ */
-const _cfg = window.__APEX_CONFIG || {};
-const SUPABASE_URL = _cfg.SUPABASE_URL;
-const SUPABASE_ANON = _cfg.SUPABASE_ANON;
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+const db = window.supabaseClient;
 
 /* ══════════════════════════════════════════════
    AUTH — Verificar sesión
 ══════════════════════════════════════════════ */
 async function verificarSesion() {
-    const { data: { session } } = await db.auth.getSession();
+    const user = await window.ApexAuth.requireAuth();
+    if (!user) return;
 
     const navUsuario = document.getElementById('nav-usuario');
     const btnLogout = document.getElementById('btn-logout');
 
-    if (session) {
-        const email = session.user.email;
-        if (navUsuario) navUsuario.textContent = email;
-        if (btnLogout) btnLogout.style.display = 'inline';
-    } else {
-        if (navUsuario) navUsuario.textContent = 'Sin sesión';
+    const { data: profile } = await db
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+
+    if (profile && navUsuario) {
+        navUsuario.textContent = profile.full_name || user.email;
+    } else if (navUsuario) {
+        navUsuario.textContent = user.email;
     }
+
+    if (btnLogout) btnLogout.style.display = 'inline';
 }
 
 async function cerrarSesion() {
-    await db.auth.signOut();
-    window.location.href = 'login.html';
+    await window.ApexAuth.signOut();
 }
 
 /* ══════════════════════════════════════════════

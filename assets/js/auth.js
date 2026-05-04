@@ -4,11 +4,7 @@
 ============================================================ */
 
 /* ─── SUPABASE — INICIALIZACIÓN ────────────────────────── */
-const _cfg = window.__APEX_CONFIG || {};
-const SUPABASE_URL  = _cfg.SUPABASE_URL;
-const SUPABASE_ANON = _cfg.SUPABASE_ANON;
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+const db = window.supabaseClient;
 
 const ROL_ID = { entrenador: 2, monitor: 2, alumno: 1 };
 
@@ -314,10 +310,6 @@ async function manejarLogin() {
     return;
   }
 
-  await db.from('usuarios')
-    .update({ ultimo_login: new Date().toISOString() })
-    .eq('uuid', data.user.id);
-
   window.location.href = '../pages/dashboard.html';
 }
 
@@ -364,22 +356,7 @@ async function manejarRegistro() {
     return;
   }
 
-  var datosUsuario = {
-    uuid:             authData.user.id,
-    nombre,
-    apellido,
-    email:            correo,
-    password_hash:    'supabase_auth',
-    fecha_nacimiento: nacimiento || '2000-01-01',
-    rol_id:           ROL_ID[rolSeleccionado] || 1,
-    estado:           'pendiente',
-    email_verificado: false
-  };
-  if (telefono) datosUsuario.telefono = telefono;
-
-  const { error: dbError } = await db.from('usuarios').insert(datosUsuario);
-  if (dbError) console.warn('[APEX] No se pudo insertar en usuarios:', dbError.message);
-
+  // El perfil se crea automáticamente a través del trigger on_auth_user_created en Supabase
   setBtnCargando('btn-registro', false, 'Crear Cuenta');
 
   mostrarVista('vista-login');

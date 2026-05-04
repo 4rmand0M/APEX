@@ -9,6 +9,8 @@ const CONFIG = {
   TEMA_KEY: 'apex_tema',
 };
 
+const db = window.supabaseClient;
+
 const Estado = {
   fechaActual:       new Date(),
   drawerAbierto:     false,
@@ -175,16 +177,55 @@ async function guardarEntreno() {
     mostrarToast('Añade al menos un ejercicio');
     return;
   }
-  const payload = {
-    usuario_id: 'usuario-actual',
-    fecha:      new Date().toISOString(),
-    ejercicios: Estado.ejerciciosEntreno.map(ej => ({
-      ejercicio_id: ej.id,
-      nombre:       ej.nombre,
-      series:       ej.series,
-    })),
-  };
-  console.log('[APEX] POST /sessions —', payload);
+  
+  const user = await window.ApexAuth.getUser();
+  if (!user) {
+    mostrarToast('Debes iniciar sesión para guardar');
+    return;
+  }
+
+  // 1. Crear sesión de entrenamiento
+  const { data: session, error: sessionError } = await db
+    .from('workout_sessions')
+    .insert({
+      user_id: user.id,
+      start_time: new Date().toISOString(),
+      end_time: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (sessionError) {
+    console.error('Error al guardar sesión:', sessionError);
+    mostrarToast('Error al guardar el entreno');
+    return;
+  }
+
+  // 2. Insertar logs de ejercicios (series)
+  const logs = [];
+  Estado.ejerciciosEntreno.forEach(ej => {
+    ej.series.forEach((serie, idx) => {
+      // Ignoramos el guardado de series sin reps ni peso
+      if (!serie.reps && !serie.kg) return;
+      
+      logs.push({
+        session_id: session.id,
+        exercise_id: ej.id, // Debe ser UUID válido en la DB
+        set_number: idx + 1,
+        reps_completed: serie.reps || 0,
+        weight_used: serie.kg || 0
+      });
+    });
+  });
+
+  if (logs.length > 0) {
+    const { error: logsError } = await db.from('workout_logs').insert(logs);
+    if (logsError) {
+      console.error('Error guardando logs:', logsError);
+      // Falla silente para logs, la sesión ya se guardó
+    }
+  }
+
   mostrarToast('Entreno guardado ✓');
   Estado.ejerciciosEntreno = [];
   renderizarListaDrawer();
@@ -440,17 +481,31 @@ function renderizarHistorialCorporal() {
   }).join('');
 }
 
-function guardarCorporal() {
-  const campos = ['peso','grasa','musculo','agua','cuello','pecho','cintura','cadera',
-                  'biceps-izq','biceps-der','muslo-izq','muslo-der','pant-izq','pant-der'];
-  const payload = { fecha: new Date().toISOString() };
-  campos.forEach(c => {
-    const val = document.getElementById(`corp-${c}`)?.value;
-    if (val) payload[c.replace(/-/g, '_')] = parseFloat(val);
-  });
+async function guardarCorporal() {
+  const pesoVal = document.getElementById('corp-peso')?.value;
+  if (!pesoVal) { mostrarToast('Ingresa al menos el peso'); return; }
 
-  if (!payload.peso) { mostrarToast('Ingresa al menos el peso'); return; }
-  console.log('[APEX] POST /body-tracking —', payload);
+  const user = await window.ApexAuth.getUser();
+  if (!user) {
+    mostrarToast('Debes iniciar sesión para guardar');
+    return;
+  }
+
+  const payload = { 
+    user_id: user.id,
+    recorded_at: new Date().toISOString(),
+    weight: parseFloat(pesoVal),
+    body_fat_percentage: parseFloat(document.getElementById('corp-grasa')?.value) || null
+  };
+
+  const { error } = await db.from('user_measurements').insert(payload);
+  
+  if (error) {
+    console.error('Error guardando medidas:', error);
+    mostrarToast('Error al guardar');
+    return;
+  }
+
   mostrarToast('Medidas guardadas ✓');
   cerrarDrawerCorporal();
 }
