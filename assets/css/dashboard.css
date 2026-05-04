@@ -52,7 +52,7 @@ html {
 
 body {
     overflow-y: auto;
-    cursor: none;
+    cursor: pointer;
     height: auto;
     transition: background 0.3s, color 0.3s;
 }
@@ -150,7 +150,7 @@ body.sobre-interactivo #cursor-punto {
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--texto-atenuado);
-    cursor: none;
+    cursor: pointer;
     background: none;
     border: none;
     font-family: 'DM Sans', sans-serif;
@@ -172,7 +172,7 @@ body.sobre-interactivo #cursor-punto {
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: none;
+    cursor: pointer;
     color: var(--texto-atenuado);
     flex-shrink: 0;
     transition: border-color 0.15s, color 0.15s, background 0.15s;
@@ -595,7 +595,7 @@ body.sobre-interactivo #cursor-punto {
     letter-spacing: 1px;
     text-transform: uppercase;
     padding: 5px 10px;
-    cursor: none;
+    cursor: pointer;
     font-family: 'DM Sans', sans-serif;
     transition: border-color 0.14s, color 0.14s;
 }

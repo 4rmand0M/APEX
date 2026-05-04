@@ -24,6 +24,7 @@ window.ApexAuth = {
       console.error('[APEX] Error getting session:', error);
       return null;
     }
+    // Si hay sesión pero no hay usuario en memoria, forzamos refresco
     return session;
   },
 
@@ -60,6 +61,18 @@ window.ApexAuth = {
   },
 
   /**
+   * Redirige al usuario según su rol
+   * @param {string} role - 'user', 'trainer', 'admin'
+   */
+  redirectByRole: function(role) {
+    if (role === 'trainer' || role === 'admin') {
+      window.location.href = '../pages/dashboard.html';
+    } else {
+      window.location.href = '../pages/workout.html'; // Journal
+    }
+  },
+
+  /**
    * Hidrata la interfaz con los datos del usuario logueado
    */
   hydrateUI: async function() {
@@ -79,6 +92,22 @@ window.ApexAuth = {
     }
 
     if (profile) {
+      // Guardar rol en el body para CSS si es necesario
+      document.body.dataset.role = profile.role || 'user';
+
+      // 0. Ocultar Dashboard si es alumno
+      if (profile.role === 'user') {
+        document.querySelectorAll('a[href="dashboard.html"]').forEach(el => {
+          el.closest('li')?.remove(); // Quitar del sidebar desktop
+          el.remove(); // Quitar del nav móvil
+        });
+        
+        // Si estamos en dashboard.html y somos alumnos, redirigir a journal
+        if (window.location.pathname.includes('dashboard.html')) {
+          window.location.href = 'workout.html';
+        }
+      }
+
       // 1. Nombre completo
       const nombre = profile.full_name || 'Usuario';
       document.querySelectorAll('.nombre-usuario-barra, .perfil-nombre').forEach(el => {
@@ -96,14 +125,16 @@ window.ApexAuth = {
       document.querySelectorAll('.avatar-barra, .perfil-avatar').forEach(el => {
         el.textContent = iniciales;
       });
-
-      // 4. Bio
-      if (profile.bio) {
-        document.querySelectorAll('.perfil-bio').forEach(el => {
-          el.textContent = profile.bio;
-        });
-      }
     }
+
+    // 5. Vincular logout si existe el botón
+    document.querySelectorAll('.icono-logout').forEach(el => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await this.signOut();
+      });
+    });
   }
 };
 

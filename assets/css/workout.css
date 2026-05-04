@@ -203,7 +203,7 @@ html {
   width: 36px;
   height: 36px;
   color: var(--texto-atenuado);
-  cursor: none;
+  cursor: pointer;
   margin-bottom: 8px;
   transition: color .14s, border-color .14s, background .14s;
 }
@@ -509,7 +509,7 @@ html {
   align-items: center;
   justify-content: center;
   color: var(--texto-atenuado);
-  cursor: none;
+  cursor: pointer;
   flex-shrink: 0;
   transition: color .14s, border-color .14s, background .14s;
 }
@@ -821,7 +821,7 @@ html {
   font-size: 15px;
   font-weight: 500;
   color: var(--acento);
-  cursor: none;
+  cursor: pointer;
   flex-direction: column;
   transition: opacity .14s;
 }
@@ -876,7 +876,7 @@ html {
   min-width: 48px;
   background: none;
   border: none;
-  cursor: none;
+  cursor: pointer;
   flex-shrink: 0;
 }
 
@@ -909,7 +909,7 @@ html {
   background: rgba(0, 0, 0, .55);
   backdrop-filter: blur(3px);
   z-index: 199;
-  cursor: none;
+  cursor: pointer;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -952,7 +952,7 @@ html {
 .drawer-btn-cancelar {
   background: none;
   border: none;
-  cursor: none;
+  cursor: pointer;
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   font-weight: 500;
@@ -979,7 +979,7 @@ html {
   font-family: 'DM Sans', sans-serif;
   font-size: 13px;
   font-weight: 700;
-  cursor: none;
+  cursor: pointer;
   transition: opacity .18s, transform .18s;
 }
 
@@ -1057,7 +1057,7 @@ html {
   background: none;
   border: none;
   color: var(--texto-atenuado);
-  cursor: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   padding: 4px;
@@ -1121,7 +1121,7 @@ html {
 .drawer-ej-del-serie {
   background: none;
   border: none;
-  cursor: none;
+  cursor: pointer;
   color: var(--texto-atenuado);
   display: flex;
   align-items: center;
@@ -1145,7 +1145,7 @@ html {
   font-size: 12px;
   font-weight: 600;
   color: var(--texto-atenuado);
-  cursor: none;
+  cursor: pointer;
   width: 100%;
   justify-content: center;
   transition: color .14s, border-color .14s;
@@ -1168,7 +1168,7 @@ html {
   font-size: 14px;
   font-weight: 700;
   color: var(--acento);
-  cursor: none;
+  cursor: pointer;
   flex-shrink: 0;
   transition: background .14s;
 }
@@ -1226,7 +1226,7 @@ html {
   background: none;
   border: none;
   color: var(--texto-atenuado);
-  cursor: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   padding: 4px;
@@ -1285,7 +1285,7 @@ html {
   background: none;
   border: none;
   padding: 14px 20px;
-  cursor: none;
+  cursor: pointer;
   text-align: left;
   transition: background .14s;
 }
@@ -1334,7 +1334,7 @@ html {
   background: none;
   border: none;
   padding: 12px 20px 12px 44px;
-  cursor: none;
+  cursor: pointer;
   transition: background .14s;
 }
 

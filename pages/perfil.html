@@ -79,7 +79,6 @@
         <div class="perfil-info-col">
           <h1 class="perfil-nombre" id="perfil-nombre">Cargando...</h1>
           <span class="perfil-handle" id="perfil-handle">@usuario</span>
-          <p class="perfil-bio" id="perfil-bio">...</p>
         </div>
 
         <div class="perfil-stats">
@@ -102,7 +101,7 @@
         </div>
 
         <div class="perfil-acciones">
-          <button class="btn-perfil btn-perfil-primario">
+          <button class="btn-perfil btn-perfil-primario" id="btn-editar-perfil">
             <i data-lucide="edit-3"></i>
             Editar Perfil
           </button>
@@ -136,10 +135,6 @@
             <span class="perfil-fila-label">Fecha de nacimiento</span>
             <span class="perfil-fila-valor" id="info-nacimiento">—</span>
           </div>
-          <div class="perfil-fila">
-            <span class="perfil-fila-label">Ubicación</span>
-            <span class="perfil-fila-valor" id="info-ubicacion">—</span>
-          </div>
         </div>
       </section>
 
@@ -169,75 +164,7 @@
         </div>
       </section>
 
-      <!-- ═══ PREFERENCIAS DE ENTRENAMIENTO ═══ -->
-      <section class="perfil-seccion">
-        <div class="perfil-seccion-header">
-          <i data-lucide="target"></i>
-          <h2 class="perfil-seccion-titulo">Preferencias de Entrenamiento</h2>
-        </div>
-        <div class="perfil-seccion-body">
-          <div class="perfil-fila">
-            <span class="perfil-fila-label">Objetivo principal</span>
-            <span class="perfil-fila-valor">Hipertrofia</span>
-          </div>
-          <div class="perfil-fila">
-            <span class="perfil-fila-label">Nivel</span>
-            <span class="perfil-fila-valor">Intermedio</span>
-          </div>
-          <div class="perfil-fila">
-            <span class="perfil-fila-label">Gimnasio</span>
-            <span class="perfil-fila-valor">Apex Central</span>
-          </div>
-          <div class="perfil-fila">
-            <span class="perfil-fila-label">Días por semana</span>
-            <span class="perfil-fila-valor">5 días</span>
-          </div>
-          <div class="perfil-fila">
-            <span class="perfil-fila-label">Unidades</span>
-            <span class="perfil-fila-valor">Libras (lbs)</span>
-          </div>
-        </div>
-        <div class="perfil-tags">
-          <span class="perfil-tag">Fuerza</span>
-          <span class="perfil-tag">Hipertrofia</span>
-          <span class="perfil-tag">Funcional</span>
-          <span class="perfil-tag">Movilidad</span>
-        </div>
-      </section>
 
-      <!-- ═══ LOGROS ═══ -->
-      <section class="perfil-seccion">
-        <div class="perfil-seccion-header">
-          <i data-lucide="trophy"></i>
-          <h2 class="perfil-seccion-titulo">Logros</h2>
-        </div>
-        <div class="perfil-logros-grid">
-          <div class="perfil-logro">
-            <div class="perfil-logro-icono"><i data-lucide="flame"></i></div>
-            <span class="perfil-logro-nombre">Racha 7 días</span>
-          </div>
-          <div class="perfil-logro">
-            <div class="perfil-logro-icono"><i data-lucide="zap"></i></div>
-            <span class="perfil-logro-nombre">100 Entrenos</span>
-          </div>
-          <div class="perfil-logro">
-            <div class="perfil-logro-icono"><i data-lucide="trophy"></i></div>
-            <span class="perfil-logro-nombre">10 PRs</span>
-          </div>
-          <div class="perfil-logro">
-            <div class="perfil-logro-icono"><i data-lucide="star"></i></div>
-            <span class="perfil-logro-nombre">Elite</span>
-          </div>
-          <div class="perfil-logro">
-            <div class="perfil-logro-icono"><i data-lucide="dumbbell"></i></div>
-            <span class="perfil-logro-nombre">1000 kg Vol</span>
-          </div>
-          <div class="perfil-logro">
-            <div class="perfil-logro-icono"><i data-lucide="heart"></i></div>
-            <span class="perfil-logro-nombre">Consistente</span>
-          </div>
-        </div>
-      </section>
 
       <!-- ═══ CUENTA ═══ -->
       <section class="perfil-seccion">
@@ -307,6 +234,71 @@
     </a>
   </nav>
 
+</div>
+
+<!-- ════════════════════════════════════════════════════
+   DRAWER — EDITAR PERFIL
+════════════════════════════════════════════════════ -->
+<div class="perfil-overlay oculto" id="perfil-overlay"></div>
+<div class="perfil-drawer oculto" id="perfil-drawer" role="dialog" aria-modal="true" aria-label="Editar perfil">
+  <div class="perfil-drawer-header">
+    <button class="perfil-drawer-cerrar" id="perfil-drawer-cerrar" aria-label="Cerrar">
+      <i data-lucide="x"></i>
+    </button>
+    <h2 class="perfil-drawer-titulo">Editar Perfil</h2>
+    <button class="perfil-drawer-guardar" id="perfil-drawer-guardar">Guardar</button>
+  </div>
+
+  <form class="perfil-drawer-body" id="perfil-edit-form" autocomplete="off">
+    <!-- Nombre (solo lectura) -->
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">Nombre completo</label>
+      <input type="text" class="perfil-campo-input perfil-campo-disabled" id="edit-nombre" disabled />
+    </div>
+
+    <!-- Username -->
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">Username</label>
+      <input type="text" class="perfil-campo-input" id="edit-username" placeholder="@usuario" />
+    </div>
+
+    <!-- Teléfono -->
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">Teléfono</label>
+      <input type="tel" class="perfil-campo-input" id="edit-telefono" placeholder="+1 234 567 8900" />
+    </div>
+
+    <!-- Fecha de nacimiento -->
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">Fecha de nacimiento</label>
+      <input type="date" class="perfil-campo-input" id="edit-nacimiento" />
+    </div>
+
+    <!-- Altura -->
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">Altura (cm)</label>
+      <input type="number" class="perfil-campo-input" id="edit-altura" placeholder="170" step="0.1" min="50" max="250" />
+    </div>
+
+    <!-- Peso -->
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">Peso (kg)</label>
+      <input type="number" class="perfil-campo-input" id="edit-peso" placeholder="70" step="0.1" min="20" max="300" />
+    </div>
+
+    <!-- Objetivo -->
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">Objetivo fitness</label>
+      <select class="perfil-campo-input" id="edit-objetivo">
+        <option value="">Sin definir</option>
+        <option value="Hipertrofia">Hipertrofia</option>
+        <option value="Fuerza">Fuerza</option>
+        <option value="Resistencia">Resistencia</option>
+        <option value="Pérdida de grasa">Pérdida de grasa</option>
+        <option value="Salud general">Salud general</option>
+      </select>
+    </div>
+  </form>
 </div>
 
   <script src="../assets/js/config.js"></script>

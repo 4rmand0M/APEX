@@ -62,7 +62,7 @@ body.sobre-interactivo #cursor-punto {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: none;
+  cursor: pointer;
   color: var(--texto-atenuado);
   transition: border-color .15s, color .15s, background .15s;
 }
@@ -84,7 +84,7 @@ body.sobre-interactivo #cursor-punto {
   font-size: 9px;
   letter-spacing: 2px;
   text-transform: uppercase;
-  cursor: none;
+  cursor: pointer;
   text-decoration: none;
   transition: color 0.14s;
 }
@@ -239,7 +239,7 @@ body.sobre-interactivo #cursor-punto {
   margin-left: -1px;
   border-left: 1px solid transparent;
   transition: color 0.14s;
-  cursor: none;
+  cursor: pointer;
 }
 
 .indice-enlace:hover {
@@ -390,7 +390,7 @@ body.sobre-interactivo #cursor-punto {
   color: var(--acento);
   text-decoration: none;
   font-size: 13px;
-  cursor: none;
+  cursor: pointer;
   transition: opacity 0.14s;
 }
 
@@ -445,7 +445,7 @@ body.sobre-interactivo #cursor-punto {
   letter-spacing: 1px;
   color: var(--texto-atenuado);
   text-decoration: none;
-  cursor: none;
+  cursor: pointer;
   transition: color 0.14s;
 }
 

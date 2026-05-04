@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     full_name TEXT,
     avatar_url TEXT,
     bio TEXT,
+    phone TEXT,                    -- Teléfono del usuario
+    date_of_birth DATE,            -- Fecha de nacimiento
     weight DECIMAL(5,2), -- Peso actual en kg
     height DECIMAL(5,2), -- Altura en cm
     imc DECIMAL(5,2),    -- Índice de masa corporal
@@ -33,6 +35,7 @@ CREATE TABLE IF NOT EXISTS public.user_measurements (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     weight DECIMAL(5,2) NOT NULL,
+    height DECIMAL(5,2),            -- Altura en cm usada en el cálculo
     body_fat_percentage DECIMAL(5,2),
     imc DECIMAL(5,2),
     recorded_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL

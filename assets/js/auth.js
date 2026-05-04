@@ -8,6 +8,20 @@ const db = window.supabaseClient;
 
 const ROL_ID = { entrenador: 2, monitor: 2, alumno: 1 };
 
+// Redirigir si ya está logueado
+(async function checkExistingSession() {
+  const { data: { session } } = await db.auth.getSession();
+  if (session && !window.location.pathname.includes('logout')) {
+    const { data: profile } = await db
+      .from('profiles')
+      .select('role')
+      .eq('id', session.user.id)
+      .single();
+    
+    window.ApexAuth.redirectByRole(profile?.role || 'user');
+  }
+})();
+
 
 /* ─── 1. PANTALLA DE CARGA ───────────────────────────*/
 
@@ -310,7 +324,14 @@ async function manejarLogin() {
     return;
   }
 
-  window.location.href = '../pages/dashboard.html';
+  // Obtener el rol del usuario desde profiles
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', data.user.id)
+    .single();
+
+  window.ApexAuth.redirectByRole(profile?.role || 'user');
 }
 
 

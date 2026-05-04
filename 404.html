@@ -21,7 +21,7 @@
       font-family: 'DM Sans', sans-serif;
       background: var(--fondo);
       color: var(--texto);
-      cursor: none;
+      cursor: pointer;
       transition: background 0.3s, color 0.3s;
     }
 
@@ -29,45 +29,8 @@
     /* ══════════════════════════════════════════════════════
        CURSOR — solo punto, sin anillo
     ══════════════════════════════════════════════════════ */
-    #cursor-punto {
-      position: fixed;
-      width: 6px;
-      height: 6px;
-      background: var(--acento);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 99999;
-      transform: translate(-50%, -50%);
-      will-change: left, top;
-      transition: width 0.12s, height 0.12s;
-    }
 
     /* El punto crece levemente sobre interactivos */
-    body.sobre-interactivo #cursor-punto { width: 9px; height: 9px; }
-
-
-    /* ══════════════════════════════════════════════════════
-       NAV — blur refinado para ambos temas
-    ══════════════════════════════════════════════════════ */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 52px;
-
-      /* Oscuro: negro semitransparente */
-      background: rgba(8, 8, 8, 0.55);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-
-      /* Borde inferior extremadamente sutil */
-      border-bottom: 1px solid var(--borde);
-
-      transition: background 0.3s, border-color 0.3s;
-    }
 
     /* Claro: crema semitransparente — evita el aspecto plano */
     [data-tema="claro"] nav {
@@ -100,7 +63,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: none;
+      cursor: pointer;
       color: var(--texto-atenuado);
       transition: border-color 0.2s, color 0.2s, background 0.2s;
     }
@@ -257,7 +220,7 @@
       font-weight: 700;
       letter-spacing: 3px;
       text-transform: uppercase;
-      cursor: none;
+      cursor: pointer;
       text-decoration: none;
       display: inline-block;
       transition: transform 0.1s, box-shadow 0.14s;
@@ -281,7 +244,7 @@
       letter-spacing: 2.5px;
       text-transform: uppercase;
       color: var(--texto);
-      cursor: none;
+      cursor: pointer;
       text-decoration: none;
       display: inline-block;
       transition: border-color 0.14s, background 0.14s;
@@ -344,8 +307,6 @@
     ══════════════════════════════════════════════════════ */
     @media (max-width: 820px) {
       html, body { overflow: auto; cursor: auto; }
-      #cursor-punto { display: none; }
-      button, a { cursor: pointer; }
 
       /* En móvil la página puede hacer scroll para mostrar
          ambas columnas apiladas */
@@ -387,7 +348,6 @@
 <body>
 
   <!-- Solo el punto — sin cursor-anillo -->
-  <div id="cursor-punto"></div>
 
   <!-- ══════════════════════════════════════════════════════
        NAV

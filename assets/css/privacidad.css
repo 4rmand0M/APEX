@@ -68,7 +68,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: none;
+      cursor: pointer;
       color: var(--texto-atenuado);
       transition: border-color .15s, color .15s, background .15s;
     }
@@ -90,7 +90,7 @@
       font-size: 9px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      cursor: none;
+      cursor: pointer;
       text-decoration: none;
       transition: color 0.14s;
     }
@@ -244,7 +244,7 @@
       text-decoration: none;
       padding: 5px 0;
       transition: color 0.14s;
-      cursor: none;
+      cursor: pointer;
       border-left: 1px solid transparent;
       padding-left: 12px;
       margin-left: -1px;
@@ -405,7 +405,7 @@
       color: var(--acento);
       text-decoration: none;
       font-size: 13px;
-      cursor: none;
+      cursor: pointer;
       transition: opacity 0.14s;
     }
 
@@ -460,7 +460,7 @@
       letter-spacing: 1px;
       color: var(--texto-atenuado);
       text-decoration: none;
-      cursor: none;
+      cursor: pointer;
       transition: color 0.14s;
     }
 

@@ -79,6 +79,7 @@ function calcularIMC() {
   // Guardar estado para persistencia posterior
   ultimoCalculo = {
     weight: peso,
+    height: altura,
     body_fat_percentage: parseFloat(document.getElementById('grasa').value) || null,
     imc: imcRedondeado,
     recorded_at: new Date().toISOString(),
@@ -120,6 +121,7 @@ async function guardarMetrica() {
     user_id: usuarioActual.id,
     recorded_at: ultimoCalculo.recorded_at,
     weight: ultimoCalculo.weight,
+    height: ultimoCalculo.height,
     body_fat_percentage: ultimoCalculo.body_fat_percentage,
     imc: ultimoCalculo.imc
   };
@@ -163,7 +165,7 @@ async function cargarHistorial() {
   // Consulta principal: historial completo ordenado por fecha
   const { data: metricas, error } = await db
     .from('user_measurements')
-    .select('recorded_at, weight, body_fat_percentage, imc')
+    .select('recorded_at, weight, height, body_fat_percentage, imc')
     .eq('user_id', usuarioActual.id)
     .order('recorded_at', { ascending: false })
     .limit(50); // Máximo 50 registros en el historial
@@ -204,7 +206,7 @@ function renderizarHistorial(metricas) {
     tr.innerHTML = `
       <td>${fecha}</td>
       <td><strong style="color:var(--texto)">${m.weight ?? '—'}</strong></td>
-      <td>—</td>
+      <td>${m.height ?? '—'} cm</td>
       <td><strong style="color:var(--texto)">${m.imc ? parseFloat(m.imc).toFixed(1) : '—'}</strong></td>
       <td><span class="badge-categoria ${badgeClass}">${categoria.replace(/_/g, ' ')}</span></td>
       <td>${m.body_fat_percentage ? m.body_fat_percentage + '%' : '—'}</td>

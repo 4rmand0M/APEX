@@ -141,104 +141,7 @@
         ════════════════════════════ -->
           <section class="vista-lista oculto" id="vista-lista" aria-label="Vista de lista">
             <ul class="cal-lista-entrenos" id="cal-lista-entrenos" role="list">
-
-              <!-- Grupo de fecha -->
-              <!-- BACKEND: Agrupar sesiones por fecha -->
-              <li class="cal-lista-grupo">
-                <div class="cal-lista-fecha-header">
-                  <h2 class="cal-lista-fecha-titulo">viernes 20th marzo 2026</h2>
-                </div>
-                <ul class="cal-lista-sesiones" role="list">
-                  <!-- Ejercicio de la sesión -->
-                  <li class="cal-lista-ejercicio">
-                    <span class="cal-lista-dot" style="--c:#7EB8A4"></span>
-                    <div class="cal-lista-ej-detalle">
-                      <span class="cal-lista-ej-nombre">Jalón Al Pecho Neutro</span>
-                      <!-- BACKEND: Iterar series -->
-                      <ul class="cal-lista-ej-series">
-                        <li>120.0 lbs × 10 reps</li>
-                        <li>120.0 lbs × 7 reps</li>
-                        <li>105.0 lbs × 10 reps</li>
-                      </ul>
-                    </div>
-                  </li>
-                  <li class="cal-lista-ejercicio">
-                    <span class="cal-lista-dot" style="--c:#7EB8A4"></span>
-                    <div class="cal-lista-ej-detalle">
-                      <span class="cal-lista-ej-nombre">Remo Cerrado En Polea</span>
-                      <ul class="cal-lista-ej-series">
-                        <li>111.0 lbs × 15 reps</li>
-                        <li>133.0 lbs × 10 reps</li>
-                        <li>133.0 lbs × 10 reps</li>
-                      </ul>
-                    </div>
-                  </li>
-                  <li class="cal-lista-ejercicio">
-                    <span class="cal-lista-dot" style="--c:#5CB85C"></span>
-                    <div class="cal-lista-ej-detalle">
-                      <span class="cal-lista-ej-nombre">Curl Bíceps Mancuerna</span>
-                      <ul class="cal-lista-ej-series">
-                        <li>22.0 lbs × 12 reps</li>
-                        <li>22.0 lbs × 10 reps</li>
-                        <li>22.0 lbs × 10 reps</li>
-                      </ul>
-                    </div>
-                  </li>
-                </ul>
-                <!-- Chips de músculo al pie del grupo -->
-                <div class="cal-lista-chips">
-                  <span class="cal-chip" style="--c:#7EB8A4">ESPALDA</span>
-                  <span class="cal-chip" style="--c:#5CB85C">BÍCEPS</span>
-                  <span class="cal-chip" style="--c:#5CB85C">TRAPECIOS</span>
-                  <span class="cal-chip" style="--c:#5B9BD5">ANTEBRAZOS</span>
-                </div>
-              </li>
-
-              <li class="cal-lista-grupo">
-                <div class="cal-lista-fecha-header">
-                  <h2 class="cal-lista-fecha-titulo">jueves 19th marzo 2026</h2>
-                </div>
-                <ul class="cal-lista-sesiones" role="list">
-                  <li class="cal-lista-ejercicio">
-                    <span class="cal-lista-dot" style="--c:#5CB85C"></span>
-                    <div class="cal-lista-ej-detalle">
-                      <span class="cal-lista-ej-nombre">Press Inclinado Mancuerna</span>
-                      <ul class="cal-lista-ej-series">
-                        <li>45.0 lbs × 9 reps</li>
-                        <li>40.0 lbs × 9 reps</li>
-                        <li>40.0 lbs × 10 reps</li>
-                      </ul>
-                    </div>
-                  </li>
-                  <li class="cal-lista-ejercicio">
-                    <span class="cal-lista-dot" style="--c:#5CB85C"></span>
-                    <div class="cal-lista-ej-detalle">
-                      <span class="cal-lista-ej-nombre">Apertura De Pecho Maquina</span>
-                      <ul class="cal-lista-ej-series">
-                        <li>90.0 lbs × 10 reps</li>
-                        <li>90.0 lbs × 10 reps</li>
-                        <li>110.0 lbs × 10 reps</li>
-                      </ul>
-                    </div>
-                  </li>
-                  <li class="cal-lista-ejercicio">
-                    <span class="cal-lista-dot" style="--c:#5B9BD5"></span>
-                    <div class="cal-lista-ej-detalle">
-                      <span class="cal-lista-ej-nombre">Elevaciones Laterales</span>
-                      <ul class="cal-lista-ej-series">
-                        <li>11.0 lbs × 20 reps</li>
-                        <li>11.0 lbs × 20 reps</li>
-                      </ul>
-                    </div>
-                  </li>
-                </ul>
-                <div class="cal-lista-chips">
-                  <span class="cal-chip" style="--c:#5CB85C">PECHO</span>
-                  <span class="cal-chip" style="--c:#5B9BD5">HOMBRO</span>
-                  <span class="cal-chip" style="--c:#9B59B6">TRÍCEPS</span>
-                </div>
-              </li>
-
+              <!-- JS renderiza dinámicamente -->
             </ul>
           </section>
 
@@ -460,6 +363,9 @@
     <span class="toast-mensaje" id="toast-mensaje">Listo</span>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/supabase-client.js"></script>
   <script src="../assets/js/calendario.js"></script>
 </body>
 

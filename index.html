@@ -135,7 +135,6 @@
       text-transform: uppercase;
       color: var(--texto-sub);
       text-decoration: none;
-      cursor: none;
       transition: color 0.14s;
     }
 
@@ -155,7 +154,7 @@
       font-weight: 700;
       letter-spacing: 2.5px;
       text-transform: uppercase;
-      cursor: none;
+      cursor: pointer;
       text-decoration: none;
       transition: transform 0.1s, box-shadow 0.14s;
     }
@@ -175,7 +174,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: none;
+      cursor: pointer;
       color: var(--texto-atenuado);
       transition: border-color 0.15s, color 0.15s, background 0.15s;
       flex-shrink: 0;
@@ -333,7 +332,7 @@
       font-weight: 700;
       letter-spacing: 3px;
       text-transform: uppercase;
-      cursor: none;
+      cursor: pointer;
       text-decoration: none;
       transition: transform 0.1s, box-shadow 0.14s;
     }
@@ -359,7 +358,7 @@
       font-weight: 500;
       letter-spacing: 2.5px;
       text-transform: uppercase;
-      cursor: none;
+      cursor: pointer;
       text-decoration: none;
       transition: border-color 0.14s, color 0.14s;
     }
@@ -662,7 +661,7 @@
       text-transform: uppercase;
       color: var(--acento);
       text-decoration: none;
-      cursor: none;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -784,7 +783,7 @@
       text-transform: uppercase;
       color: var(--texto-atenuado);
       text-decoration: none;
-      cursor: none;
+      cursor: pointer;
       transition: color 0.14s;
     }
 
@@ -836,7 +835,7 @@
       background: none;
       border: 1px solid var(--borde);
       border-radius: 5px;
-      cursor: none;
+      cursor: pointer;
       gap: 5px;
       flex-shrink: 0;
       transition: border-color 0.14s;
@@ -986,22 +985,42 @@
       }
 
       .nav-menu-movil {
-        display: block;
+        display: none; /* Cambiado de block a none para evitar bloqueo */
       }
 
       .nav-overlay {
-        display: block;
+        display: none !important; /* Eliminado completamente por ahora */
       }
 
       .hero {
         padding: 100px 22px 60px;
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 32px;
+      }
+
+      .hero-contenido {
+        align-items: center;
+      }
+
+      .hero-imagen-wrapper {
+        display: none; /* Ocultar imagen en móvil para dar prioridad al CTA */
+      }
+
+      .hero-badge {
+        justify-content: center;
+      }
+
+      .hero-titulo {
+        font-size: 64px;
+        margin-inline: auto;
+      }
+
+      .hero-desc {
+        margin-inline: auto;
       }
 
       .hero-deco {
-        display: none;
-      }
-
-      .hero-logo-deco {
         display: none;
       }
 
@@ -1047,21 +1066,15 @@
       }
 
       /* Cursor nativo en móvil */
-      body,
       button,
       a {
-        cursor: auto;
-      }
-
-      #cursor-punto {
-        display: none;
+        cursor: pointer;
       }
     }
   </style>
 </head>
 
 <body>
-  <div id="cursor-punto"></div>
 
   <!-- ══════════════════════════════════════════════════════
        NAV — Logo + enlaces + botón tema + CTA
@@ -1130,7 +1143,7 @@
     <div class="hero-glow-2"></div>
 
     <!-- Columna izquierda: texto -->
-    <div class="hero-contenido" style="position:relative; z-index:2; display:flex; flex-direction:column;">
+    <div class="hero-contenido" style="position:relative; z-index:500; display:flex; flex-direction:column; pointer-events:auto;">
       <div class="hero-badge">Performance Training Platform</div>
 
       <h1 class="hero-titulo">
@@ -1318,27 +1331,14 @@
     </div>
   </footer>
 
+  <!-- ── Scripts externos ── -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./assets/js/config.js"></script>
+  <script src="./assets/js/supabase-client.js"></script>
+
   <script>
     /* Inicializar íconos Lucide */
     lucide.createIcons();
-
-    /* ── Cursor personalizado ── */
-    (function () {
-      var punto = document.getElementById('cursor-punto');
-
-      document.addEventListener('mousemove', function (e) {
-        punto.style.left = e.clientX + 'px';
-        punto.style.top = e.clientY + 'px';
-      });
-
-      var sel = 'button, a, input, select';
-      document.addEventListener('mouseover', function (e) {
-        if (e.target.closest(sel)) document.body.classList.add('sobre-interactivo');
-      });
-      document.addEventListener('mouseout', function (e) {
-        if (e.target.closest(sel)) document.body.classList.remove('sobre-interactivo');
-      });
-    })();
 
     /* ── Toggle de tema oscuro / claro ── */
     var modoOscuro = true;
@@ -1404,9 +1404,10 @@
 
       btn.classList.add('abierto');
       btn.setAttribute('aria-expanded', 'true');
+      menu.style.display = 'block'; // Activar solo al abrir
       menu.classList.add('abierto');
       menu.setAttribute('aria-hidden', 'false');
-      overlay.classList.add('visible');
+      // overlay.classList.add('visible'); // Overlay desactivado
 
       /* Evitar scroll del body mientras el menú está abierto */
       document.body.style.overflow = 'hidden';
@@ -1421,8 +1422,9 @@
       btn.classList.remove('abierto');
       btn.setAttribute('aria-expanded', 'false');
       menu.classList.remove('abierto');
+      setTimeout(() => { if(!menuAbierto) menu.style.display = 'none'; }, 300);
       menu.setAttribute('aria-hidden', 'true');
-      overlay.classList.remove('visible');
+      // overlay.classList.remove('visible');
 
       document.body.style.overflow = '';
     }
@@ -1501,6 +1503,85 @@
 
       obsContador.observe(statsBar);
     })();
+
+    /* ── Cargar estadísticas reales desde Supabase ── */
+    async function cargarEstadisticasReales() {
+      const db = window.supabaseClient;
+      if (!db) return;
+
+      try {
+        // 1. Atletas (alumnos)
+        const { count: atletas } = await db
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .eq('role', 'user');
+
+        // 2. Entrenadores
+        const { count: entrenadores } = await db
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .eq('role', 'trainer');
+
+        // 3. Sesiones totales
+        const { count: sesiones } = await db
+          .from('workout_sessions')
+          .select('*', { count: 'exact', head: true });
+
+        // Actualizar los data-count para que la animación los use
+        const statEls = document.querySelectorAll('.stat-numero');
+        
+        if (atletas !== null) {
+          statEls[0].setAttribute('data-count', atletas);
+          statEls[0].setAttribute('data-sufijo', '+');
+        }
+        
+        if (entrenadores !== null) {
+          statEls[1].setAttribute('data-count', entrenadores);
+        }
+        
+        if (sesiones !== null) {
+          // Si sesiones > 1000, mostrar en formato K
+          if (sesiones >= 1000) {
+            statEls[3].setAttribute('data-count', (sesiones / 1000).toFixed(1) * 10);
+            statEls[3].setAttribute('data-decimal', '10');
+            statEls[3].setAttribute('data-sufijo', 'K');
+          } else {
+            statEls[3].setAttribute('data-count', sesiones);
+            statEls[3].setAttribute('data-sufijo', '');
+          }
+        }
+      } catch (e) {
+        console.error('Error cargando stats:', e);
+      }
+    }
+
+    /* ── Verificar sesión para adaptar el Nav ── */
+    async function adaptarNavSesion() {
+      const user = await window.ApexAuth.getUser();
+      if (user) {
+        // Cambiar "Iniciar sesión" por "Mi Perfil" o "Ir a la App"
+        const links = document.querySelectorAll('.nav-link, .menu-movil-enlace');
+        links.forEach(link => {
+          if (link.textContent.toLowerCase().includes('iniciar sesión')) {
+            link.textContent = 'Mi Perfil';
+            link.href = './pages/perfil.html';
+          }
+        });
+
+        const ctas = document.querySelectorAll('.nav-cta, .menu-movil-cta, .btn-hero-primario');
+        ctas.forEach(cta => {
+          if (cta.textContent.toLowerCase().includes('comenzar')) {
+            cta.textContent = 'Ir a la App →';
+            cta.href = './pages/workout.html';
+          }
+        });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarEstadisticasReales();
+      adaptarNavSesion();
+    });
   </script>
 </body>
 
