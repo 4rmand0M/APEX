@@ -64,81 +64,220 @@
       font-weight: 300;
     }
 
+    /* =========================================
+       GRID DE ENTRENADORES — REDISEÑADO
+    ========================================= */
+
     .grid-entrenadores {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 18px;
+      gap: 24px;
     }
 
     .tarjeta-entrenador {
+      position: relative;
       background: var(--superficie);
       border: 1px solid var(--borde);
-      border-radius: 14px;
+      border-radius: 18px;
       overflow: hidden;
       cursor: pointer;
-      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      transition: border-color 0.35s, transform 0.35s cubic-bezier(0.34, 1.3, 0.64, 1), box-shadow 0.35s;
+    }
+
+    /* Verde desde atrás — resplandor radial en la base de la carta */
+    .tarjeta-entrenador::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      background: radial-gradient(ellipse 85% 55% at 50% 115%, rgba(var(--acento-rgb), 0.16) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      transition: opacity 0.35s;
+    }
+
+    /* Línea verde inferior al hover */
+    .tarjeta-entrenador::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--acento), transparent);
+      opacity: 0;
+      transition: opacity 0.35s;
     }
 
     .tarjeta-entrenador:hover {
-      border-color: var(--borde-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      border-color: var(--acento);
+      transform: translateY(-5px);
+      box-shadow:
+        0 0 0 1px rgba(var(--acento-rgb), 0.2),
+        0 20px 40px rgba(0, 0, 0, 0.35),
+        0 0 60px rgba(var(--acento-rgb), 0.08);
     }
 
-    .tarjeta-entrenador img {
+    .tarjeta-entrenador:hover::before {
+      background: radial-gradient(ellipse 85% 65% at 50% 115%, rgba(var(--acento-rgb), 0.28) 0%, transparent 70%);
+    }
+
+    .tarjeta-entrenador:hover::after {
+      opacity: 1;
+    }
+
+    /* Imagen */
+    .entrenador-img-wrap {
+      position: relative;
+      height: 270px;
+      overflow: hidden;
+    }
+
+    .entrenador-img-wrap img {
       width: 100%;
-      height: 280px;
+      height: 100%;
       object-fit: cover;
+      display: block;
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
+    .tarjeta-entrenador:hover .entrenador-img-wrap img {
+      transform: scale(1.05);
+    }
+
+    /* Overlay degradado sobre la foto */
+    .entrenador-img-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.65) 100%);
+      pointer-events: none;
+    }
+
+    /* Badge de experiencia sobre la foto */
+    .entrenador-exp-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(var(--acento-rgb), 0.35);
+      color: var(--acento);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 99px;
+    }
+
+    .entrenador-exp-badge i {
+      width: 11px;
+      height: 11px;
+    }
+
+    /* Cuerpo de la tarjeta */
     .entrenador-body {
-      padding: 20px;
+      position: relative;
+      z-index: 1;
+      padding: 20px 22px 22px;
+    }
+
+    .entrenador-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
     .entrenador-nombre {
       font-family: 'Bebas Neue', cursive;
-      font-size: 24px;
-      letter-spacing: 2px;
+      font-size: 26px;
+      letter-spacing: 2.5px;
       color: var(--texto);
-      margin-bottom: 6px;
       line-height: 1;
     }
 
     .entrenador-especialidad {
-      font-size: 13px;
-      color: var(--texto-atenuado);
-      margin-bottom: 8px;
+      font-size: 12px;
+      color: var(--acento);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
     }
 
-    .entrenador-experiencia {
-      display: inline-flex;
+    [data-tema="claro"] .entrenador-especialidad {
+      color: var(--texto-sub);
+    }
+
+    /* Botón flecha */
+    .entrenador-arrow {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(var(--acento-rgb), 0.25);
+      background: rgba(var(--acento-rgb), 0.08);
+      display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .tarjeta-entrenador:hover .entrenador-arrow {
+      background: rgba(var(--acento-rgb), 0.18);
+      border-color: rgba(var(--acento-rgb), 0.5);
+    }
+
+    .entrenador-arrow i {
+      width: 14px;
+      height: 14px;
       color: var(--acento);
-      background: rgba(var(--acento-rgb), 0.1);
+    }
+
+    /* Divisor verde */
+    .entrenador-divider {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(var(--acento-rgb), 0.3), transparent);
+      margin-bottom: 14px;
+    }
+
+    /* Tags de especialidades en la carta */
+    .entrenador-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .entrenador-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
       padding: 4px 10px;
       border-radius: 99px;
+      background: rgba(var(--acento-rgb), 0.08);
+      border: 1px solid rgba(var(--acento-rgb), 0.2);
+      color: var(--acento);
     }
 
-    [data-tema="claro"] .entrenador-experiencia {
+    [data-tema="claro"] .entrenador-tag {
+      background: rgba(0, 0, 0, 0.05);
+      border-color: rgba(0, 0, 0, 0.12);
       color: var(--texto-sub);
-      background: rgba(0,0,0,0.06);
     }
 
-    .entrenador-experiencia i {
-      width: 12px;
-      height: 12px;
-    }
+    /* =========================================
+       MODAL
+    ========================================= */
 
-    /* MODAL */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.75);
+      background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(4px);
       display: none;
       align-items: center;
@@ -156,12 +295,25 @@
       border: 1px solid var(--borde);
       width: 100%;
       max-width: 640px;
-      border-radius: 16px;
+      border-radius: 20px;
       padding: 32px;
       position: relative;
       max-height: 90vh;
       overflow-y: auto;
       animation: modalEntrada 0.3s cubic-bezier(0.34, 1.45, 0.64, 1);
+      box-shadow:
+        0 0 0 1px rgba(var(--acento-rgb), 0.1),
+        0 40px 80px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Verde desde atrás en el modal también */
+    .modal-contenido::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: radial-gradient(ellipse 70% 45% at 50% 100%, rgba(var(--acento-rgb), 0.1) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     @keyframes modalEntrada {
@@ -208,7 +360,7 @@
       font-size: 36px;
       letter-spacing: 2px;
       color: var(--texto);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .modal-especialidad {
@@ -224,7 +376,7 @@
 
     .modal-bio {
       font-size: 14px;
-      line-height: 1.7;
+      line-height: 1.75;
       color: var(--texto-atenuado);
       margin-bottom: 24px;
     }
@@ -247,14 +399,20 @@
     .badge-especialidad {
       display: inline-flex;
       align-items: center;
-      background: var(--superficie-2);
-      border: 1px solid var(--borde);
-      color: var(--texto);
+      background: rgba(var(--acento-rgb), 0.08);
+      border: 1px solid rgba(var(--acento-rgb), 0.2);
+      color: var(--acento);
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.5px;
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 99px;
+    }
+
+    [data-tema="claro"] .badge-especialidad {
+      background: rgba(0, 0, 0, 0.05);
+      border-color: rgba(0, 0, 0, 0.12);
+      color: var(--texto-sub);
     }
 
     @media (min-width: 820px) {
@@ -286,15 +444,14 @@
     </a>
     <nav class="nav-principal">
       <ul class="lista-nav" role="list">
-        <li><a href="dashboard.html" class="enlace-nav"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
-        <li><a href="workout.html"    class="enlace-nav"><i data-lucide="dumbbell"></i><span>Journal</span></a></li>
-        <li><a href="calendario.html" class="enlace-nav"><i data-lucide="calendar"></i><span>Calendario</span></a></li>
-        <li><a href="ejercicios.html" class="enlace-nav"><i data-lucide="layers"></i><span>Ejercicios</span></a></li>
-        <li><a href="rutina.html"     class="enlace-nav"><i data-lucide="clipboard-list"></i><span>Rutinas</span></a></li>
-        <li><a href="perfil.html"     class="enlace-nav"><i data-lucide="user"></i><span>Perfil</span></a></li>
-        <li><a href="entrenadores.html" class="enlace-nav activo" aria-current="page"><i data-lucide="users"></i><span>Entrenadores</span></a></li>
-        <li><a href="gyms.html" class="enlace-nav"><i data-lucide="map-pin"></i><span>Gimnasios</span></a></li>
-
+        <li><a href="dashboard.html"     class="enlace-nav"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+        <li><a href="workout.html"       class="enlace-nav"><i data-lucide="dumbbell"></i><span>Journal</span></a></li>
+        <li><a href="calendario.html"    class="enlace-nav"><i data-lucide="calendar"></i><span>Calendario</span></a></li>
+        <li><a href="ejercicios.html"    class="enlace-nav"><i data-lucide="layers"></i><span>Ejercicios</span></a></li>
+        <li><a href="rutina.html"        class="enlace-nav"><i data-lucide="clipboard-list"></i><span>Rutinas</span></a></li>
+        <li><a href="perfil.html"        class="enlace-nav"><i data-lucide="user"></i><span>Perfil</span></a></li>
+        <li><a href="entrenadores.html"  class="enlace-nav activo" aria-current="page"><i data-lucide="users"></i><span>Entrenadores</span></a></li>
+        <li><a href="gyms.html"          class="enlace-nav"><i data-lucide="map-pin"></i><span>Gimnasios</span></a></li>
         <li><a href="calculadora-imc.html" class="enlace-nav"><i data-lucide="calculator"></i><span>Calculadora IMC</span></a></li>
       </ul>
     </nav>
@@ -326,7 +483,7 @@
   <!-- CONTENIDO -->
   <div class="area-contenido">
     <main class="contenido-entrenadores" role="main">
-      
+
       <header class="cabecera-entrenadores">
         <span class="badge-seccion">NUESTRO EQUIPO</span>
         <h1 class="titulo-entrenadores">ENTRENADORES</h1>
@@ -340,34 +497,15 @@
 
   <!-- NAV MÓVIL -->
   <nav class="nav-movil" aria-label="Navegación móvil">
-    <a href="dashboard.html" class="enlace-nav-movil" aria-label="Dashboard">
-      <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
-    </a>
-    <a href="workout.html" class="enlace-nav-movil" aria-label="Journal">
-      <i data-lucide="dumbbell"></i><span>Journal</span>
-    </a>
-    <a href="calendario.html" class="enlace-nav-movil" aria-label="Calendario">
-      <i data-lucide="calendar"></i><span>Calendario</span>
-    </a>
-    <a href="ejercicios.html" class="enlace-nav-movil" aria-label="Ejercicios">
-      <i data-lucide="layers"></i><span>Ejercicios</span>
-    </a>
-    <a href="rutina.html" class="enlace-nav-movil" aria-label="Rutinas">
-      <i data-lucide="clipboard-list"></i><span>Rutinas</span>
-    </a>
-    <a href="perfil.html" class="enlace-nav-movil" aria-label="Perfil">
-      <i data-lucide="user"></i><span>Perfil</span>
-    </a>
-    <a href="entrenadores.html" class="enlace-nav-movil activo" aria-current="page" aria-label="Entrenadores">
-      <i data-lucide="users"></i><span>Entrenadores</span>
-    </a>
-    <a href="gyms.html" class="enlace-nav-movil" aria-label="Gimnasios">
-      <i data-lucide="map-pin"></i><span>Gimnasios</span>
-    </a>
-
-    <a href="calculadora-imc.html" class="enlace-nav-movil" aria-label="Calculadora IMC">
-      <i data-lucide="calculator"></i><span>IMC</span>
-    </a>
+    <a href="dashboard.html"     class="enlace-nav-movil" aria-label="Dashboard"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+    <a href="workout.html"       class="enlace-nav-movil" aria-label="Journal"><i data-lucide="dumbbell"></i><span>Journal</span></a>
+    <a href="calendario.html"    class="enlace-nav-movil" aria-label="Calendario"><i data-lucide="calendar"></i><span>Calendario</span></a>
+    <a href="ejercicios.html"    class="enlace-nav-movil" aria-label="Ejercicios"><i data-lucide="layers"></i><span>Ejercicios</span></a>
+    <a href="rutina.html"        class="enlace-nav-movil" aria-label="Rutinas"><i data-lucide="clipboard-list"></i><span>Rutinas</span></a>
+    <a href="perfil.html"        class="enlace-nav-movil" aria-label="Perfil"><i data-lucide="user"></i><span>Perfil</span></a>
+    <a href="entrenadores.html"  class="enlace-nav-movil activo" aria-current="page" aria-label="Entrenadores"><i data-lucide="users"></i><span>Entrenadores</span></a>
+    <a href="gyms.html"          class="enlace-nav-movil" aria-label="Gimnasios"><i data-lucide="map-pin"></i><span>Gimnasios</span></a>
+    <a href="calculadora-imc.html" class="enlace-nav-movil" aria-label="Calculadora IMC"><i data-lucide="calculator"></i><span>IMC</span></a>
   </nav>
 
 </div>
@@ -384,47 +522,64 @@
 
 <script>
 const trainers = [
-  { 
-    id: 1, 
-    name: "CARLOS RUIZ", 
-    specialty: "Fuerza e Hipertrofia", 
-    experience: "5 AÑOS", 
-    image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=500", 
-    bio: "Especialista en biomecánica aplicada al entrenamiento de fuerza. Certificado en metodología Westside y periodización ondulatoria.", 
-    specialties: ["Powerlifting", "Nutrición Deportiva", "Rehabilitación"] 
+  {
+    id: 1,
+    name: "CARLOS RUIZ",
+    specialty: "Fuerza e Hipertrofia",
+    experience: "5 AÑOS",
+    image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=500",
+    bio: "Especialista en biomecánica aplicada al entrenamiento de fuerza. Certificado en metodología Westside y periodización ondulatoria.",
+    specialties: ["Powerlifting", "Nutrición Deportiva", "Rehabilitación"]
   },
-  { 
-    id: 2, 
-    name: "LAURA MARTE", 
-    specialty: "Fitness Funcional", 
-    experience: "4 AÑOS", 
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500", 
-    bio: "Entrenadora certificada en CrossFit y movilidad funcional. Enfoque en entrenamiento de alto rendimiento y prevención de lesiones.", 
-    specialties: ["CrossFit", "Movilidad", "HIIT"] 
+  {
+    id: 2,
+    name: "LAURA MARTE",
+    specialty: "Fitness Funcional",
+    experience: "4 AÑOS",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500",
+    bio: "Entrenadora certificada en CrossFit y movilidad funcional. Enfoque en entrenamiento de alto rendimiento y prevención de lesiones.",
+    specialties: ["CrossFit", "Movilidad", "HIIT"]
   },
-  { 
-    id: 3, 
-    name: "MIGUEL SANTOS", 
-    specialty: "Bodybuilding Clásico", 
-    experience: "7 AÑOS", 
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500", 
-    bio: "Competidor nacional de culturismo. Experto en preparación para competencias y desarrollo muscular estético.", 
-    specialties: ["Culturismo", "Preparación Competencia", "Volumen"] 
+  {
+    id: 3,
+    name: "MIGUEL SANTOS",
+    specialty: "Bodybuilding Clásico",
+    experience: "7 AÑOS",
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500",
+    bio: "Competidor nacional de culturismo. Experto en preparación para competencias y desarrollo muscular estético.",
+    specialties: ["Culturismo", "Preparación Competencia", "Volumen"]
   }
 ];
 
 function render() {
   document.getElementById('grid-entrenadores').innerHTML = trainers.map(t => `
     <article class="tarjeta-entrenador" onclick="abrirModal(${t.id})">
-      <img src="${t.image}" alt="${t.name}">
-      <div class="entrenador-body">
-        <h3 class="entrenador-nombre">${t.name}</h3>
-        <p class="entrenador-especialidad">${t.specialty}</p>
-        <div class="entrenador-experiencia">
+
+      <div class="entrenador-img-wrap">
+        <img src="${t.image}" alt="${t.name}" loading="lazy">
+        <div class="entrenador-img-overlay"></div>
+        <div class="entrenador-exp-badge">
           <i data-lucide="award"></i>
           <span>${t.experience}</span>
         </div>
       </div>
+
+      <div class="entrenador-body">
+        <div class="entrenador-top">
+          <div>
+            <div class="entrenador-nombre">${t.name}</div>
+            <div class="entrenador-especialidad">${t.specialty}</div>
+          </div>
+          <div class="entrenador-arrow">
+            <i data-lucide="arrow-up-right"></i>
+          </div>
+        </div>
+        <div class="entrenador-divider"></div>
+        <div class="entrenador-tags">
+          ${t.specialties.map(s => `<span class="entrenador-tag">${s}</span>`).join('')}
+        </div>
+      </div>
+
     </article>
   `).join('');
   lucide.createIcons();
@@ -462,7 +617,7 @@ document.getElementById('boton-tema')?.addEventListener('click', () => {
   localStorage.setItem('apex_tema', nuevo);
 });
 
-// Cursor
+// Cursor personalizado
 (function() {
   const punto = document.getElementById('cursor-punto');
   if (!punto) return;
