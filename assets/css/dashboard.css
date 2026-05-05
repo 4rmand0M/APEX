@@ -163,20 +163,15 @@ body.sobre-interactivo #cursor-punto {
     color: var(--texto);
 }
 
-.boton-tema {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--superficie);
-    border: 1px solid var(--borde);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: var(--texto-atenuado);
-    flex-shrink: 0;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
-}
+.boton-tema { display:flex;
+    align-items:center;
+    justify-content:center;
+    background:none;
+    border:1px solid var(--borde);
+    border-radius:8px;
+    width:36px;
+    height:36px;color:var(--texto-atenuado);
+    transition:color .14s,border-color .14s,background .14s; }
 
 .boton-tema:hover {
     border-color: var(--borde-hover);

@@ -53,10 +53,18 @@
         </ul>
       </nav>
       <div class="nav-inferior">
-        <button class="boton-tema" id="boton-tema" aria-label="Cambiar tema">
-          <i data-lucide="sun" class="icono-tema icono-claro"></i>
-          <i data-lucide="moon" class="icono-tema icono-oscuro"></i>
-        </button>
+        <div class="botones-legales">
+         <button class="boton-legal" id="boton-tema" aria-label="Cambiar tema">
+            <i data-lucide="sun" class="icono-tema icono-claro"></i>
+            <i data-lucide="moon" class="icono-tema icono-oscuro"></i>
+          </button>
+          <a href="privacidad.html" class="boton-legal" aria-label="Privacidad" title="Privacidad">
+            <i data-lucide="shield" class="icono-legal"></i>
+          </a>
+          <a href="terminos.html" class="boton-legal" aria-label="Términos y Condiciones" title="Términos">
+            <i data-lucide="file-text" class="icono-legal"></i>
+          </a>
+        </div>
         <hr class="separador-nav" />
         <!-- BACKEND: Reemplazar con datos del usuario autenticado (JWT) -->
         <a href="#" class="usuario-barra">
