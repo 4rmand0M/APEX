@@ -270,8 +270,9 @@ body {
 ============================================================ */
 .botones-legales {
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .boton-legal {
@@ -300,6 +301,8 @@ body {
   height: 14px;
   stroke-width: 1.8;
 }
+
+
 
 @media (hover: none), (max-width: 820px) {
   .boton-legal {
@@ -397,4 +400,29 @@ body {
 
 .modal-body {
   padding: 24px;
+}
+
+/*Estilo en crear rutina botón*/
+
+.enlace-acento {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--acento);
+  color: #000;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  margin-top: 14px;
+  align-self: flex-start;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.enlace-acento:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
 }
