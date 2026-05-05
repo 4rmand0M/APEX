@@ -59,10 +59,10 @@
       </div>
       <hr class="separador-nav"/>
       <a href="#" class="usuario-barra">
-        <div class="avatar-barra">J</div>
+        <div class="avatar-barra skeleton sk-sidebar-avatar" style="color: transparent;"></div>
         <div class="info-usuario-barra">
-          <span class="nombre-usuario-barra">Jeremy Infante</span>
-          <span class="handle-usuario-barra">@jeremyinfante</span>
+          <span class="nombre-usuario-barra skeleton sk-sidebar-num" style="width: 100px; height: 14px; display: inline-block; border-radius: 4px; margin-bottom: 4px; color: transparent;"></span>
+          <span class="handle-usuario-barra skeleton sk-sidebar-sub" style="width: 80px; height: 12px; display: inline-block; border-radius: 4px; color: transparent;"></span>
         </div>
         <i data-lucide="log-out" class="icono-logout"></i>
       </a>
@@ -75,7 +75,14 @@
 
       <!-- ═══ HERO ═══ -->
       <section class="perfil-hero">
-        <div class="perfil-avatar" id="perfil-avatar-iniciales">JI</div>
+        <div class="perfil-avatar-wrapper" id="btn-avatar-upload" style="position: relative; cursor: pointer; display: inline-block; width: 90px; height: 90px;">
+          <img class="perfil-avatar-img oculto" id="perfil-avatar-img" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; position: absolute; inset: 0;" />
+          <div class="perfil-avatar" id="perfil-avatar-iniciales" style="width: 100%; height: 100%; position: absolute; inset: 0;">JI</div>
+          <div class="perfil-avatar-overlay" id="perfil-avatar-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; z-index: 10;">
+             <i data-lucide="camera" style="color: white; width: 24px; height: 24px;"></i>
+          </div>
+          <input type="file" id="input-avatar" accept="image/*" class="oculto" />
+        </div>
         <div class="perfil-info-col">
           <h1 class="perfil-nombre" id="perfil-nombre">Cargando...</h1>
           <span class="perfil-handle" id="perfil-handle">@usuario</span>

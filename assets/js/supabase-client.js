@@ -112,18 +112,32 @@ window.ApexAuth = {
       const nombre = profile.full_name || 'Usuario';
       document.querySelectorAll('.nombre-usuario-barra, .perfil-nombre').forEach(el => {
         el.textContent = nombre;
+        el.classList.remove('skeleton', 'sk-sidebar-num');
+        el.style.color = '';
+        el.style.width = '';
+        el.style.height = '';
       });
 
       // 2. Username / Handle
       const handle = '@' + (profile.username || 'usuario');
       document.querySelectorAll('.handle-usuario-barra, .perfil-handle').forEach(el => {
         el.textContent = handle;
+        el.classList.remove('skeleton', 'sk-sidebar-sub');
+        el.style.color = '';
+        el.style.width = '';
+        el.style.height = '';
       });
 
       // 3. Avatar / Iniciales
       const iniciales = nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-      document.querySelectorAll('.avatar-barra, .perfil-avatar').forEach(el => {
-        el.textContent = iniciales;
+      document.querySelectorAll('.avatar-barra').forEach(el => {
+        el.classList.remove('skeleton', 'sk-sidebar-avatar');
+        el.style.color = '';
+        if (profile.avatar_url) {
+          el.innerHTML = `<img src="${profile.avatar_url}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" alt="Avatar" />`;
+        } else {
+          el.textContent = iniciales;
+        }
       });
     }
 

@@ -7,10 +7,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="../assets/css/variables.css" />
   <link rel="stylesheet" href="../assets/css/base.css" />
   <link rel="stylesheet" href="../assets/css/workout.css" />
+  <link rel="stylesheet" href="../assets/css/perfil.css" />
   <style>
     .contenido-gyms {
       padding: 32px 24px 100px;
@@ -606,10 +610,10 @@
       </div>
       <hr class="separador-nav"/>
       <a href="#" class="usuario-barra">
-        <div class="avatar-barra">J</div>
+        <div class="avatar-barra skeleton sk-sidebar-avatar" style="color: transparent;"></div>
         <div class="info-usuario-barra">
-          <span class="nombre-usuario-barra">Jeremy Infante</span>
-          <span class="handle-usuario-barra">@jeremyinfante</span>
+          <span class="nombre-usuario-barra skeleton sk-sidebar-num" style="width: 100px; height: 14px; display: inline-block; border-radius: 4px; margin-bottom: 4px; color: transparent;"></span>
+          <span class="handle-usuario-barra skeleton sk-sidebar-sub" style="width: 80px; height: 12px; display: inline-block; border-radius: 4px; color: transparent;"></span>
         </div>
         <i data-lucide="log-out" class="icono-logout"></i>
       </a>
@@ -622,26 +626,22 @@
 
       <header class="cabecera-gyms">
         <span class="badge-seccion">UBICACIONES</span>
-        <h1 class="titulo-gyms">NUESTROS GIMNASIOS</h1>
-        <p class="subtitulo-gyms">Encuentra la sucursal más cercana a ti</p>
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h1 class="titulo-gyms">NUESTROS GIMNASIOS</h1>
+            <p class="subtitulo-gyms">Encuentra la sucursal más cercana a ti</p>
+          </div>
+          <button class="btn-crud-gym oculto" id="btn-agregar-gym" onclick="abrirDrawerGym()">
+            <i data-lucide="plus"></i> Agregar Gimnasio
+          </button>
+        </div>
       </header>
 
       <div class="layout-gyms">
 
-        <!-- MAPA MEJORADO -->
-        <div class="mapa-placeholder">
-          <div class="mapa-puntos">
-            <div class="mapa-punto"></div>
-            <div class="mapa-punto"></div>
-            <div class="mapa-punto"></div>
-          </div>
-          <div class="mapa-pin-wrap">
-            <div class="mapa-ping">
-              <i data-lucide="map-pin"></i>
-            </div>
-            <p class="mapa-placeholder-titulo">MAPA INTERACTIVO</p>
-            <p class="mapa-placeholder-sub">3 SEDES DISPONIBLES</p>
-          </div>
+        <!-- MAPA INTERACTIVO -->
+        <div class="mapa-placeholder" id="mapa-interactivo" style="height: 400px; width: 100%; border-radius: 18px; overflow: hidden; z-index: 1;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0;" id="mapa-loading">Cargando mapa...</div>
         </div>
 
         <div class="lista-gyms" id="lista-gyms"></div>
@@ -675,39 +675,157 @@
   </div>
 </div>
 
-<script>
-const gyms = [
-  {
-    id: 1,
-    name: "APEX CENTRAL",
-    address: "Av. Principal 123, Santo Domingo",
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400",
-    description: "Nuestra sede principal con equipamiento de última generación y espacios de entrenamiento funcional.",
-    services: ["Parking Gratis", "Duchas", "Sauna", "Zona Cardio", "Peso Libre"]
-  },
-  {
-    id: 2,
-    name: "APEX NORTE",
-    address: "Calle Santiago 456, Santiago",
-    image: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=400",
-    description: "Gimnasio boutique enfocado en entrenamiento personalizado y clases grupales.",
-    services: ["Clases Grupales", "Duchas", "WiFi", "Zona CrossFit"]
-  },
-  {
-    id: 3,
-    name: "APEX SUR",
-    address: "Boulevard Sur 789, La Romana",
-    image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400",
-    description: "Instalaciones completas con piscina olímpica y cancha de basketball.",
-    services: ["Piscina", "Cancha", "Parking", "Cafetería", "Tienda"]
+<!-- DRAWER CRUD GIMNASIO -->
+<div class="perfil-overlay oculto" id="gym-overlay"></div>
+<div class="perfil-drawer oculto" id="gym-drawer" role="dialog" aria-modal="true" aria-label="Gestionar gimnasio">
+  <div class="perfil-drawer-header">
+    <button class="perfil-drawer-cerrar" id="gym-drawer-cerrar" aria-label="Cerrar" onclick="cerrarDrawerGym()">
+      <i data-lucide="x"></i>
+    </button>
+    <h2 class="perfil-drawer-titulo" id="gym-drawer-titulo">Agregar Gimnasio</h2>
+    <button class="perfil-drawer-guardar" id="gym-drawer-guardar" onclick="guardarGym()">Guardar</button>
+  </div>
+  <form class="perfil-drawer-body" id="gym-form" autocomplete="off">
+    <input type="hidden" id="gym-edit-id" />
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">Nombre del gimnasio</label>
+      <input type="text" class="perfil-campo-input" id="gym-nombre" placeholder="APEX MOCA CENTRO" required />
+    </div>
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">Descripción</label>
+      <textarea class="perfil-campo-input" id="gym-descripcion" rows="3" placeholder="Descripción del gimnasio..." style="resize: vertical;"></textarea>
+    </div>
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">Ubicación (latitud,longitud)</label>
+      <input type="text" class="perfil-campo-input" id="gym-ubicacion" placeholder="19.3935,-70.5259" />
+    </div>
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">URL de imagen</label>
+      <input type="url" class="perfil-campo-input" id="gym-imagen" placeholder="https://..." />
+    </div>
+    <div class="perfil-campo">
+      <label class="perfil-campo-label">Servicios (separados por coma)</label>
+      <input type="text" class="perfil-campo-input" id="gym-servicios" placeholder="Zona Cardio, Peso Libre, Sauna" />
+    </div>
+    <button type="button" class="btn-eliminar-gym oculto" id="btn-eliminar-gym" onclick="eliminarGym()">
+      <i data-lucide="trash-2"></i> Eliminar Gimnasio
+    </button>
+  </form>
+</div>
+
+<style>
+  .btn-crud-gym {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--acento); color: #000; border: none;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; padding: 10px 20px;
+    border-radius: 10px; cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
   }
-];
+  .btn-crud-gym:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn-crud-gym i { width: 16px; height: 16px; }
+  .btn-eliminar-gym {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3);
+    color: #ef4444; font-size: 13px; font-weight: 600;
+    padding: 12px; border-radius: 10px; cursor: pointer;
+    margin-top: 16px; transition: background 0.2s;
+  }
+  .btn-eliminar-gym:hover { background: rgba(220,38,38,0.2); }
+  .btn-eliminar-gym i { width: 16px; height: 16px; }
+  .gym-edit-btn {
+    position: absolute; top: 10px; right: 10px; z-index: 5;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+    border: 1px solid rgba(var(--acento-rgb),0.3); color: var(--acento);
+    border-radius: 50%; width: 30px; height: 30px;
+    display: none; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .gym-edit-btn:hover { background: rgba(0,0,0,0.8); }
+  .gym-edit-btn i { width: 14px; height: 14px; }
+  [data-role="admin"] .gym-edit-btn,
+  [data-role="trainer"] .gym-edit-btn { display: flex; }
+</style>
+
+<script>
+let gyms = [];
+let mapa;
+
+async function loadGyms() {
+  document.getElementById('lista-gyms').innerHTML = `
+    <div class="skeleton" style="height: 160px; border-radius: 16px;"></div>
+    <div class="skeleton" style="height: 160px; border-radius: 16px;"></div>
+    <div class="skeleton" style="height: 160px; border-radius: 16px;"></div>
+  `;
+
+  const db = window.supabaseClient;
+  const { data, error } = await db.from('gyms').select('*');
+
+  if (error) {
+    console.error('Error fetching gyms:', error);
+    document.getElementById('lista-gyms').innerHTML = '<p>Error al cargar gimnasios.</p>';
+    return;
+  }
+
+  // Si no hay gimnasios en DB, usar defaults para mostrar la vista
+  if (!data || data.length === 0) {
+    gyms = [
+      {
+        id: '1', name: "APEX MOCA CENTRO", location: "19.3935,-70.5259", description: "Sede principal en el centro de Moca.",
+        media_url: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400", facilities: ["Zona Cardio", "Peso Libre", "Sauna"]
+      },
+      {
+        id: '2', name: "APEX MOCA ESTE", location: "19.3900,-70.5100", description: "Nuevas instalaciones modernas.",
+        media_url: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=400", facilities: ["Clases Grupales", "CrossFit"]
+      }
+    ];
+  } else {
+    gyms = data;
+  }
+
+  render();
+  initMap();
+}
+
+function initMap() {
+  const mocaCoords = [19.3935, -70.5259];
+  document.getElementById('mapa-loading').style.display = 'none';
+
+  mapa = L.map('mapa-interactivo').setView(mocaCoords, 14);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    subdomains: 'abcd',
+    maxZoom: 20
+  }).addTo(mapa);
+
+  const greenIcon = L.divIcon({
+    className: 'custom-div-icon',
+    html: "<div style='background-color:var(--acento); width:14px; height:14px; border-radius:50%; box-shadow: 0 0 10px var(--acento); border: 2px solid #000;'></div>",
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+  });
+
+  gyms.forEach(g => {
+    let latlng = mocaCoords;
+    if (g.location && g.location.includes(',')) {
+      const parts = g.location.split(',');
+      latlng = [parseFloat(parts[0]), parseFloat(parts[1])];
+    } else {
+      latlng = [mocaCoords[0] + (Math.random()-0.5)*0.02, mocaCoords[1] + (Math.random()-0.5)*0.02];
+    }
+    L.marker(latlng, {icon: greenIcon}).addTo(mapa)
+      .bindPopup(`<b>${g.name}</b><br>${g.description || ''}`);
+  });
+}
 
 function render() {
+  const isAdmin = document.body.dataset.role === 'admin' || document.body.dataset.role === 'trainer';
   document.getElementById('lista-gyms').innerHTML = gyms.map((g, i) => `
-    <article class="gym-item" onclick="abrirModal(${g.id})">
+    <article class="gym-item" style="position:relative;" onclick="abrirModal('${g.id}')">
+      ${isAdmin ? `<button class="gym-edit-btn" style="display:flex;" onclick="event.stopPropagation(); abrirDrawerGym('${g.id}')"><i data-lucide="pencil"></i></button>` : ''}
       <div class="gym-img-wrap">
-        <img src="${g.image}" alt="${g.name}" class="gym-imagen" loading="lazy">
+        <img src="${g.media_url || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400'}" alt="${g.name}" class="gym-imagen" loading="lazy">
         <div class="gym-img-overlay"></div>
         <span class="gym-numero">0${i + 1}</span>
       </div>
@@ -715,11 +833,11 @@ function render() {
         <h3 class="gym-nombre">${g.name}</h3>
         <p class="gym-direccion">
           <i data-lucide="map-pin"></i>
-          <span>${g.address}</span>
+          <span>Moca, Rep. Dominicana</span>
         </p>
         <div class="gym-servicios-preview">
-          ${g.services.slice(0, 3).map(s => `<span class="gym-tag">${s}</span>`).join('')}
-          ${g.services.length > 3 ? `<span class="gym-tag">+${g.services.length - 3}</span>` : ''}
+          ${(g.facilities || []).slice(0, 3).map(s => `<span class="gym-tag">${s}</span>`).join('')}
+          ${(g.facilities || []).length > 3 ? `<span class="gym-tag">+${g.facilities.length - 3}</span>` : ''}
         </div>
       </div>
       <div class="gym-arrow">
@@ -734,13 +852,14 @@ function render() {
 
 function abrirModal(id) {
   const g = gyms.find(x => x.id === id);
+  if (!g) return;
   document.getElementById('modal-body').innerHTML = `
     <h2 class="modal-titulo">${g.name}</h2>
-    <p class="modal-descripcion">${g.description}</p>
+    <p class="modal-descripcion">${g.description || ''}</p>
     <div>
       <p class="modal-seccion-titulo">SERVICIOS</p>
       <div class="modal-servicios">
-        ${g.services.map(s => `<span class="badge-servicio">${s}</span>`).join('')}
+        ${(g.facilities || []).map(s => `<span class="badge-servicio">${s}</span>`).join('')}
       </div>
     </div>
   `;
@@ -783,7 +902,111 @@ document.getElementById('boton-tema')?.addEventListener('click', () => {
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarModal(); });
 document.getElementById('modal')?.addEventListener('click', (e) => { if (e.target.id === 'modal') cerrarModal(); });
 
-render();
+document.addEventListener('DOMContentLoaded', () => {
+  loadGyms();
+});
+
+// ═══ CRUD GIMNASIOS ═══
+
+function abrirDrawerGym(gymId) {
+  const drawer = document.getElementById('gym-drawer');
+  const overlay = document.getElementById('gym-overlay');
+  document.getElementById('gym-form').reset();
+  document.getElementById('gym-edit-id').value = '';
+
+  if (gymId) {
+    const g = gyms.find(x => x.id === gymId);
+    if (!g) return;
+    document.getElementById('gym-drawer-titulo').textContent = 'Editar Gimnasio';
+    document.getElementById('gym-edit-id').value = g.id;
+    document.getElementById('gym-nombre').value = g.name || '';
+    document.getElementById('gym-descripcion').value = g.description || '';
+    document.getElementById('gym-ubicacion').value = g.location || '';
+    document.getElementById('gym-imagen').value = g.media_url || '';
+    document.getElementById('gym-servicios').value = (g.facilities || []).join(', ');
+    document.getElementById('btn-eliminar-gym').classList.remove('oculto');
+  } else {
+    document.getElementById('gym-drawer-titulo').textContent = 'Agregar Gimnasio';
+    document.getElementById('btn-eliminar-gym').classList.add('oculto');
+  }
+
+  drawer.classList.remove('oculto');
+  overlay.classList.remove('oculto');
+  requestAnimationFrame(() => {
+    drawer.classList.add('abierto');
+    overlay.classList.add('abierto');
+  });
+  lucide.createIcons();
+}
+
+function cerrarDrawerGym() {
+  const drawer = document.getElementById('gym-drawer');
+  const overlay = document.getElementById('gym-overlay');
+  drawer.classList.remove('abierto');
+  overlay?.classList.remove('abierto');
+  setTimeout(() => {
+    drawer.classList.add('oculto');
+    overlay?.classList.add('oculto');
+  }, 320);
+}
+
+async function guardarGym() {
+  const db = window.supabaseClient;
+  const id = document.getElementById('gym-edit-id').value;
+  const name = document.getElementById('gym-nombre').value.trim();
+  if (!name) { alert('El nombre es obligatorio'); return; }
+
+  const payload = {
+    name,
+    description: document.getElementById('gym-descripcion').value.trim(),
+    location: document.getElementById('gym-ubicacion').value.trim(),
+    media_url: document.getElementById('gym-imagen').value.trim() || null,
+    facilities: document.getElementById('gym-servicios').value.split(',').map(s => s.trim()).filter(Boolean)
+  };
+
+  let error;
+  if (id) {
+    ({ error } = await db.from('gyms').update(payload).eq('id', id));
+  } else {
+    ({ error } = await db.from('gyms').insert(payload));
+  }
+
+  if (error) {
+    console.error('Error guardando gym:', error);
+    alert('Error: ' + error.message);
+    return;
+  }
+
+  cerrarDrawerGym();
+  if (mapa) { mapa.remove(); mapa = null; }
+  await loadGyms();
+}
+
+async function eliminarGym() {
+  const id = document.getElementById('gym-edit-id').value;
+  if (!id || !confirm('¿Eliminar este gimnasio?')) return;
+  const db = window.supabaseClient;
+  const { error } = await db.from('gyms').delete().eq('id', id);
+  if (error) { alert('Error: ' + error.message); return; }
+  cerrarDrawerGym();
+  if (mapa) { mapa.remove(); mapa = null; }
+  await loadGyms();
+}
+
+document.getElementById('gym-overlay')?.addEventListener('click', cerrarDrawerGym);
+</script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/supabase-client.js"></script>
+<script>
+// Show CRUD button after role is known
+document.addEventListener('DOMContentLoaded', async () => {
+  // Wait a tick for supabase-client hydration
+  await new Promise(r => setTimeout(r, 1200));
+  const role = document.body.dataset.role;
+  if (role === 'admin' || role === 'trainer') {
+    document.getElementById('btn-agregar-gym')?.classList.remove('oculto');
+  }
+});
 </script>
 </body>
 </html>

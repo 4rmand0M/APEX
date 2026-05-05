@@ -67,7 +67,16 @@ async function cargarDatosPerfil() {
     
     document.getElementById('perfil-nombre').textContent = nombreCompleto;
     document.getElementById('perfil-handle').textContent = '@' + (profile.username || 'usuario');
-    document.getElementById('perfil-avatar-iniciales').textContent = iniciales;
+    
+    if (profile.avatar_url) {
+      document.getElementById('perfil-avatar-img').src = profile.avatar_url;
+      document.getElementById('perfil-avatar-img').classList.remove('oculto');
+      document.getElementById('perfil-avatar-iniciales').classList.add('oculto');
+    } else {
+      document.getElementById('perfil-avatar-iniciales').textContent = iniciales;
+      document.getElementById('perfil-avatar-img').classList.add('oculto');
+      document.getElementById('perfil-avatar-iniciales').classList.remove('oculto');
+    }
 
     // Info de contacto
     document.getElementById('info-nombre').textContent = nombreCompleto;
@@ -274,6 +283,41 @@ function inicializarEventos() {
     e.preventDefault();
     await guardarPerfil();
   });
+
+  // Hover y Clic para Avatar
+  const btnAvatar = document.getElementById('btn-avatar-upload');
+  const inputAvatar = document.getElementById('input-avatar');
+  const overlayAvatar = document.getElementById('perfil-avatar-overlay');
+
+  if (btnAvatar && inputAvatar && overlayAvatar) {
+    btnAvatar.addEventListener('mouseenter', () => overlayAvatar.style.opacity = '1');
+    btnAvatar.addEventListener('mouseleave', () => overlayAvatar.style.opacity = '0');
+    btnAvatar.addEventListener('click', () => inputAvatar.click());
+
+    inputAvatar.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64String = event.target.result;
+        
+        // Optimización simple para mostrar de inmediato
+        document.getElementById('perfil-avatar-img').src = base64String;
+        document.getElementById('perfil-avatar-img').classList.remove('oculto');
+        document.getElementById('perfil-avatar-iniciales').classList.add('oculto');
+
+        // Guardar en Supabase
+        const user = await window.ApexAuth.getUser();
+        if (user) {
+          await db.from('profiles').update({ avatar_url: base64String }).eq('id', user.id);
+          // Opcional: Actualizar sidebar
+          window.ApexAuth.hydrateUI();
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 }
 
 /* ── INIT ── */

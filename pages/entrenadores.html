@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <link rel="stylesheet" href="../assets/css/variables.css" />
   <link rel="stylesheet" href="../assets/css/base.css" />
@@ -70,8 +71,21 @@
 
     .grid-entrenadores {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: 1fr;
       gap: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .grid-entrenadores {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .grid-entrenadores {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+      }
     }
 
     .tarjeta-entrenador {
@@ -470,10 +484,10 @@
       </div>
       <hr class="separador-nav"/>
       <a href="#" class="usuario-barra">
-        <div class="avatar-barra">J</div>
+        <div class="avatar-barra skeleton sk-sidebar-avatar" style="color: transparent;"></div>
         <div class="info-usuario-barra">
-          <span class="nombre-usuario-barra">Jeremy Infante</span>
-          <span class="handle-usuario-barra">@jeremyinfante</span>
+          <span class="nombre-usuario-barra skeleton sk-sidebar-num" style="width: 100px; height: 14px; display: inline-block; border-radius: 4px; margin-bottom: 4px; color: transparent;"></span>
+          <span class="handle-usuario-barra skeleton sk-sidebar-sub" style="width: 80px; height: 12px; display: inline-block; border-radius: 4px; color: transparent;"></span>
         </div>
         <i data-lucide="log-out" class="icono-logout"></i>
       </a>
@@ -521,53 +535,90 @@
 </div>
 
 <script>
-const trainers = [
-  {
-    id: 1,
-    name: "CARLOS RUIZ",
-    specialty: "Fuerza e Hipertrofia",
-    experience: "5 AÑOS",
-    image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=500",
-    bio: "Especialista en biomecánica aplicada al entrenamiento de fuerza. Certificado en metodología Westside y periodización ondulatoria.",
-    specialties: ["Powerlifting", "Nutrición Deportiva", "Rehabilitación"]
-  },
-  {
-    id: 2,
-    name: "LAURA MARTE",
-    specialty: "Fitness Funcional",
-    experience: "4 AÑOS",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500",
-    bio: "Entrenadora certificada en CrossFit y movilidad funcional. Enfoque en entrenamiento de alto rendimiento y prevención de lesiones.",
-    specialties: ["CrossFit", "Movilidad", "HIIT"]
-  },
-  {
-    id: 3,
-    name: "MIGUEL SANTOS",
-    specialty: "Bodybuilding Clásico",
-    experience: "7 AÑOS",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500",
-    bio: "Competidor nacional de culturismo. Experto en preparación para competencias y desarrollo muscular estético.",
-    specialties: ["Culturismo", "Preparación Competencia", "Volumen"]
+let trainers = [];
+
+async function loadTrainers() {
+  document.getElementById('grid-entrenadores').innerHTML = `
+    <div class="skeleton" style="height: 400px; border-radius: 18px;"></div>
+    <div class="skeleton" style="height: 400px; border-radius: 18px;"></div>
+    <div class="skeleton" style="height: 400px; border-radius: 18px;"></div>
+  `;
+
+  // Fetch trainers from Supabase (role = trainer OR monitor)
+  const db = window.supabaseClient;
+  const { data, error } = await db
+    .from('profiles')
+    .select(`
+      id,
+      full_name,
+      bio,
+      avatar_url,
+      role,
+      trainer_profiles (
+        specialties,
+        experience_years,
+        rating
+      )
+    `)
+    .in('role', ['trainer', 'monitor', 'admin']);
+
+  if (error) {
+    console.error('Error fetching trainers:', error);
+    document.getElementById('grid-entrenadores').innerHTML = '<p style="color: var(--texto-atenuado)">Error al cargar entrenadores.</p>';
+    return;
   }
-];
+
+  trainers = (data || []).map(p => {
+    const tp = Array.isArray(p.trainer_profiles) ? p.trainer_profiles[0] : p.trainer_profiles;
+    return {
+      id: p.id,
+      name: p.full_name || 'Entrenador',
+      specialty: tp && tp.specialties && tp.specialties.length > 0 ? tp.specialties[0] : 'Fitness Coach',
+      experience: tp && tp.experience_years ? tp.experience_years + ' AÑOS' : 'NUEVO',
+      image: p.avatar_url || null,
+      bio: p.bio || 'Entrenador certificado y dedicado a tu evolución física y bienestar general.',
+      specialties: tp && tp.specialties ? tp.specialties : ['Fitness', 'Entrenamiento'],
+      role: p.role
+    };
+  });
+
+  if (trainers.length === 0) {
+    document.getElementById('grid-entrenadores').innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+        <i data-lucide="users" style="width: 48px; height: 48px; color: var(--texto-atenuado); margin-bottom: 16px;"></i>
+        <p style="color: var(--texto-atenuado); font-size: 16px; margin-bottom: 6px;">No hay entrenadores registrados</p>
+        <p style="color: var(--texto-atenuado); font-size: 13px; opacity: 0.6;">Los perfiles con rol "trainer" o "monitor" aparecerán aquí</p>
+      </div>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  render();
+}
 
 function render() {
-  document.getElementById('grid-entrenadores').innerHTML = trainers.map(t => `
-    <article class="tarjeta-entrenador" onclick="abrirModal(${t.id})">
+  document.getElementById('grid-entrenadores').innerHTML = trainers.map(t => {
+    const initials = t.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    const imageHtml = t.image && t.image.trim() !== ''
+      ? `<img src="${t.image}" alt="${t.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+         <div class="entrenador-iniciales-fallback" style="display:none; width:100%; height:100%; align-items:center; justify-content:center; background:var(--superficie-2); font-size:64px; font-weight:bold; color:var(--texto-atenuado); font-family:'Bebas Neue', cursive;">${initials}</div>`
+      : `<div class="entrenador-iniciales-fallback" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:var(--superficie-2); font-size:64px; font-weight:bold; color:var(--texto-atenuado); font-family:'Bebas Neue', cursive;">${initials}</div>`;
 
+    return `
+    <article class="tarjeta-entrenador" onclick="abrirModal('${t.id}')">
       <div class="entrenador-img-wrap">
-        <img src="${t.image}" alt="${t.name}" loading="lazy">
+        ${imageHtml}
         <div class="entrenador-img-overlay"></div>
         <div class="entrenador-exp-badge">
           <i data-lucide="award"></i>
           <span>${t.experience}</span>
         </div>
       </div>
-
       <div class="entrenador-body">
         <div class="entrenador-top">
           <div>
-            <div class="entrenador-nombre">${t.name}</div>
+            <div class="entrenador-nombre">${t.name.toUpperCase()}</div>
             <div class="entrenador-especialidad">${t.specialty}</div>
           </div>
           <div class="entrenador-arrow">
@@ -576,19 +627,20 @@ function render() {
         </div>
         <div class="entrenador-divider"></div>
         <div class="entrenador-tags">
-          ${t.specialties.map(s => `<span class="entrenador-tag">${s}</span>`).join('')}
+          ${t.specialties.slice(0, 3).map(s => `<span class="entrenador-tag">${s}</span>`).join('')}
         </div>
       </div>
-
     </article>
-  `).join('');
+    `;
+  }).join('');
   lucide.createIcons();
 }
 
 function abrirModal(id) {
   const t = trainers.find(x => x.id === id);
+  if (!t) return;
   document.getElementById('modal-body').innerHTML = `
-    <h2 class="modal-titulo">${t.name}</h2>
+    <h2 class="modal-titulo">${t.name.toUpperCase()}</h2>
     <p class="modal-especialidad">${t.specialty}</p>
     <p class="modal-bio">${t.bio}</p>
     <div style="margin-top: 24px">
@@ -644,7 +696,12 @@ document.getElementById('modal')?.addEventListener('click', (e) => {
   if (e.target.id === 'modal') cerrarModal();
 });
 
-render();
+// Load data when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  loadTrainers();
+});
 </script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/supabase-client.js"></script>
 </body>
 </html>

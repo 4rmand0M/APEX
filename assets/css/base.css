@@ -426,3 +426,22 @@ body {
   opacity: 0.85;
   transform: translateY(-1px);
 }
+
+/* ============================================================
+   SKELETON LOADER
+============================================================ */
+.skeleton {
+    background: linear-gradient(90deg,
+            var(--borde) 25%,
+            var(--superficie-2) 50%,
+            var(--borde) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+

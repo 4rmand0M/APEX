@@ -388,6 +388,22 @@ async function manejarRegistro() {
   };
   const roleParaBD = mapeoRoles[rolSeleccionado] || 'user';
 
+  let specialty = 'Fitness';
+  let experience = 1;
+
+  if (rolSeleccionado === 'entrenador') {
+    const elSpec = document.getElementById('ent-especialidad');
+    if (elSpec && elSpec.selectedIndex >= 0) specialty = elSpec.options[elSpec.selectedIndex].text;
+    const elExp = document.getElementById('ent-experiencia');
+    if (elExp && elExp.value) {
+      let expVal = parseInt(elExp.value);
+      experience = isNaN(expVal) ? 1 : expVal;
+    }
+  } else if (rolSeleccionado === 'monitor') {
+    const elArea = document.getElementById('mon-area');
+    if (elArea && elArea.selectedIndex >= 0) specialty = elArea.options[elArea.selectedIndex].text;
+  }
+
   const { data: authData, error: authError } = await db.auth.signUp({
     email:    correo,
     password: contrasena,
@@ -395,7 +411,9 @@ async function manejarRegistro() {
       data: { 
         full_name: nombreCompleto,
         username: correo.split('@')[0] + Math.floor(Math.random() * 1000), // Username más único
-        role: roleParaBD 
+        role: roleParaBD,
+        specialty: specialty,
+        experience_years: experience
       } 
     }
   });
