@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEX — Presentación del Proyecto</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --fondo: #080808;
+            --acento: #C8F400; /* Verde Lima APEX */
+            --acento-rgb: 200, 244, 0;
+            --texto-sub: rgba(255, 255, 255, 0.4);
+            --borde: rgba(200, 244, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--fondo);
+            color: #ffffff;
+            font-family: 'DM Sans', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Cuadrícula de fondo con toque verde */
+        .background-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(200, 244, 0, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 244, 0, 0.015) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .background-glow {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(var(--acento-rgb), 0.04) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .loader-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+        }
+
+        /* Logo de APEX con el verde representativo */
+        .logo-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .apex-logo {
+            width: 90px;
+            height: 90px;
+            color: var(--acento);
+            filter: drop-shadow(0 0 25px rgba(var(--acento-rgb), 0.4));
+            animation: logoPulse 2.5s infinite ease-in-out;
+        }
+
+        /* Órbitas tecnológicas */
+        .orbit {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid var(--borde);
+            animation: rotate 10s linear infinite;
+        }
+
+        .orbit-1 {
+            width: 160px;
+            height: 160px;
+            border-top: 2px solid var(--acento);
+            animation-duration: 4s;
+        }
+
+        .orbit-2 {
+            width: 200px;
+            height: 200px;
+            border-bottom: 1px solid rgba(var(--acento-rgb), 0.2);
+            animation-duration: 12s;
+            animation-direction: reverse;
+        }
+
+        /* Texto de Presentación */
+        .loading-text-container {
+            text-align: center;
+        }
+
+        .brand-name {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 48px;
+            letter-spacing: 16px;
+            margin-bottom: 10px;
+            color: var(--acento);
+            text-shadow: 0 0 30px rgba(var(--acento-rgb), 0.2);
+        }
+
+        .presentation-label {
+            font-size: 11px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: #ffffff;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .status-text {
+            font-size: 9px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--texto-sub);
+            margin-top: 15px;
+            min-height: 14px;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        /* Barra de carga temática */
+        .progress-bar-container {
+            width: 240px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--acento), transparent);
+            width: 40%;
+            border-radius: 20px;
+            animation: progressMove 2.5s infinite ease-in-out;
+        }
+
+        /* Animaciones */
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 25px rgba(var(--acento-rgb), 0.4)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 0 45px rgba(var(--acento-rgb), 0.6)); }
+        }
+
+        @keyframes progressMove {
+            0% { transform: translateX(-150%); }
+            100% { transform: translateX(250%); }
+        }
+
+        /* Partículas en el verde de la marca */
+        .particle {
+            position: absolute;
+            background: var(--acento);
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+
+        /* Badge de presentación */
+        .badge {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--texto-sub);
+            border: 1px solid var(--borde);
+            padding: 8px 16px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            z-index: 10;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="background-grid"></div>
+    <div class="background-glow"></div>
+
+    <div class="loader-container">
+        <div class="logo-wrapper">
+            <div class="orbit orbit-1"></div>
+            <div class="orbit orbit-2"></div>
+            <svg class="apex-logo" viewBox="0 0 68 68" fill="none">
+                <polygon points="34,4 62,58 34,44 6,58" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linejoin="round" />
+            </svg>
+        </div>
+
+        <div class="loading-text-container">
+            <h1 class="brand-name">APEX</h1>
+            <p class="presentation-label">Iniciando Presentación</p>
+            
+            <div class="progress-bar-container">
+                <div class="progress-fill"></div>
+            </div>
+
+            <p class="status-text" id="loading-status">Inicializando interfaz...</p>
+        </div>
+    </div>
+
+    <div class="badge">Ecosistema Fitness — 2024</div>
+
+    <script>
+        const statuses = [
+            "Cargando entorno visual...",
+            "Sincronizando base de datos...",
+            "Optimizando experiencia de usuario...",
+            "Verificando módulos de entrenamiento...",
+            "Calibrando métricas de rendimiento...",
+            "Preparando el escenario...",
+            "Forjando tus límites...",
+            "Listo para comenzar."
+        ];
+
+        const statusElement = document.getElementById('loading-status');
+        let index = 0;
+
+        function updateStatus() {
+            statusElement.style.opacity = 0;
+            statusElement.style.transform = "translateY(5px)";
+            
+            setTimeout(() => {
+                index = (index + 1) % statuses.length;
+                statusElement.innerText = statuses[index];
+                statusElement.style.opacity = 1;
+                statusElement.style.transform = "translateY(0)";
+            }, 500);
+        }
+
+        setInterval(updateStatus, 3500);
+
+        function createParticles() {
+            const body = document.body;
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 2 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.top = `${Math.random() * 100}vh`;
+                particle.style.opacity = Math.random() * 0.2;
+                
+                particle.animate([
+                    { transform: 'translate(0, 0)', opacity: 0 },
+                    { transform: `translate(${Math.random() * 60 - 30}px, ${Math.random() * 60 - 30}px)`, opacity: 0.3 },
+                    { transform: `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)`, opacity: 0 }
+                ], {
+                    duration: 4000 + Math.random() * 4000,
+                    iterations: Infinity,
+                    easing: 'ease-in-out'
+                });
+
+                body.appendChild(particle);
+            }
+        }
+
+        createParticles();
+    </script>
+</body>
+</html>

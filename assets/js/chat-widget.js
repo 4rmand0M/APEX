@@ -281,8 +281,16 @@
 
     /* ── Responsive móvil ── */
     @media (max-width: 480px) {
-      #apex-chat-widget { width: calc(100vw - 24px); right: 12px; bottom: 80px; height: 70vh; }
-      #apex-chat-btn    { right: 16px; bottom: 16px; }
+      #apex-chat-widget { 
+        width: calc(100vw - 24px); 
+        right: 12px; 
+        bottom: calc(145px + env(safe-area-inset-bottom)); 
+        height: 60vh; 
+      }
+      #apex-chat-btn { 
+        right: 16px; 
+        bottom: calc(85px + env(safe-area-inset-bottom)); 
+      }
     }
   `;
 
